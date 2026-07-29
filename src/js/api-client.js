@@ -14,7 +14,7 @@ function showToast(message, type = 'success', duration = 5000) {
   if (!container) {
     container = document.createElement('div');
     container.id = 'toast-container';
-    container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;max-width:22rem;';
+    container.style.cssText = 'position:fixed;top:1.25rem;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;max-width:26rem;width:calc(100% - 2rem);align-items:center;';
     document.body.appendChild(container);
   }
 
@@ -44,7 +44,7 @@ function showToast(message, type = 'success', duration = 5000) {
     gap:0.5rem;
     line-height:1.4;
     opacity:0;
-    transform:translateY(0.5rem);
+    transform:translateY(-0.5rem);
     transition:opacity 0.25s ease, transform 0.25s ease;
     max-width:100%;
     word-break:break-word;
@@ -76,7 +76,7 @@ function showToast(message, type = 'success', duration = 5000) {
 
   function dismiss() {
     toast.style.opacity = '0';
-    toast.style.transform = 'translateY(0.5rem)';
+    toast.style.transform = 'translateY(-0.5rem)';
     setTimeout(() => toast.remove(), 300);
   }
 
