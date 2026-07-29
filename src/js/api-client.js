@@ -582,14 +582,14 @@ async function initDashboardPage() {
       `;
       html += items.map(s => {
         const rate = parseFloat(s.rate_per_1000 || s.our_price_per_1000 || s.rate_per_1k || s.rate || 0).toFixed(2);
-        const shortId = typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id;
+        const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
         const isSelected = selectedService && String(selectedService.id) === String(s.id);
         const activeClass = isSelected ? 'bg-pink-50/90 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 font-bold' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200';
 
         return `
           <div data-svc-id="${s.id}" class="svc-option-item px-4 py-2.5 cursor-pointer text-xs transition flex items-center justify-between border-b border-gray-50 dark:border-gray-800/40 ${activeClass}">
             <div class="flex-grow pr-3 truncate">
-              <span class="font-bold text-pink-600 dark:text-pink-400 font-mono mr-1 text-[11px]">#${shortId}</span>
+              <span class="font-bold text-pink-600 dark:text-pink-400 font-mono mr-1 text-[11px]">ID: ${providerId}</span>
               <span class="font-medium truncate">${s.name}</span>
             </div>
             <div class="flex items-center space-x-2 flex-shrink-0">
@@ -1091,7 +1091,7 @@ async function initServicesPage() {
         }
 
         tableBody.innerHTML = list.map(s => {
-          const shortId = typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id;
+          const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
           const catName = s.category_name || s.categories?.name || 'General Services';
           const catObj = categoriesList.find(c => String(c.id) === String(s.category_id) || c.name === catName);
           const iconPath = catObj ? catObj.icon : (s.categories?.icon || '');
@@ -1102,7 +1102,7 @@ async function initServicesPage() {
 
           return `
             <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
-              <td class="py-4 px-4 font-mono font-bold text-pink-600 text-xs">#${escapeHtml(String(shortId))}</td>
+              <td class="py-4 px-4 font-mono font-bold text-pink-600 text-xs">ID: ${escapeHtml(String(providerId))}</td>
               <td class="py-4 px-4">
                 <div class="font-bold text-gray-900 text-xs flex items-center">
                   ${formatIconHtml(iconPath)}
