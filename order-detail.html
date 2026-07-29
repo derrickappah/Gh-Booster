@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title & Description -->
+  <title>Order Details | GhBooster - #1 SMM Panel</title>
+  <meta name="description" content="View comprehensive details, live fulfillment progress, start count, remainder, and refill guarantee for your SMM order on GhBooster.">
+  <!-- Authenticated dashboard page — should not be indexed by search engines -->
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" id="page-canonical" href="https://ghbooster.com/dashboard/orders/">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Order Details | GhBooster SMM Panel">
+  <meta property="og:description" content="Track live fulfillment status, start count, remainder, and refill guarantees on GhBooster.">
+  <meta property="og:url" id="og-url" content="https://ghbooster.com/dashboard/orders/">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Google Fonts — preconnect for performance, font-display=swap to avoid FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="src/css/style.css">
+  <link rel="icon" href="src/img/favicon.png">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:bg-gray-900 dark:text-gray-100">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden" aria-label="Main Navigation">
+    <!-- Brand Header (Fixed at top of sidebar) -->
+    <div id="brand-header" class="bg-gray-900 z-10 h-20 flex items-center justify-between px-6 border-b border-gray-800 transition-all duration-300 flex-shrink-0">
+        <a href="/dashboard.html" id="brand-full" class="h-full flex items-center text-2xl md:text-3xl font-extrabold text-white tracking-wide flex-shrink-0 select-none">
+          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-9 w-auto object-contain max-h-12">
+        </a>
+        <button id="toggle-sidebar" type="button" class="hidden md:flex p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 flex-shrink-0" title="Toggle Sidebar" aria-label="Toggle Sidebar" aria-expanded="true" aria-controls="sidebar-nav">
+          <!-- Collapse Left Icon (shown when expanded) -->
+          <svg id="icon-collapse" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+          <!-- Expand Right Icon (shown when collapsed) -->
+          <svg id="icon-expand" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+    <!-- Scrollable Navigation Area -->
+    <div class="flex-1 min-h-0 overflow-y-auto sidebar-scrollbar">
+      <!-- Navigation Links -->
+      <nav id="sidebar-nav" class="py-6 px-4 space-y-1 transition-all duration-300" aria-label="Dashboard navigation">
+        <a href="/dashboard.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span class="sidebar-text truncate">Dashboard</span>
+        </a>
+        <a href="/bulk-order.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          <span class="sidebar-text truncate">Bulk Order</span>
+        </a>
+        <a href="/orders.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-semibold text-white bg-pink-600 rounded-lg shadow-lg shadow-pink-600/30 transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" aria-current="page">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-white group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span class="sidebar-text truncate">Orders History</span>
+        </a>
+        <a href="/add-funds.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="sidebar-text truncate">Add Funds</span>
+        </a>
+        <a href="/services.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span class="sidebar-text truncate">Services List</span>
+        </a>
+        <a href="/tickets.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span class="sidebar-text truncate">Support Tickets</span>
+        </a>
+        <a href="/account.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span class="sidebar-text truncate">Account Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- User & Logout Footer -->
+    <div id="sidebar-footer" class="p-4 border-t border-gray-800 transition-all duration-300 flex-shrink-0">
+      <a href="login.html" data-action="logout" class="logout-btn sidebar-link flex items-center px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="Sign out of your account">
+        <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span class="sidebar-text truncate">Sign Out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content Body -->
+  <div class="flex-grow flex flex-col min-w-0 min-h-screen">
+
+    <!-- Top Header Bar -->
+    <header class="sticky top-0 z-30 h-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/dashboard.html" class="flex items-center md:hidden">
+          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+        </a>
+
+        <!-- Desktop Breadcrumbs (hidden on mobile) -->
+        <div class="hidden md:flex items-center space-x-3">
+          <a href="/orders.html" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" title="Back to Orders History" aria-label="Back to Orders History">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </a>
+          <nav aria-label="Breadcrumb">
+            <ol class="flex text-xs font-semibold text-gray-500 dark:text-gray-400 space-x-1 list-none p-0 m-0">
+              <li><a href="/dashboard.html" class="hover:text-pink-600 transition-colors">Dashboard</a></li>
+              <li aria-hidden="true" class="select-none">/</li>
+              <li><a href="/orders.html" class="hover:text-pink-600 transition-colors">Orders</a></li>
+              <li aria-hidden="true" class="select-none">/</li>
+              <li><span id="breadcrumb-order-id" class="text-gray-900 dark:text-white font-bold" aria-current="page">#...</span></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
+          <!-- Hamburger Icon (shown when closed) -->
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <!-- Close Icon (shown when expanded) -->
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main View Content -->
+    <main class="p-4 md:p-6 space-y-6 flex-grow max-w-7xl w-full mx-auto" id="order-detail-container">
+
+      <!-- Screen reader live announcer for notifications & copy actions -->
+      <div id="a11y-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+      <!-- Skeleton Loading State (Shown initially) -->
+      <div id="order-skeleton" class="space-y-6 animate-pulse" aria-busy="true" aria-live="polite" role="status" aria-label="Loading order details">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-28"></div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-32"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24 sm:col-span-2 lg:col-span-1"></div>
+        </div>
+      </div>
+
+      <!-- Error State (Hidden by default) -->
+      <div id="order-error-state" class="hidden bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-sm border border-red-100 dark:border-red-900/30 text-center space-y-4" role="alert" aria-live="assertive">
+        <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white" id="error-title">Order Not Found</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto" id="error-message">We could not retrieve details for this order ID. Please verify the ID or check your order history.</p>
+        <div class="pt-2">
+          <a href="/orders.html" class="inline-flex items-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold text-xs rounded-xl shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2">
+            Return to Order History
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Order View (Populated dynamically) -->
+      <div id="order-content-wrapper" class="hidden space-y-6">
+
+        <!-- Banner Header Card -->
+        <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-pink-950 text-white p-6 rounded-2xl shadow-lg border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+              <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white" id="order-id-display">Order #...</h1>
+              <span id="order-status-badge" class="px-3 py-1 text-xs font-extrabold rounded-full flex items-center" aria-label="Order status" aria-live="polite">
+                <span class="w-2 h-2 rounded-full mr-2" id="status-dot" aria-hidden="true"></span>
+                <span id="status-text">Loading...</span>
+              </span>
+              <span id="refill-guarantee-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span id="refill-guarantee-label">Refill Guarantee</span>
+              </span>
+            </div>
+            <div class="flex items-center text-xs text-gray-400 space-x-4 pt-1 flex-wrap gap-y-1">
+              <span>Placed: <strong class="text-gray-200" id="order-created-at">—</strong></span>
+              <span aria-hidden="true">•</span>
+              <span>Provider ID: <strong class="text-gray-200 font-mono" id="provider-order-id">—</strong></span>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <button id="copy-order-id-btn" type="button" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold backdrop-blur transition flex items-center space-x-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60" aria-label="Copy order ID to clipboard" title="Copy order ID to clipboard">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span>Copy ID</span>
+            </button>
+            <button id="refresh-order-btn" type="button" class="px-3.5 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center space-x-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" aria-label="Refresh order status" title="Refresh order status">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh Status</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Stepper Progress Tracker -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4" role="region" aria-label="Order fulfillment progress">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Fulfillment Lifecycle Tracker</h2>
+            <span class="text-xs font-semibold text-pink-600 dark:text-pink-400" id="progress-percentage" aria-live="polite">Loading...</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="relative py-2">
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-gray-100 dark:bg-gray-700" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Order progress" id="progress-bar-container">
+              <div id="progress-bar-fill" style="width: 0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-pink-500 to-green-500 transition-all duration-700"></div>
+            </div>
+
+            <!-- Step Labels -->
+            <div class="grid grid-cols-4 text-center text-xs font-semibold" aria-hidden="true">
+              <div class="space-y-1 px-1" id="step-placed">
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-1">1</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400">Placed</div>
+              </div>
+              <div class="space-y-1 px-1" id="step-processing">
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-2">2</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400" id="step-label-2">Processing</div>
+              </div>
+              <div class="space-y-1 px-1" id="step-inprogress">
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-3">3</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400" id="step-label-3">In Progress</div>
+              </div>
+              <div class="space-y-1 px-1" id="step-completed">
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-4">4</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400" id="step-label-4">Delivered</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Stat Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" role="region" aria-label="Order statistics">
+
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Quantity Ordered</span>
+            <div class="text-2xl font-black text-gray-900 dark:text-white" id="stat-quantity">—</div>
+            <span class="text-[11px] text-gray-400 block">Target Units</span>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Start Count</span>
+            <div class="text-2xl font-black text-blue-600 dark:text-blue-400" id="stat-start-count">—</div>
+            <span class="text-[11px] text-gray-400 block">Initial Baseline</span>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Remainder</span>
+            <div class="text-2xl font-black text-amber-600 dark:text-amber-400" id="stat-remains">—</div>
+            <span class="text-[11px] text-gray-400 block">Remaining Units</span>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Total Charge</span>
+            <div class="text-2xl font-black text-green-600 dark:text-green-400" id="stat-charge">—</div>
+            <span class="text-[11px] text-gray-400 block" id="stat-rate">Rate per 1k</span>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1 sm:col-span-2 lg:col-span-1">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Refill Eligibility</span>
+            <div class="text-lg font-bold text-pink-600 dark:text-pink-400 pt-1" id="stat-refill-status">—</div>
+            <span class="text-[11px] text-gray-400 block">Non-Drop Guarantee</span>
+          </div>
+
+        </div>
+
+        <!-- Detailed Content Grid (Target Link & Service Details) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Left Column: Service Details & Target Link (2 cols) -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- Target Link Card -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
+              <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider flex items-center justify-between">
+                <span>Target Social URL</span>
+                <span id="link-validated-badge" class="text-xs font-normal text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2.5 py-0.5 rounded-md hidden">Validated</span>
+              </h2>
+              
+              <div class="flex items-center space-x-2 bg-gray-50 dark:bg-gray-900/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <!-- cursor-text gives users correct visual cue that the text is selectable -->
+                <input type="text" id="target-link-input" readonly value="" class="bg-transparent text-xs md:text-sm font-mono text-pink-600 dark:text-pink-400 font-semibold w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 rounded cursor-text" aria-label="Target URL for this order" tabindex="0">
+                
+                <button id="copy-link-btn" type="button" class="p-2 text-gray-500 hover:text-pink-600 dark:hover:text-pink-400 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded flex-shrink-0" title="Copy URL" aria-label="Copy target URL to clipboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <a id="open-link-btn" href="#" target="_blank" rel="noopener noreferrer" class="p-2 text-gray-500 hover:text-pink-600 dark:hover:text-pink-400 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded flex-shrink-0" title="Open Link in New Tab" aria-label="Open target URL in new tab">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Service Details Card -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+              <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+                <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Service Information</h2>
+                <span class="text-xs font-bold text-gray-400" id="service-id-tag">ID: —</span>
+              </div>
+
+              <div class="space-y-3">
+                <div>
+                  <h3 class="text-base font-bold text-gray-900 dark:text-white" id="service-name">Loading service...</h3>
+                  <span class="text-xs text-pink-600 dark:text-pink-400 font-semibold" id="category-name"></span>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed" id="service-description">
+                  Loading service details...
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Quick Action Controls & Support (1 col) -->
+          <div class="space-y-6">
+
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+              <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Order Management Actions</h2>
+
+              <div class="space-y-3">
+                <button id="trigger-refill-btn" type="button" title="Request an automatic refill if your count has dropped" class="w-full py-3 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2" aria-label="Request automatic refill for this order">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Request Automatic Refill</span>
+                </button>
+
+                <button id="trigger-cancel-btn" type="button" title="Cancel order and request a refund to your wallet" class="w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold text-xs rounded-xl transition flex items-center justify-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2" aria-label="Cancel order and request refund">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Cancel &amp; Refund Order</span>
+                </button>
+
+                <a id="open-ticket-link" href="/tickets.html" class="w-full py-3 px-4 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-200 font-bold text-xs rounded-xl transition flex items-center justify-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span>Report Issue / Support Ticket</span>
+                </a>
+              </div>
+
+              <!-- Toast notification area — aria-live so screen readers announce messages -->
+              <div id="action-toast" class="hidden p-3 rounded-xl text-xs font-semibold" role="status" aria-live="polite" aria-atomic="true"></div>
+            </div>
+
+            <!-- Helpful Info Box -->
+            <div class="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 p-5 rounded-2xl border border-pink-100 dark:border-gray-700 space-y-2">
+              <h3 class="text-xs font-extrabold text-pink-700 dark:text-pink-400 uppercase">Refill Policy Info</h3>
+              <p class="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">
+                If your count drops within the refill guarantee period after completion, press <strong>Request Automatic Refill</strong> above. Refill servers will re-deliver the missing quantity within 1–6 hours automatically.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      Copyright &copy; <span id="footer-year"></span> GhBooster SMM Panel | All rights reserved.
+    </footer>
+
+  </div>
+
+  <!-- Dynamic Scripts -->
+  <script src="/src/js/theme.js"></script>
+  <script src="/src/js/api-client.js"></script>
+  <!-- Set dynamic footer year -->
+  <script>
+    const yr = document.getElementById('footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
