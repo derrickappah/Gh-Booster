@@ -512,7 +512,7 @@ async function initDashboardPage() {
     const rate = parseFloat(s.rate_per_1000 || s.our_price_per_1000 || s.rate_per_1k || s.rate || 0);
     const min = (s.min_quantity || 100).toLocaleString();
     const max = (s.max_quantity || 100000).toLocaleString();
-    const shortId = typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id;
+    const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
     const catName = s.category_name || s.categories?.name || 'General Services';
     const icon = getPlatformIcon(catName);
 
@@ -524,8 +524,11 @@ async function initDashboardPage() {
 
     if (selectedServiceCard) {
       if (selectedSvcIcon) selectedSvcIcon.src = icon;
-      if (selectedSvcBadge) selectedSvcBadge.textContent = `#${shortId}`;
-      if (selectedSvcCategoryBadge) selectedSvcCategoryBadge.textContent = catName;
+      if (selectedSvcBadge) selectedSvcBadge.textContent = `ID: ${providerId}`;
+      if (selectedSvcCategoryBadge) {
+        selectedSvcCategoryBadge.classList.add('hidden');
+        selectedSvcCategoryBadge.style.display = 'none';
+      }
       if (selectedSvcTitle) selectedSvcTitle.textContent = s.name;
       if (selectedSvcRate) selectedSvcRate.textContent = `GH₵${rate.toFixed(2)}`;
       if (selectedSvcMin) selectedSvcMin.textContent = min;
