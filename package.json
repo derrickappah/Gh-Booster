@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "node server/server.js",
-    "build": "echo 'Build complete'"
+    "build": "node build.js"
   },
   "license": "ISC"
 }
