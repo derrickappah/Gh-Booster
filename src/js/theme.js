@@ -301,10 +301,6 @@
       if (!sidebar) return;
       sidebar.classList.add('is-collapsed');
       sidebar.style.width = '4.5rem';
-      if (brandHeader) {
-        brandHeader.classList.remove('justify-between', 'px-4');
-        brandHeader.classList.add('justify-center', 'px-0');
-      }
       if (sidebarNav) {
         sidebarNav.classList.remove('px-4');
         sidebarNav.classList.add('px-2');
@@ -331,10 +327,6 @@
       if (!sidebar) return;
       sidebar.classList.remove('is-collapsed');
       sidebar.style.width = '16rem';
-      if (brandHeader) {
-        brandHeader.classList.remove('justify-center', 'px-0');
-        brandHeader.classList.add('justify-between', 'px-4');
-      }
       if (sidebarNav) {
         sidebarNav.classList.remove('px-2');
         sidebarNav.classList.add('px-4');
@@ -436,12 +428,22 @@
       }
       if (sidebar) {
         if (expandSidebarGlobal) expandSidebarGlobal();
-        sidebar.classList.remove('hidden', '-translate-x-full');
-        void sidebar.offsetWidth; // Force layout reflow for CSS transition
-        sidebar.classList.add('translate-x-0');
+        // Step 1: make visible but still off-screen
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+        // Step 2: on next frame, slide in
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+          });
+        });
       }
       if (backdrop) {
         backdrop.classList.remove('hidden');
+        backdrop.style.opacity = '0';
+        requestAnimationFrame(function () { backdrop.style.opacity = '1'; });
       }
       showCloseIcon();
       document.body.classList.add('overflow-hidden', 'md:overflow-auto');
@@ -457,10 +459,11 @@
           if (sidebar && sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
             sidebar.classList.add('hidden');
           }
-        }, 300);
+        }, 350);
       }
       if (backdrop) {
-        backdrop.classList.add('hidden');
+        backdrop.style.opacity = '0';
+        setTimeout(function () { backdrop.classList.add('hidden'); backdrop.style.opacity = ''; }, 300);
       }
       showHamburgerIcon();
       document.body.classList.remove('overflow-hidden', 'md:overflow-auto');

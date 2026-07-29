@@ -4573,12 +4573,22 @@ iframe.wait-autoplay {
 
 /* Brand logo smooth opacity on collapse */
 #brand-full {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 1;
+  max-width: 200px;
+  overflow: hidden;
 }
 #sidebar.is-collapsed #brand-full {
   opacity: 0;
+  max-width: 0;
   pointer-events: none;
+}
+
+/* When collapsed: center the toggle button */
+#sidebar.is-collapsed #brand-header {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Toggle button icon swap animation */
