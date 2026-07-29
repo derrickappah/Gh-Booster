@@ -1,14 +1,22 @@
 {
   "version": 2,
-  "outputDirectory": ".",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
     },
     {
-      "source": "/dashboard/orders/:id",
-      "destination": "/order-detail.html"
+      "src": "/dashboard/orders/(.*)",
+      "dest": "/order-detail.html"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }
