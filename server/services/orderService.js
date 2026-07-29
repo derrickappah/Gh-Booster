@@ -231,7 +231,8 @@ class OrderService {
     if (res && res.error) {
       throw new Error(res.error);
     }
-    return { success: true, message: 'Refill requested successfully', refill_id: res ? res.refill : null };
+    const updatedOrder = await OrderService.getOrderById(orderId, userId);
+    return { success: true, message: 'Refill requested successfully', refill_id: res ? res.refill : null, order: updatedOrder };
   }
 
   static async cancelOrder(orderId, userId) {
@@ -256,6 +257,7 @@ class OrderService {
 
     // Refund the charge to the user's wallet
     const chargeAmount = parseFloat(order.charge || 0);
+    let newBalance = null;
     if (chargeAmount > 0 && userId) {
       const { data: wallet } = await supabaseAdmin
         .from('wallets')
@@ -264,7 +266,7 @@ class OrderService {
         .maybeSingle();
 
       const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-      const newBalance = currentBalance + chargeAmount;
+      newBalance = currentBalance + chargeAmount;
 
       await supabaseAdmin
         .from('wallets')
@@ -281,18 +283,15 @@ class OrderService {
         type: 'order_refund',
         status: 'completed'
       });
-
-      return {
-        success: true,
-        message: `Order canceled and GH₵${chargeAmount.toFixed(2)} has been refunded to your wallet.`,
-        new_balance: newBalance
-      };
     }
+
+    const updatedOrder = await OrderService.getOrderById(orderId, userId);
 
     return {
       success: true,
-      message: 'Order has been canceled successfully.',
-      new_balance: null
+      message: chargeAmount > 0 ? `Order canceled and GH₵${chargeAmount.toFixed(2)} has been refunded to your wallet.` : 'Order has been canceled successfully.',
+      new_balance: newBalance,
+      order: updatedOrder
     };
   }
 }

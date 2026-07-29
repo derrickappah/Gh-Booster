@@ -1,0 +1,16 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow: /dashboard/
+Disallow: /admin
+Disallow: /api/
+Disallow: /account.html
+Disallow: /add-funds.html
+Disallow: /admin-*.html
+Disallow: /bulk-order.html
+Disallow: /child-panel.html
+Disallow: /order-detail.html
+Disallow: /orders.html
+Disallow: /tickets.html
+Allow: /
+
+Sitemap: https://ghbooster.com/sitemap.xml

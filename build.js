@@ -10,9 +10,9 @@ const publicDir = path.join(root, 'public');
     fs.mkdirSync(targetDir, { recursive: true });
   }
 
-  // Copy all .html files
+  // Copy all .html files, robots.txt, and sitemap.xml
   fs.readdirSync(root).forEach(file => {
-    if (file.endsWith('.html')) {
+    if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml') {
       fs.copyFileSync(path.join(root, file), path.join(targetDir, file));
     }
   });

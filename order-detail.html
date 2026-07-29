@@ -8,17 +8,70 @@
 
   <!-- Title & Description -->
   <title>Order Details | GhBooster - #1 SMM Panel</title>
-  <meta name="description" content="View comprehensive details, live fulfillment progress, start count, remainder, and refill guarantee for your SMM order on GhBooster.">
+  <meta name="description" id="page-description" content="View comprehensive details, live fulfillment progress, start count, remainder, and refill guarantee for your SMM order on GhBooster.">
   <!-- Authenticated dashboard page — should not be indexed by search engines -->
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" id="page-canonical" href="https://ghbooster.com/dashboard/orders/">
 
+  <!-- Theme & Mobile App Icons -->
+  <meta name="theme-color" content="#0f172a">
+  <link rel="apple-touch-icon" href="/src/img/logo.png">
+
   <!-- Open Graph / Social -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Order Details | GhBooster SMM Panel">
-  <meta property="og:description" content="Track live fulfillment status, start count, remainder, and refill guarantees on GhBooster.">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" id="og-title" content="Order Details | GhBooster SMM Panel">
+  <meta property="og:description" id="og-desc" content="Track live fulfillment status, start count, remainder, and refill guarantees on GhBooster.">
   <meta property="og:url" id="og-url" content="https://ghbooster.com/dashboard/orders/">
-  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+  <meta property="og:image" id="og-image" content="https://ghbooster.com/src/img/logo.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="GhBooster Logo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" id="twitter-title" content="Order Details | GhBooster SMM Panel">
+  <meta name="twitter:description" id="twitter-desc" content="Track live fulfillment status, start count, remainder, and refill guarantees on GhBooster.">
+  <meta name="twitter:image" id="twitter-image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json" id="schema-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://ghbooster.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Dashboard",
+            "item": "https://ghbooster.com/dashboard.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Orders",
+            "item": "https://ghbooster.com/orders.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Order Details",
+            "item": "https://ghbooster.com/dashboard/orders/"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Google Fonts — preconnect for performance, font-display=swap to avoid FOIT -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,17 +79,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="src/css/style.css">
-  <link rel="icon" href="src/img/favicon.png">
+  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="icon" href="/src/img/favicon.png">
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:bg-gray-900 dark:text-gray-100">
 
   <!-- Sidebar -->
   <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden" aria-label="Main Navigation">
-    <!-- Brand Header (Fixed at top of sidebar) -->
-    <div id="brand-header" class="bg-gray-900 z-10 h-20 flex items-center justify-between px-6 border-b border-gray-800 transition-all duration-300 flex-shrink-0">
+        <!-- Brand Header (Fixed at top of sidebar) -->
+        <div id="brand-header" class="bg-gray-900 z-10 h-20 flex items-center justify-between px-6 border-b border-gray-800 transition-all duration-300 flex-shrink-0">
         <a href="/dashboard.html" id="brand-full" class="h-full flex items-center text-2xl md:text-3xl font-extrabold text-white tracking-wide flex-shrink-0 select-none">
-          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-9 w-auto object-contain max-h-12">
+          <img src="/src/img/logo.png" alt="GhBooster Logo" width="160" height="36" class="h-9 w-auto object-contain max-h-12">
         </a>
         <button id="toggle-sidebar" type="button" class="hidden md:flex p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 flex-shrink-0" title="Toggle Sidebar" aria-label="Toggle Sidebar" aria-expanded="true" aria-controls="sidebar-nav">
           <!-- Collapse Left Icon (shown when expanded) -->
@@ -60,7 +113,7 @@
           </svg>
           <span class="sidebar-text truncate">Dashboard</span>
         </a>
-        <a href="/bulk-order.html" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+        <a href="/bulk-order.html" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
@@ -118,7 +171,7 @@
       <div class="flex items-center space-x-3">
         <!-- Mobile Logo (visible on mobile only) -->
         <a href="/dashboard.html" class="flex items-center md:hidden">
-          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+          <img src="/src/img/logo.png" alt="GhBooster Logo" width="140" height="32" class="h-8 w-auto object-contain">
         </a>
 
         <!-- Desktop Breadcrumbs (hidden on mobile) -->
@@ -232,9 +285,9 @@
         </div>
 
         <!-- Visual Stepper Progress Tracker -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4" role="region" aria-label="Order fulfillment progress">
+        <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4" aria-labelledby="tracker-heading">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Fulfillment Lifecycle Tracker</h2>
+            <h2 id="tracker-heading" class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Fulfillment Lifecycle Tracker</h2>
             <span class="text-xs font-semibold text-pink-600 dark:text-pink-400" id="progress-percentage" aria-live="polite">Loading...</span>
           </div>
 
@@ -264,42 +317,42 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         <!-- Metric Stat Cards Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" role="region" aria-label="Order statistics">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" aria-label="Order statistics">
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Quantity Ordered</span>
             <div class="text-2xl font-black text-gray-900 dark:text-white" id="stat-quantity">—</div>
-            <span class="text-[11px] text-gray-400 block">Target Units</span>
+            <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Target Units</span>
           </div>
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Start Count</span>
             <div class="text-2xl font-black text-blue-600 dark:text-blue-400" id="stat-start-count">—</div>
-            <span class="text-[11px] text-gray-400 block">Initial Baseline</span>
+            <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Initial Baseline</span>
           </div>
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Remainder</span>
             <div class="text-2xl font-black text-amber-600 dark:text-amber-400" id="stat-remains">—</div>
-            <span class="text-[11px] text-gray-400 block">Remaining Units</span>
+            <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Remaining Units</span>
           </div>
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Total Charge</span>
             <div class="text-2xl font-black text-green-600 dark:text-green-400" id="stat-charge">—</div>
-            <span class="text-[11px] text-gray-400 block" id="stat-rate">Rate per 1k</span>
+            <span class="text-[11px] text-gray-500 dark:text-gray-400 block" id="stat-rate">Rate per 1k</span>
           </div>
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1 sm:col-span-2 lg:col-span-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Refill Eligibility</span>
             <div class="text-lg font-bold text-pink-600 dark:text-pink-400 pt-1" id="stat-refill-status">—</div>
-            <span class="text-[11px] text-gray-400 block">Non-Drop Guarantee</span>
+            <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Non-Drop Guarantee</span>
           </div>
 
-        </div>
+        </section>
 
         <!-- Detailed Content Grid (Target Link & Service Details) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -308,8 +361,8 @@
           <div class="lg:col-span-2 space-y-6">
 
             <!-- Target Link Card -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
-              <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider flex items-center justify-between">
+            <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3" aria-labelledby="target-url-heading">
+              <h2 id="target-url-heading" class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider flex items-center justify-between">
                 <span>Target Social URL</span>
                 <span id="link-validated-badge" class="text-xs font-normal text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2.5 py-0.5 rounded-md hidden">Validated</span>
               </h2>
@@ -332,12 +385,12 @@
                   </svg>
                 </a>
               </div>
-            </div>
+            </section>
 
             <!-- Service Details Card -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+            <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4" aria-labelledby="service-info-heading">
               <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
-                <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Service Information</h2>
+                <h2 id="service-info-heading" class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Service Information</h2>
                 <span class="text-xs font-bold text-gray-400" id="service-id-tag">ID: —</span>
               </div>
 
@@ -350,15 +403,15 @@
                   Loading service details...
                 </p>
               </div>
-            </div>
+            </section>
 
           </div>
 
           <!-- Right Column: Quick Action Controls & Support (1 col) -->
           <div class="space-y-6">
 
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
-              <h2 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Order Management Actions</h2>
+            <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4" aria-labelledby="order-actions-heading">
+              <h2 id="order-actions-heading" class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Order Management Actions</h2>
 
               <div class="space-y-3">
                 <button id="trigger-refill-btn" type="button" title="Request an automatic refill if your count has dropped" class="w-full py-3 px-4 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2" aria-label="Request automatic refill for this order">
@@ -385,7 +438,7 @@
 
               <!-- Toast notification area — aria-live so screen readers announce messages -->
               <div id="action-toast" class="hidden p-3 rounded-xl text-xs font-semibold" role="status" aria-live="polite" aria-atomic="true"></div>
-            </div>
+            </section>
 
             <!-- Helpful Info Box -->
             <div class="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 p-5 rounded-2xl border border-pink-100 dark:border-gray-700 space-y-2">

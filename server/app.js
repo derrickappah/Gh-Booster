@@ -71,8 +71,26 @@ app.get(['/api/health', '/health'], (req, res) => {
   });
 });
 
+// Serve robots.txt & sitemap.xml
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.sendFile(path.join(__dirname, '..', 'robots.txt'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
+});
+
+// Middleware for defense-in-depth SEO protection on private dashboard routes
+app.use(['/dashboard', '/dashboard/*'], (req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  next();
+});
+
 // Fallback to order-detail.html for order detail views
 app.get(['/dashboard/orders/:id', '/order-detail.html', '/order-detail'], (req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.sendFile(path.join(__dirname, '..', 'order-detail.html'));
 });
 

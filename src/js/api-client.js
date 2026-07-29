@@ -1004,7 +1004,7 @@ async function initOrdersPage() {
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50">
               <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400">
-                <a href="/order-detail.html?id=${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(shortId))}">#${escapeHtml(String(shortId))}</a>
+                <a href="/dashboard/orders/${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(shortId))}">#${escapeHtml(String(shortId))}</a>
               </td>
               <td class="py-4 px-4">
                 <span class="font-medium text-gray-900 dark:text-white flex items-center">
@@ -2561,6 +2561,8 @@ async function initOrderDetailPage() {
 
   let currentOrder = null;
   let pollTimer = null;
+  let pollFailures = 0;
+  const MAX_POLL_FAILURES = 3;
 
   // Extract order ID from URL path (e.g. /dashboard/orders/76a57d66-...) or query param (?id=...)
   const urlParams = new URLSearchParams(window.location.search);
@@ -2619,6 +2621,19 @@ async function initOrderDetailPage() {
     announce(message);
   }
 
+  function sanitizeUrl(input) {
+    if (!input) return '';
+    const trimmed = String(input).trim();
+    if (!trimmed) return '';
+    try {
+      const url = new URL(trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`);
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        return url.href;
+      }
+    } catch (e) {}
+    return '';
+  }
+
   async function loadOrder(isSilent = false) {
     if (!orderId) {
       showError('No Order ID', 'No valid order ID was found in the URL. Please navigate from your Orders History.');
@@ -2634,6 +2649,7 @@ async function initOrderDetailPage() {
 
       const res = await API.request(`/orders/${orderId}`);
       if (res.success && res.order) {
+        pollFailures = 0;
         currentOrder = res.order;
         renderOrderDetail(res.order);
         managePolling(res.order.status);
@@ -2645,14 +2661,21 @@ async function initOrderDetailPage() {
       const status = err.status;
       if (status === 404) {
         showError('Order Not Found', 'This order does not exist or does not belong to your account.');
+        stopPolling();
       } else if (status === 403 || status === 401) {
         showError('Access Denied', 'You do not have permission to view this order.');
+        stopPolling();
       } else {
-        if (!isSilent) {
+        if (isSilent) {
+          pollFailures++;
+          if (pollFailures >= MAX_POLL_FAILURES) {
+            stopPolling();
+          }
+        } else {
           showError('Unable to Load Order', err.message || 'A server error occurred while fetching order details.');
+          stopPolling();
         }
       }
-      stopPolling();
     }
   }
 
@@ -2679,7 +2702,7 @@ async function initOrderDetailPage() {
   }
 
   /**
-   * Updates visual stepper progress bar and step dots
+   * Updates visual stepper progress bar and step dots with accessibility attributes
    */
   function updateStepper(order) {
     const status = order.status || '';
@@ -2735,12 +2758,16 @@ async function initOrderDetailPage() {
 
       if (activeStep === 0) {
         dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-gray-400');
+        dot.removeAttribute('aria-current');
       } else if (i < activeStep) {
         dot.classList.add('bg-green-100', 'dark:bg-green-900/40', 'border-green-500', 'text-green-700', 'dark:text-green-400');
+        dot.removeAttribute('aria-current');
       } else if (i === activeStep) {
         dot.classList.add('bg-blue-100', 'dark:bg-blue-900/40', 'border-blue-500', 'text-blue-700', 'dark:text-blue-400', 'ring-2', 'ring-blue-400/30');
+        dot.setAttribute('aria-current', 'step');
       } else {
         dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-gray-400');
+        dot.removeAttribute('aria-current');
       }
     }
 
@@ -2795,8 +2822,60 @@ async function initOrderDetailPage() {
 
     const shortId = order.id.substring(0, 8);
     const displayId = `#${shortId}…`;
+    const svcName = order.service_name || 'Social Media Service';
 
-    document.title = `Order #${shortId} | GhBooster`;
+    // Dynamic SEO Title & Meta Tags
+    const fullTitle = `Order #${shortId} - ${svcName} | GhBooster`;
+    const dynamicDesc = `Live progress, start count (${order.start_count || 0}), remainder (${order.remains || 0}), and refill status for Order #${shortId} on GhBooster SMM Panel.`;
+    const orderUrl = `https://ghbooster.com/dashboard/orders/${order.id}`;
+
+    document.title = fullTitle;
+
+    const pageDescEl = document.getElementById('page-description');
+    if (pageDescEl) pageDescEl.setAttribute('content', dynamicDesc);
+
+    const ogTitleEl = document.getElementById('og-title');
+    if (ogTitleEl) ogTitleEl.setAttribute('content', fullTitle);
+
+    const ogDescEl = document.getElementById('og-desc');
+    if (ogDescEl) ogDescEl.setAttribute('content', dynamicDesc);
+
+    const twTitleEl = document.getElementById('twitter-title');
+    if (twTitleEl) twTitleEl.setAttribute('content', fullTitle);
+
+    const twDescEl = document.getElementById('twitter-desc');
+    if (twDescEl) twDescEl.setAttribute('content', dynamicDesc);
+
+    // Update JSON-LD Structured Data
+    const schemaEl = document.getElementById('schema-jsonld');
+    if (schemaEl) {
+      schemaEl.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
+              { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://ghbooster.com/dashboard.html" },
+              { "@type": "ListItem", "position": 3, "name": "Orders", "item": "https://ghbooster.com/orders.html" },
+              { "@type": "ListItem", "position": 4, "name": `Order #${shortId}`, "item": orderUrl }
+            ]
+          },
+          {
+            "@type": "Order",
+            "orderNumber": order.id,
+            "orderStatus": `https://schema.org/Order${order.status === 'Completed' ? 'Delivered' : order.status === 'Processing' || order.status === 'In Progress' ? 'InTransit' : 'Processing'}`,
+            "price": String(order.charge || 0),
+            "priceCurrency": "GHS",
+            "orderedItem": {
+              "@type": "Product",
+              "name": svcName,
+              "description": order.service_description || "Social media boosting service"
+            }
+          }
+        ]
+      }, null, 2);
+    }
 
     const bcId = document.getElementById('breadcrumb-order-id');
     if (bcId) bcId.textContent = displayId;
@@ -2865,17 +2944,10 @@ async function initOrderDetailPage() {
       }
     }
 
-    // Target Link Card & Protocol Validation
+    // Target Link Card & Strict URL Protocol Sanitization
     const linkInput = document.getElementById('target-link-input');
     const rawUrl = String(order.link || '').trim();
-    let safeUrl = '';
-    if (rawUrl) {
-      if (/^https?:\/\//i.test(rawUrl)) {
-        safeUrl = rawUrl;
-      } else if (!/^[a-z]+:/i.test(rawUrl)) {
-        safeUrl = `https://${rawUrl}`;
-      }
-    }
+    const safeUrl = sanitizeUrl(rawUrl);
 
     if (linkInput) {
       linkInput.value = rawUrl || 'No target link provided';
@@ -2900,7 +2972,7 @@ async function initOrderDetailPage() {
 
     const validatedBadge = document.getElementById('link-validated-badge');
     if (validatedBadge) {
-      if (safeUrl && /^https?:\/\//i.test(safeUrl)) {
+      if (safeUrl) {
         validatedBadge.classList.remove('hidden');
       } else {
         validatedBadge.classList.add('hidden');
@@ -2922,46 +2994,6 @@ async function initOrderDetailPage() {
     const ticketLink = document.getElementById('open-ticket-link');
     if (ticketLink) ticketLink.href = `/tickets.html?order_id=${encodeURIComponent(order.id)}`;
 
-    // ── Action Buttons & Availability Logic ──────────────────────────
-
-    const copyIdBtn = document.getElementById('copy-order-id-btn');
-    if (copyIdBtn) {
-      copyIdBtn.onclick = async () => {
-        const success = await copyToClipboard(order.id);
-        if (success) {
-          copyIdBtn.querySelector('span').textContent = 'Copied!';
-          setTimeout(() => { copyIdBtn.querySelector('span').textContent = 'Copy ID'; }, 2000);
-          showToast('Order ID copied to clipboard!');
-        } else {
-          showToast('Could not copy automatically. Please copy manually: ' + order.id, true);
-        }
-      };
-    }
-
-    const refreshBtn = document.getElementById('refresh-order-btn');
-    if (refreshBtn) {
-      refreshBtn.onclick = () => {
-        showToast('Refreshing order status...');
-        loadOrder(false);
-      };
-    }
-
-    const copyLinkBtn = document.getElementById('copy-link-btn');
-    if (copyLinkBtn) {
-      copyLinkBtn.onclick = async () => {
-        if (!rawUrl) {
-          showToast('No target URL available to copy.', true);
-          return;
-        }
-        const success = await copyToClipboard(rawUrl);
-        if (success) {
-          showToast('Target URL copied to clipboard!');
-        } else {
-          showToast('Could not copy automatically. Please copy manually.', true);
-        }
-      };
-    }
-
     // Refill Button Availability
     const refillBtn = document.getElementById('trigger-refill-btn');
     if (refillBtn) {
@@ -2971,24 +3003,10 @@ async function initOrderDetailPage() {
         refillBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         refillBtn.removeAttribute('aria-disabled');
         refillBtn.title = 'Request an automatic refill if your count has dropped';
-        refillBtn.onclick = async () => {
-          try {
-            refillBtn.disabled = true;
-            refillBtn.querySelector('span').textContent = 'Submitting…';
-            const rRes = await API.request(`/orders/${order.id}/refill`, 'POST');
-            showToast(rRes.message || 'Refill request submitted successfully!');
-          } catch (e) {
-            showToast(e.message || 'Refill request failed. Please try again.', true);
-          } finally {
-            refillBtn.disabled = false;
-            refillBtn.querySelector('span').textContent = 'Request Automatic Refill';
-          }
-        };
       } else {
         refillBtn.disabled = true;
         refillBtn.classList.add('opacity-50', 'cursor-not-allowed');
         refillBtn.setAttribute('aria-disabled', 'true');
-        refillBtn.onclick = null;
         if (order.status !== 'Completed') {
           refillBtn.title = 'Refill is available after order status becomes Completed.';
         } else if (!order.refill_guarantee) {
@@ -3008,35 +3026,110 @@ async function initOrderDetailPage() {
         cancelBtn.classList.add('opacity-50', 'cursor-not-allowed');
         cancelBtn.setAttribute('aria-disabled', 'true');
         cancelBtn.title = `Orders with status "${order.status}" cannot be canceled.`;
-        cancelBtn.onclick = null;
       } else {
         cancelBtn.disabled = false;
         cancelBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         cancelBtn.removeAttribute('aria-disabled');
         cancelBtn.title = 'Cancel order and request a refund to your wallet';
-        cancelBtn.onclick = async () => {
-          const chargeFormatted = `GH₵${parseFloat(order.charge || 0).toFixed(2)}`;
-          if (!confirm(`Are you sure you want to cancel Order #${shortId} and refund ${chargeFormatted} to your wallet balance?`)) return;
-          try {
-            cancelBtn.disabled = true;
-            cancelBtn.querySelector('span').textContent = 'Canceling…';
-            const cRes = await API.request(`/orders/${order.id}/cancel`, 'POST');
-            showToast(cRes.message || 'Order canceled and wallet refunded successfully!');
-            const user = API.getUser();
-            if (user && cRes.new_balance !== undefined && cRes.new_balance !== null) {
-              user.balance = cRes.new_balance;
-              API.setUser(user);
-              updateUserUI(user);
-            }
-            setTimeout(() => loadOrder(false), 1200);
-          } catch (e) {
-            showToast(e.message || 'Failed to cancel order. Please contact support.', true);
-            cancelBtn.disabled = false;
-            cancelBtn.querySelector('span').textContent = 'Cancel & Refund Order';
-          }
-        };
       }
     }
+  }
+
+  // Bind Static Event Listeners Once
+  const copyIdBtn = document.getElementById('copy-order-id-btn');
+  if (copyIdBtn) {
+    copyIdBtn.onclick = async () => {
+      if (!currentOrder) return;
+      const success = await copyToClipboard(currentOrder.id);
+      if (success) {
+        copyIdBtn.querySelector('span').textContent = 'Copied!';
+        setTimeout(() => { copyIdBtn.querySelector('span').textContent = 'Copy ID'; }, 2000);
+        showToast('Order ID copied to clipboard!');
+      } else {
+        showToast('Could not copy automatically. Please copy manually: ' + currentOrder.id, true);
+      }
+    };
+  }
+
+  const refreshBtn = document.getElementById('refresh-order-btn');
+  if (refreshBtn) {
+    refreshBtn.onclick = () => {
+      showToast('Refreshing order status...');
+      loadOrder(false);
+    };
+  }
+
+  const copyLinkBtn = document.getElementById('copy-link-btn');
+  if (copyLinkBtn) {
+    copyLinkBtn.onclick = async () => {
+      const rawUrl = currentOrder ? String(currentOrder.link || '').trim() : '';
+      if (!rawUrl) {
+        showToast('No target URL available to copy.', true);
+        return;
+      }
+      const success = await copyToClipboard(rawUrl);
+      if (success) {
+        showToast('Target URL copied to clipboard!');
+      } else {
+        showToast('Could not copy automatically. Please copy manually.', true);
+      }
+    };
+  }
+
+  const refillBtn = document.getElementById('trigger-refill-btn');
+  if (refillBtn) {
+    refillBtn.onclick = async () => {
+      if (!currentOrder || refillBtn.disabled) return;
+      try {
+        refillBtn.disabled = true;
+        refillBtn.querySelector('span').textContent = 'Submitting…';
+        const rRes = await API.request(`/orders/${currentOrder.id}/refill`, 'POST');
+        showToast(rRes.message || 'Refill request submitted successfully!');
+        if (rRes.order) {
+          currentOrder = rRes.order;
+          renderOrderDetail(rRes.order);
+        } else {
+          loadOrder(true);
+        }
+      } catch (e) {
+        showToast(e.message || 'Refill request failed. Please try again.', true);
+      } finally {
+        refillBtn.disabled = false;
+        refillBtn.querySelector('span').textContent = 'Request Automatic Refill';
+      }
+    };
+  }
+
+  const cancelBtn = document.getElementById('trigger-cancel-btn');
+  if (cancelBtn) {
+    cancelBtn.onclick = async () => {
+      if (!currentOrder || cancelBtn.disabled) return;
+      const shortId = currentOrder.id.substring(0, 8);
+      const chargeFormatted = `GH₵${parseFloat(currentOrder.charge || 0).toFixed(2)}`;
+      if (!confirm(`Are you sure you want to cancel Order #${shortId} and refund ${chargeFormatted} to your wallet balance?`)) return;
+      try {
+        cancelBtn.disabled = true;
+        cancelBtn.querySelector('span').textContent = 'Canceling…';
+        const cRes = await API.request(`/orders/${currentOrder.id}/cancel`, 'POST');
+        showToast(cRes.message || 'Order canceled and wallet refunded successfully!');
+        const user = API.getUser();
+        if (user && cRes.new_balance !== undefined && cRes.new_balance !== null) {
+          user.balance = cRes.new_balance;
+          API.setUser(user);
+          updateUserUI(user);
+        }
+        if (cRes.order) {
+          currentOrder = cRes.order;
+          renderOrderDetail(cRes.order);
+        } else {
+          loadOrder(false);
+        }
+      } catch (e) {
+        showToast(e.message || 'Failed to cancel order. Please contact support.', true);
+        cancelBtn.disabled = false;
+        cancelBtn.querySelector('span').textContent = 'Cancel & Refund Order';
+      }
+    };
   }
 
   // Handle Tab Visibility Changes to pause/resume auto-polling
