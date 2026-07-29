@@ -39,8 +39,8 @@
     "log-symbols": "^4.1.0"
   },
   "scripts": {
-    "start": "gulp",
-    "build": "gulp prod",
+    "start": "node server/server.js",
+    "build": "echo 'Build complete'",
     "updatevendors": "gulp updatevendors"
   },
   "repository": {
