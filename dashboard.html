@@ -158,37 +158,37 @@
     </header>
 
     <!-- Dashboard Main View -->
-    <main class="p-4 md:p-5 space-y-4 flex-grow">
+    <main class="p-3 md:p-4 space-y-3 flex-grow">
 
       <!-- News & Announcements Banner Container -->
-      <div id="news-announcements-container"></div>
+      <div id="news-announcements-container" class="empty:hidden"></div>
 
       <!-- Compact Metrics Cards Row (3 Cards: Balance, Spend, Orders) -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
         <!-- Card 1: Balance -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-3.5">
-          <img src="src/img/credit-card.svg" alt="Balance Credit Card" class="w-12 h-12 object-contain flex-shrink-0">
+        <div class="bg-white dark:bg-gray-800 py-2.5 px-3.5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-3">
+          <img src="src/img/credit-card.svg" alt="Balance Credit Card" class="w-8 h-8 object-contain flex-shrink-0">
           <div class="overflow-hidden">
-            <h3 class="text-base font-bold text-green-600 dark:text-green-400 leading-tight truncate" data-user-balance>GH₵0.00</h3>
-            <span class="text-xs font-normal text-gray-500 dark:text-gray-400 block mt-0.5">Available Balance</span>
+            <h3 class="text-sm font-bold text-green-600 dark:text-green-400 leading-tight truncate" data-user-balance>GH₵0.00</h3>
+            <span class="text-[11px] font-normal text-gray-500 dark:text-gray-400 block mt-0.5">Available Balance</span>
           </div>
         </div>
 
         <!-- Card 2: Total Spend -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-3.5">
-          <img src="src/img/spent.svg" alt="Total Spend" class="w-12 h-12 object-contain flex-shrink-0">
+        <div class="bg-white dark:bg-gray-800 py-2.5 px-3.5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-3">
+          <img src="src/img/spent.svg" alt="Total Spend" class="w-8 h-8 object-contain flex-shrink-0">
           <div class="overflow-hidden">
-            <h3 class="text-base font-bold text-gray-900 dark:text-white leading-tight truncate" id="dash-total-spent">GH₵0.00</h3>
-            <span class="text-xs font-normal text-gray-500 dark:text-gray-400 block mt-0.5">Total Spend</span>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate" id="dash-total-spent">GH₵0.00</h3>
+            <span class="text-[11px] font-normal text-gray-500 dark:text-gray-400 block mt-0.5">Total Spend</span>
           </div>
         </div>
 
         <!-- Card 3: Your Orders -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-3.5">
-          <img src="src/img/orders.svg" alt="Your Orders" class="w-12 h-12 object-contain flex-shrink-0">
+        <div class="bg-white dark:bg-gray-800 py-2.5 px-3.5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-3">
+          <img src="src/img/orders.svg" alt="Your Orders" class="w-8 h-8 object-contain flex-shrink-0">
           <div class="overflow-hidden">
-            <h3 class="text-base font-bold text-gray-900 dark:text-white leading-tight truncate" id="dash-total-orders">0</h3>
-            <span class="text-xs font-normal text-gray-500 dark:text-gray-400 block mt-0.5">Total Orders</span>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate" id="dash-total-orders">0</h3>
+            <span class="text-[11px] font-normal text-gray-500 dark:text-gray-400 block mt-0.5">Total Orders</span>
           </div>
         </div>
       </div>
