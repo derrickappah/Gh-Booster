@@ -8,6 +8,82 @@ const API_BASE_URL = window.location.origin.includes('localhost') || window.loca
   ? `${window.location.origin}/api`
   : '/api';
 
+// ── Global Toast Notification System ─────────────────────────────────────────
+function showToast(message, type = 'success', duration = 5000) {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;max-width:22rem;';
+    document.body.appendChild(container);
+  }
+
+  const colors = {
+    success: { bg: '#f0fdf4', border: '#86efac', text: '#15803d', icon: '✅' },
+    error:   { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', icon: '❌' },
+    warning: { bg: '#fffbeb', border: '#fcd34d', text: '#b45309', icon: '⚠️' },
+    info:    { bg: '#eff6ff', border: '#93c5fd', text: '#1d4ed8', icon: 'ℹ️' }
+  };
+  const c = colors[type] || colors.info;
+
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    background:${c.bg};
+    border:1px solid ${c.border};
+    color:${c.text};
+    padding:0.75rem 1rem;
+    border-radius:0.75rem;
+    font-size:0.8125rem;
+    font-weight:600;
+    font-family:inherit;
+    box-shadow:0 4px 16px rgba(0,0,0,0.12);
+    pointer-events:auto;
+    cursor:pointer;
+    display:flex;
+    align-items:flex-start;
+    gap:0.5rem;
+    line-height:1.4;
+    opacity:0;
+    transform:translateY(0.5rem);
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    max-width:100%;
+    word-break:break-word;
+  `;
+
+  const icon = document.createElement('span');
+  icon.style.flexShrink = '0';
+  icon.textContent = c.icon;
+
+  const text = document.createElement('span');
+  text.style.flexGrow = '1';
+  text.textContent = message;
+
+  const close = document.createElement('button');
+  close.style.cssText = 'background:none;border:none;cursor:pointer;font-size:1rem;line-height:1;color:inherit;opacity:0.6;padding:0;flex-shrink:0;';
+  close.textContent = '×';
+  close.setAttribute('aria-label', 'Dismiss');
+  close.onclick = () => dismiss();
+
+  toast.append(icon, text, close);
+  container.appendChild(toast);
+  toast.onclick = (e) => { if (e.target !== close) dismiss(); };
+
+  // Animate in
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  });
+
+  function dismiss() {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(0.5rem)';
+    setTimeout(() => toast.remove(), 300);
+  }
+
+  if (duration > 0) setTimeout(dismiss, duration);
+  return dismiss;
+}
+
 const API = {
   getToken: () => localStorage.getItem('ghb_token'),
   setToken: (token) => localStorage.setItem('ghb_token', token),
@@ -727,34 +803,23 @@ async function initDashboardPage() {
   // ── Handle return from Moolre hosted page ───────────────────────────
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('deposit') === 'success') {
-    const ref     = urlParams.get('ref') || '';
-    const alertEl = document.getElementById('deposit-alert');
-
-    const showReturnAlert = (msg, success = true) => {
-      if (!alertEl) return;
-      alertEl.className = `rounded-xl p-3.5 text-xs font-semibold border ${
-        success
-          ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50'
-          : 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800/50'
-      }`;
-      alertEl.textContent = msg;
-      alertEl.classList.remove('hidden');
-    };
+    const ref = urlParams.get('ref') || '';
 
     // Clean URL immediately so it doesn't re-trigger on refresh
     window.history.replaceState({}, '', window.location.pathname);
 
     if (ref) {
-      showReturnAlert('⏳ Confirming your payment and crediting your wallet…', false);
+      const dismissPending = showToast('Confirming your payment and crediting your wallet…', 'info', 0);
       try {
         // Call /complete — this credits the wallet server-side
         const completeRes = await API.request('/payments/moolre/complete', 'POST', { reference: ref });
+        dismissPending();
 
         if (completeRes.success) {
           const amount  = parseFloat(completeRes.amount || 0).toFixed(2);
           const balance = parseFloat(completeRes.balance || 0).toFixed(2);
 
-          showReturnAlert(`✅ GH₵${amount} deposited successfully! New balance: GH₵${balance}`, true);
+          showToast(`GH₵${amount} deposited successfully! New balance: GH₵${balance}`, 'success', 7000);
 
           // Update all balance display elements on the page
           const balEls = document.querySelectorAll('[id*="balance"], [id*="wallet"], [id*="dash-balance"]');
@@ -766,10 +831,11 @@ async function initDashboardPage() {
             if (meRes.success && meRes.user) { API.setUser(meRes.user); updateUserUI(meRes.user); }
           } catch (_) {}
         } else {
-          showReturnAlert(`⚠️ Payment processed but could not confirm credit. Please contact support. Ref: ${ref}`, false);
+          showToast(`Payment processed but could not confirm credit. Please contact support. Ref: ${ref}`, 'warning', 10000);
         }
       } catch (err) {
-        showReturnAlert(`⚠️ Payment may have succeeded. Please refresh or contact support. Ref: ${ref}`, false);
+        dismissPending();
+        showToast(`Payment may have succeeded. Please refresh or contact support. Ref: ${ref}`, 'warning', 10000);
       }
     }
   }
