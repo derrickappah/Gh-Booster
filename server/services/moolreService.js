@@ -219,6 +219,10 @@ class MoolreService {
     };
 
     try {
+      console.log('[Moolre] Sending request body:', JSON.stringify({
+        ...requestBody,
+        accountnumber: requestBody.accountnumber ? '***' : '(missing)'
+      }));
       const response = await MoolreService._request({
         baseUrl: creds.baseUrl,
         path: '/embed/link',
@@ -228,6 +232,7 @@ class MoolreService {
         apiPubkey: creds.apiPubkey,
         body: requestBody
       });
+      console.log('[Moolre] Response status:', response.statusCode, JSON.stringify(response.body));
 
       const isSuccess = response.statusCode >= 200 && response.statusCode < 300
         && response.body?.status === 1;
@@ -269,7 +274,8 @@ class MoolreService {
       }
 
       await supabaseAdmin.from('transactions').update({ status: 'failed' }).eq('reference', reference);
-      throw new Error(response.body?.message || 'Moolre API returned an error. Please try again.');
+      console.error('[Moolre] API error response:', JSON.stringify(response.body));
+      throw new Error(response.body?.message || response.body?.error || 'Moolre API returned an error. Please try again.');
 
     } catch (apiError) {
       if (apiError.message.includes('already exists')) throw apiError;
@@ -287,6 +293,7 @@ class MoolreService {
       }
 
       await supabaseAdmin.from('transactions').update({ status: 'failed' }).eq('reference', reference);
+      console.error('[Moolre] Caught API error:', apiError.message);
       throw new Error('Failed to reach Moolre API: ' + apiError.message);
     }
   }
