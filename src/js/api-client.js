@@ -552,11 +552,6 @@ async function initDashboardPage() {
     if (res.success) {
       allServices = res.services || [];
       allCategories = res.categories || [];
-      
-      // Auto select first service if available
-      if (allServices.length > 0) {
-        selectService(allServices[0]);
-      }
       renderDropdownMenu();
     }
   } catch (e) {
