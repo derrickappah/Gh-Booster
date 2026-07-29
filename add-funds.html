@@ -167,7 +167,7 @@
         <div class="lg:col-span-2 space-y-6">
 
           <!-- Select Payment Method Card -->
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
             <h2 class="text-base font-bold text-gray-900 dark:text-white flex items-center border-b border-gray-100 dark:border-gray-700 pb-3">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 03-3 3v8a3 3 0 003 3z" />
@@ -184,47 +184,47 @@
                   </div>
                   <div>
                     <h3 class="font-bold text-gray-900 dark:text-white text-xs">MTN / Telecel / AT Money</h3>
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400">Ghana Local MoMo • Instant Credit</p>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400">Ghana Local MoMo · Instant Credit</p>
                   </div>
                 </div>
                 <span class="px-2 py-0.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 text-[10px] font-bold rounded">0% Fee</span>
               </div>
 
               <!-- Method 2: Cards -->
-              <div class="pay-method-card p-4 border border-gray-200 dark:border-gray-700 hover:border-pink-500 rounded-xl cursor-pointer transition flex items-center justify-between" data-method="card">
+              <div class="pay-method-card p-4 border border-gray-200 dark:border-gray-700 hover:border-pink-500 rounded-xl cursor-pointer transition flex items-center justify-between opacity-60 cursor-not-allowed" data-method="card">
                 <div class="flex items-center space-x-3">
                   <div class="w-10 h-10 bg-blue-600 text-white font-extrabold rounded-lg flex items-center justify-center text-xs shadow-sm flex-shrink-0">
                     CARD
                   </div>
                   <div>
                     <h3 class="font-bold text-gray-900 dark:text-white text-xs">Debit / Credit Cards</h3>
-                    <p class="text-[10px] text-gray-500 dark:text-gray-400">Visa & Mastercard (Paystack)</p>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400">Visa &amp; Mastercard (Coming Soon)</p>
                   </div>
                 </div>
               </div>
 
               <!-- Method 3: Crypto -->
-              <div class="pay-method-card p-4 border border-gray-200 dark:border-gray-700 hover:border-pink-500 rounded-xl cursor-pointer transition flex items-center justify-between" data-method="crypto">
+              <div class="pay-method-card p-4 border border-gray-200 dark:border-gray-700 hover:border-pink-500 rounded-xl cursor-pointer transition flex items-center justify-between opacity-60 cursor-not-allowed" data-method="crypto">
                 <div class="flex items-center space-x-3">
                   <div class="w-10 h-10 bg-gray-900 text-yellow-400 font-extrabold rounded-lg flex items-center justify-center text-xs shadow-sm flex-shrink-0">
                     ₿
-                  </div></div>
+                  </div>
                   <div>
-                    <h3 class="font-bold text-gray-900 text-xs">Cryptocurrency</h3>
-                    <p class="text-[10px] text-gray-500">USDT (TRC20), BTC, ETH</p>
+                    <h3 class="font-bold text-gray-900 dark:text-white text-xs">Cryptocurrency</h3>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400">USDT (TRC20), BTC, ETH</p>
                   </div>
                 </div>
               </div>
 
               <!-- Method 4: Bank Transfer -->
-              <div class="pay-method-card p-4 border border-gray-200 hover:border-pink-500 rounded-xl cursor-pointer transition flex items-center justify-between" data-method="bank">
+              <div class="pay-method-card p-4 border border-gray-200 dark:border-gray-700 hover:border-pink-500 rounded-xl cursor-pointer transition flex items-center justify-between opacity-60 cursor-not-allowed" data-method="bank">
                 <div class="flex items-center space-x-3">
                   <div class="w-10 h-10 bg-emerald-600 text-white font-extrabold rounded-lg flex items-center justify-center text-xs shadow-sm flex-shrink-0">
                     BANK
                   </div>
                   <div>
-                    <h3 class="font-bold text-gray-900 text-xs">Direct Bank Wire</h3>
-                    <p class="text-[10px] text-gray-500">GHS / USD Direct Deposit</p>
+                    <h3 class="font-bold text-gray-900 dark:text-white text-xs">Direct Bank Wire</h3>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400">GHS Direct Deposit</p>
                   </div>
                 </div>
               </div>
@@ -232,93 +232,96 @@
           </div>
 
           <!-- Deposit Form Card -->
-          <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
-            <h2 class="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Enter Deposit Amount</h2>
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
+            <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+              <h2 class="text-base font-bold text-gray-900 dark:text-white">Enter Deposit Amount</h2>
+              <span class="text-[10px] font-bold bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2.5 py-1 rounded-full tracking-wide">via Moolre</span>
+            </div>
 
-            <form id="deposit-form" class="space-y-4">
-              <!-- Quick Amount Selector Pills -->
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-2">Quick Select Amount (GHS)</label>
-                <div class="flex flex-wrap gap-2 text-xs font-semibold">
-                  <button type="button" class="quick-amt-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition" data-amt="10">GH₵10</button>
-                  <button type="button" class="quick-amt-btn px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active" data-amt="25">GH₵25</button>
-                  <button type="button" class="quick-amt-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition" data-amt="50">GH₵50</button>
-                  <button type="button" class="quick-amt-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition" data-amt="100">GH₵100</button>
-                  <button type="button" class="quick-amt-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition" data-amt="250">GH₵250</button>
-                  <button type="button" class="quick-amt-btn px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition" data-amt="500">GH₵500</button>
+            <form id="deposit-form" class="space-y-5">
+              <input type="hidden" id="moolre-network-hidden" value="MTN">
+
+              <!-- Amount Input -->
+              <div class="space-y-1.5">
+                <label for="deposit-amount" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</label>
+                <div class="flex items-center rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/20 focus-within:bg-white dark:focus-within:bg-gray-900 transition">
+                  <span class="pl-4 pr-1 text-gray-500 dark:text-gray-400 font-bold text-sm select-none flex-shrink-0">
+                    GH₵
+                  </span>
+                  <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="0.00" value="50"
+                    class="w-full py-3 px-2 bg-transparent text-gray-900 dark:text-white text-base font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                 </div>
               </div>
 
-              <!-- Custom Amount Input -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label for="deposit-amount" class="block text-xs font-semibold text-gray-700 mb-1.5">Amount in GHS (GH₵)</label>
-                  <div class="relative">
-                    <span class="absolute left-3 top-2.5 text-gray-400 font-bold text-sm">$</span>
-                    <input type="number" id="deposit-amount" value="25" min="1" step="1" required class="w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition">
-                  </div>
-                </div>
-
-                <!-- Local Equivalent Box -->
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 mb-1.5">Local Currency (GHS ₵)</label>
-                  <div class="py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between">
-                    <span id="ghs-equivalent" class="text-sm font-extrabold text-pink-600">₵325.00 GHS</span>
-                    <span class="text-[10px] text-gray-400">Rate: GH₵1 = ₵13.00</span>
-                  </div>
+              <!-- Quick-pick amounts -->
+              <div class="space-y-2">
+                <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Quick Select</p>
+                <div class="flex flex-row gap-2" id="quick-amounts">
+                  <button type="button" data-amount="20"  class="quick-amt flex-1 py-2 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵20</button>
+                  <button type="button" data-amount="50"  class="quick-amt flex-1 py-2 text-xs font-bold rounded-lg border border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 transition">₵50</button>
+                  <button type="button" data-amount="100" class="quick-amt flex-1 py-2 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵100</button>
+                  <button type="button" data-amount="200" class="quick-amt flex-1 py-2 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵200</button>
+                  <button type="button" data-amount="500" class="quick-amt flex-1 py-2 text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵500</button>
                 </div>
               </div>
 
-              <!-- Submit Payment Button -->
-              <button type="submit" class="w-full py-3.5 bg-pink-600 hover:bg-pink-700 text-white font-extrabold text-sm rounded-lg shadow-lg shadow-pink-600/30 transition flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <!-- Submit Button -->
+              <button type="submit" id="deposit-submit-btn"
+                class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-lg shadow-green-600/20 hover:shadow-green-600/40 transition-all duration-200 flex items-center justify-center gap-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                Pay & Top Up Account Now
+                <span id="deposit-btn-text">Pay Now &amp; Deposit</span>
               </button>
+
+              <!-- Pending / Redirect State -->
+              <div id="deposit-pending-box" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 flex items-start gap-3">
+                <svg class="animate-spin h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <div>
+                  <p class="text-xs font-bold text-amber-800 dark:text-amber-300">Payment Pending Confirmation</p>
+                  <p id="deposit-ref-display" class="text-[11px] text-amber-600 dark:text-amber-400 font-mono mt-0.5"></p>
+                </div>
+              </div>
             </form>
           </div>
 
         </div>
 
-        <!-- Right 1 Col: Guidelines & Recent Deposits -->
+        <!-- Right 1 Col: Guidelines & Account Info -->
         <div class="space-y-6">
 
           <!-- Deposit Guidelines Card -->
-          <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-3">
-            <h3 class="text-sm font-bold text-gray-900 flex items-center">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-pink-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Payment Guidelines
             </h3>
-            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed">
+            <ul class="text-xs text-gray-600 dark:text-gray-300 space-y-2 list-disc pl-4 leading-relaxed">
               <li>All Mobile Money deposits are credited <strong>instantly 24/7</strong>.</li>
-              <li>Minimum deposit amount is <strong>GH₵1.00 (≈ ₵13.00 GHS)</strong>.</li>
+              <li>Minimum deposit amount is <strong>GH₵1.00</strong>.</li>
               <li>Zero processing fees on MTN, Telecel, and AT Money transfers.</li>
-              <li>Need a custom invoice or bulk wire payment? Contact <a href="tickets.html" class="hidden text-pink-600 hover:underline font-semibold">Support Tickets</a>.</li>
+              <li>Funds are credited automatically to your GhBooster balance.</li>
             </ul>
           </div>
 
-          <!-- Recent Deposits Card -->
-          <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
-            <h3 class="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2">Recent Deposits</h3>
+          <!-- Account Balance Info Card -->
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Your Wallet Summary</h3>
             
             <div class="space-y-3 text-xs">
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-gray-900 rounded-xl">
                 <div>
-                  <span class="font-bold text-gray-900 block">+GH₵250.00 USD</span>
-                  <span class="text-[10px] text-gray-400">MTN MoMo • 2026-07-27</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Current Balance</span>
+                  <span class="font-extrabold text-green-600 dark:text-green-400 text-lg block mt-0.5" data-user-balance>GH₵0.00</span>
                 </div>
-                <span class="px-2 py-1 bg-green-100 text-green-700 font-bold rounded-full text-[10px]">Success</span>
-              </div>
-
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <span class="font-bold text-gray-900 block">+GH₵100.00 USD</span>
-                  <span class="text-[10px] text-gray-400">Visa Card • 2026-07-20</span>
+                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400 font-bold">
+                  💳
                 </div>
-                <span class="px-2 py-1 bg-green-100 text-green-700 font-bold rounded-full text-[10px]">Success</span>
               </div>
             </div>
           </div>
@@ -330,69 +333,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400">
       Copyright © GhBooster SMM Panel | All rights reserved.
     </footer>
 
   </div>
 
-  <!-- Dynamic Script -->
-  
-  
-
-
-  
-
-
-  
-
+  <!-- Scripts -->
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
-
-  
-
-
-  
-
-
-  
-
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-      const paymentTabs = document.querySelectorAll('.payment-tab');
-      const methodInputs = document.querySelectorAll('input[name="payment_method"]');
-      const depositForm = document.getElementById('deposit-form');
-      const depositAmtInput = document.getElementById('deposit-amount');
-      const GHS_RATE = 15.50;
-
-      if (paymentTabs.length > 0) {
-        paymentTabs.forEach(function (tab) {
-          tab.addEventListener('click', function () {
-            paymentTabs.forEach(function (t) {
-              t.classList.remove('border-primary', 'bg-primary/5', 'text-primary');
-              t.classList.add('border-gray-200', 'hover:border-gray-300');
-            });
-            tab.classList.remove('border-gray-200', 'hover:border-gray-300');
-            tab.classList.add('border-primary', 'bg-primary/5', 'text-primary');
-            const radio = tab.querySelector('input[type="radio"]');
-            if (radio) radio.checked = true;
-          });
-        });
-      }
-
-      if (depositForm && depositAmtInput) {
-        depositForm.addEventListener('submit', function (e) {
-          e.preventDefault();
-          const amt = depositAmtInput.value;
-          const ghs = (parseFloat(amt) * GHS_RATE).toFixed(2);
-          alert("Redirecting to Mobile Money Payment Gateway... Total: GH₵" + amt + " GHS");
-        });
-      }
-
-    });
-  </script>
-
 </body>
 </html>
