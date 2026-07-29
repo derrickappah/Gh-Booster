@@ -4465,9 +4465,15 @@ iframe.wait-autoplay {
     bottom: 0 !important;
     left: 0 !important;
     z-index: 50 !important;
-    height: 100vh !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
     width: 16rem !important;
     transition: transform 0.3s ease-in-out !important;
+  }
+
+  #sidebar-footer {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important;
   }
 
   #sidebar.-translate-x-full {
