@@ -165,7 +165,7 @@ class MoolreService {
    * Uses POST /embed/link to create a Web POS URL the user is redirected to.
    * Docs: https://moolre.com — "Generate Payment Link API"
    */
-  static async generatePaymentLink({ userId, amount, email, description }) {
+  static async generatePaymentLink({ userId, amount, email, description, appUrl }) {
     const creds = await MoolreService.getCredentials();
 
     if (!creds.enabled) {
@@ -202,7 +202,7 @@ class MoolreService {
       throw new Error('Failed to create transaction record: ' + txnErr.message);
     }
 
-    const appUrl = process.env.APP_URL || 'http://localhost:5000';
+    const resolvedAppUrl = appUrl || process.env.APP_URL || 'http://localhost:5000';
 
     // Build the /embed/link request body
     const requestBody = {
@@ -210,8 +210,8 @@ class MoolreService {
       amount: String(amountGHS.toFixed(2)),
       email: email || creds.apiUser,
       externalref: reference,
-      callback: `${appUrl}/api/payments/moolre/webhook`,
-      redirect: `${appUrl}/dashboard.html?deposit=success&ref=${reference}`,
+      callback: `${resolvedAppUrl}/api/payments/moolre/webhook`,
+      redirect: `${resolvedAppUrl}/dashboard.html?deposit=success&ref=${reference}`,
       reusable: '0',
       currency: 'GHS',
       accountnumber: creds.accountNumber,

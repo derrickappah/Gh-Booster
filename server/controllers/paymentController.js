@@ -42,11 +42,19 @@ class PaymentController {
         return res.status(400).json({ success: false, error: 'Amount is required.' });
       }
 
+      // Derive the app URL from the incoming request so it works in both
+      // development (localhost) and production (Vercel / custom domain)
+      // without needing to set APP_URL as an environment variable.
+      const proto = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
+      const host = req.headers['x-forwarded-host'] || req.headers.host;
+      const appUrl = process.env.APP_URL || `${proto}://${host}`;
+
       const result = await MoolreService.generatePaymentLink({
         userId: req.user.id,
         amount,
         email: email || req.user.email,
-        description: description || 'GhBooster wallet top-up'
+        description: description || 'GhBooster wallet top-up',
+        appUrl
       });
 
       res.json(result);
