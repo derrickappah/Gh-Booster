@@ -320,8 +320,7 @@
       sidebarIcons.forEach(function (el) {
         el.classList.remove('mr-3');
       });
-      sidebarTexts.forEach(function (el) { el.classList.add('hidden'); });
-      if (brandFull) brandFull.classList.add('hidden');
+      // Text and logo are hidden via CSS transition (opacity/width)
       if (iconCollapse) iconCollapse.classList.add('hidden');
       if (iconExpand) iconExpand.classList.remove('hidden');
       if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
@@ -351,8 +350,7 @@
       sidebarIcons.forEach(function (el) {
         el.classList.add('mr-3');
       });
-      sidebarTexts.forEach(function (el) { el.classList.remove('hidden'); });
-      if (brandFull) brandFull.classList.remove('hidden');
+      // Text and logo are shown via CSS transition (opacity/width)
       if (iconCollapse) iconCollapse.classList.remove('hidden');
       if (iconExpand) iconExpand.classList.add('hidden');
       if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');

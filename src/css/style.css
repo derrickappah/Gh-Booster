@@ -4469,7 +4469,8 @@ iframe.wait-autoplay {
     height: 100dvh !important;
     max-height: 100dvh !important;
     width: 16rem !important;
-    transition: transform 0.3s ease-in-out !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: transform;
   }
 
   #sidebar-footer {
@@ -4497,6 +4498,18 @@ iframe.wait-autoplay {
   }
 }
 
+/* Mobile backdrop fade */
+#mobile-sidebar-backdrop {
+  transition: opacity 0.3s ease !important;
+}
+#mobile-sidebar-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#mobile-sidebar-backdrop:not(.hidden) {
+  opacity: 1;
+}
+
 /* Desktop Sticky Sidebar (>= 768px) */
 @media (min-width: 768px) {
   #sidebar {
@@ -4511,6 +4524,9 @@ iframe.wait-autoplay {
     transform: none !important;
     display: flex !important;
     flex-shrink: 0 !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: width;
+    overflow: hidden !important;
   }
 
   #sidebar.is-collapsed {
@@ -4528,4 +4544,50 @@ iframe.wait-autoplay {
   #toggle-sidebar {
     display: flex !important;
   }
+}
+
+/* Sidebar text fade on collapse/expand */
+.sidebar-text {
+  transition: opacity 0.2s ease, width 0.2s ease;
+  opacity: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+#sidebar.is-collapsed .sidebar-text {
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+/* Sidebar nav link hover — lift + bg glow */
+.sidebar-link {
+  transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease !important;
+  will-change: transform;
+}
+.sidebar-link:hover {
+  transform: translateX(3px);
+}
+#sidebar.is-collapsed .sidebar-link:hover {
+  transform: none;
+}
+
+/* Brand logo smooth opacity on collapse */
+#brand-full {
+  transition: opacity 0.2s ease;
+  opacity: 1;
+}
+#sidebar.is-collapsed #brand-full {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toggle button icon swap animation */
+#icon-collapse, #icon-expand {
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+#icon-collapse {
+  transform: rotate(0deg);
+}
+#sidebar.is-collapsed #icon-collapse {
+  transform: rotate(180deg);
 }
