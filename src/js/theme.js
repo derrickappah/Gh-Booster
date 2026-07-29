@@ -389,10 +389,15 @@
     var iconHamburger = document.getElementById('mobile-icon-hamburger');
     var iconClose = document.getElementById('mobile-icon-close');
 
+    // Single source of truth for sidebar state — never rely on DOM classes for this
+    var isMobileOpen = false;
+    var isAnimating = false;  // debounce lock
+
     if (!backdrop && sidebar) {
       backdrop = document.createElement('div');
       backdrop.id = 'mobile-sidebar-backdrop';
-      backdrop.className = 'fixed inset-0 bg-gray-900/60 z-40 hidden md:hidden transition-opacity duration-300';
+      backdrop.className = 'fixed inset-0 bg-gray-900/60 z-40 hidden md:hidden';
+      backdrop.style.cssText += ';transition:opacity 0.3s ease;opacity:0;';
       document.body.appendChild(backdrop);
     }
 
@@ -414,6 +419,7 @@
         if (expandSidebarGlobal) expandSidebarGlobal();
         sidebar.classList.add('-translate-x-full', 'hidden');
         sidebar.classList.remove('translate-x-0');
+        isMobileOpen = false;
         showHamburgerIcon();
       } else {
         sidebar.classList.remove('hidden', '-translate-x-full', 'translate-x-0');
@@ -421,18 +427,19 @@
     }
 
     function openMobileSidebar() {
-      if (window.innerWidth >= 768) return;
-      if (closeTimeout) {
-        clearTimeout(closeTimeout);
-        closeTimeout = null;
-      }
+      if (window.innerWidth >= 768 || isMobileOpen || isAnimating) return;
+      isAnimating = true;
+      isMobileOpen = true;
+
+      if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+
       if (sidebar) {
         if (expandSidebarGlobal) expandSidebarGlobal();
-        // Step 1: make visible but still off-screen
+        // Make visible but keep off-screen first
         sidebar.classList.remove('hidden');
         sidebar.classList.add('-translate-x-full');
         sidebar.classList.remove('translate-x-0');
-        // Step 2: on next frame, slide in
+        // Double rAF ensures the browser has rendered the off-screen state before animating
         requestAnimationFrame(function () {
           requestAnimationFrame(function () {
             sidebar.classList.remove('-translate-x-full');
@@ -440,48 +447,79 @@
           });
         });
       }
+
       if (backdrop) {
         backdrop.classList.remove('hidden');
-        backdrop.style.opacity = '0';
         requestAnimationFrame(function () { backdrop.style.opacity = '1'; });
       }
+
       showCloseIcon();
-      document.body.classList.add('overflow-hidden', 'md:overflow-auto');
+      document.body.classList.add('overflow-hidden');
+
+      // Release debounce lock after animation completes
+      setTimeout(function () { isAnimating = false; }, 380);
     }
 
     function closeMobileSidebar() {
-      if (window.innerWidth >= 768) return;
+      if (window.innerWidth >= 768 || !isMobileOpen || isAnimating) return;
+      isAnimating = true;
+      isMobileOpen = false;
+
       if (closeTimeout) clearTimeout(closeTimeout);
+
       if (sidebar) {
         sidebar.classList.add('-translate-x-full');
         sidebar.classList.remove('translate-x-0');
         closeTimeout = setTimeout(function () {
-          if (sidebar && sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+          if (sidebar && window.innerWidth < 768) {
             sidebar.classList.add('hidden');
           }
-        }, 350);
+        }, 360);
       }
+
       if (backdrop) {
         backdrop.style.opacity = '0';
-        setTimeout(function () { backdrop.classList.add('hidden'); backdrop.style.opacity = ''; }, 300);
+        setTimeout(function () {
+          backdrop.classList.add('hidden');
+        }, 320);
       }
+
       showHamburgerIcon();
-      document.body.classList.remove('overflow-hidden', 'md:overflow-auto');
+      document.body.classList.remove('overflow-hidden');
+
+      setTimeout(function () { isAnimating = false; }, 380);
+    }
+
+    function toggleMobileSidebar(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (window.innerWidth >= 768) return;
+      if (isMobileOpen) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
     }
 
     if (mobileBtn) {
+      // Use touchend for instant response on mobile (no 300ms click delay)
+      mobileBtn.addEventListener('touchend', function (e) {
+        e.preventDefault(); // prevent the subsequent click event from firing too
+        toggleMobileSidebar(e);
+      }, { passive: false });
+
+      // Fallback for non-touch devices (desktop testing)
       mobileBtn.addEventListener('click', function (e) {
-        if (e) e.preventDefault();
-        if (window.innerWidth >= 768) return;
-        if (sidebar && (sidebar.classList.contains('-translate-x-full') || sidebar.classList.contains('hidden'))) {
-          openMobileSidebar();
-        } else {
-          closeMobileSidebar();
-        }
+        // Only handle if not already handled by touchend
+        if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+        toggleMobileSidebar(e);
       });
     }
 
     if (backdrop) {
+      backdrop.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        closeMobileSidebar();
+      }, { passive: false });
       backdrop.addEventListener('click', closeMobileSidebar);
     }
 
@@ -493,13 +531,16 @@
           sidebar.classList.remove('hidden', '-translate-x-full', 'translate-x-0');
         }
         if (backdrop) {
+          backdrop.style.opacity = '0';
           backdrop.classList.add('hidden');
         }
+        isMobileOpen = false;
+        isAnimating = false;
         showHamburgerIcon();
         document.body.classList.remove('overflow-hidden');
       } else {
         if (expandSidebarGlobal) expandSidebarGlobal();
-        if (sidebar && !sidebar.classList.contains('translate-x-0')) {
+        if (sidebar && !isMobileOpen) {
           sidebar.classList.add('-translate-x-full', 'hidden');
         }
       }
