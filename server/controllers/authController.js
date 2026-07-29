@@ -10,7 +10,7 @@ class AuthController {
         ...result
       });
     } catch (err) {
-      next(err);
+      res.status(400).json({ success: false, error: err.message });
     }
   }
 

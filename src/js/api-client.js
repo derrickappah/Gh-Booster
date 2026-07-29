@@ -35,9 +35,17 @@ const API = {
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-      const result = await response.json();
+      const text = await response.text();
+      let result = {};
+      if (text && text.trim()) {
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          result = { error: text };
+        }
+      }
       if (!response.ok) {
-        const error = new Error(result.error || 'Server error occurred');
+        const error = new Error(result.error || result.message || `Server Error (${response.status})`);
         error.status = response.status;
         throw error;
       }

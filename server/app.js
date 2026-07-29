@@ -42,22 +42,27 @@ app.use('/api', globalLimiter);
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '..')));
 
-// Mount API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/deposits', depositRoutes);
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/v2', apiV2Routes);
-app.use('/api/news', newsRoutes);
-app.use('/api/referrals', referralRoutes);
-app.use('/api/child-panels', childPanelRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/payments', paymentRoutes);
+// Mount API Routes (Supports /api/... and direct serverless /... paths)
+const registerAppRoutes = (prefix) => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/services`, serviceRoutes);
+  app.use(`${prefix}/orders`, orderRoutes);
+  app.use(`${prefix}/deposits`, depositRoutes);
+  app.use(`${prefix}/tickets`, ticketRoutes);
+  app.use(`${prefix}/admin`, adminRoutes);
+  app.use(`${prefix}/v2`, apiV2Routes);
+  app.use(`${prefix}/news`, newsRoutes);
+  app.use(`${prefix}/referrals`, referralRoutes);
+  app.use(`${prefix}/child-panels`, childPanelRoutes);
+  app.use(`${prefix}/transactions`, transactionRoutes);
+  app.use(`${prefix}/payments`, paymentRoutes);
+};
 
-// Health Check Endpoint
-app.get('/api/health', (req, res) => {
+registerAppRoutes('/api');
+registerAppRoutes('');
+
+// Health Check Endpoints
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     success: true,
     status: 'operational',
