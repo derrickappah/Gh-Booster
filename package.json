@@ -19,7 +19,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@vercel/node": "^5.0.0"
+    "@vercel/node": "^5.0.0",
+    "tailwindcss": "^4.3.3"
   },
   "scripts": {
     "start": "node server/server.js",
