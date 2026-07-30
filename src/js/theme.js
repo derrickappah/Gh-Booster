@@ -559,6 +559,307 @@
     });
   };
 
+  var myImageCache = function () {
+    if (!window.ImageCache) {
+      var STORAGE_PREFIX = 'ghb_img_';
+      var METADATA_KEY = 'ghb_img_meta';
+
+      var PRECACHE_ASSETS = [
+        'src/img/logo.png',
+        'src/img/credit-card.svg',
+        'src/img/spent.svg',
+        'src/img/orders.svg',
+        'src/img/account.svg',
+        'src/img/favicon.ico',
+        'src/img/favicon.png',
+        'src/img/platforms/facebook.png',
+        'src/img/platforms/instagram.png',
+        'src/img/platforms/snapchat.png',
+        'src/img/platforms/spotify.png',
+        'src/img/platforms/telegram.png',
+        'src/img/platforms/tiktok.png',
+        'src/img/platforms/twitter.png',
+        'src/img/platforms/whatsapp.png',
+        'src/img/platforms/youtube.png'
+      ];
+
+      function normalizeUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+        try {
+          return new URL(url, window.location.origin).href;
+        } catch (e) {
+          return url;
+        }
+      }
+
+      function isLocalStorageAvailable() {
+        try {
+          var testKey = '__ghb_img_test__';
+          localStorage.setItem(testKey, '1');
+          localStorage.removeItem(testKey);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      var storageAvailable = isLocalStorageAvailable();
+
+      function evictOldCache() {
+        if (!storageAvailable) return;
+        try {
+          var items = [];
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key && key.startsWith(STORAGE_PREFIX) && key !== METADATA_KEY) {
+              try {
+                var raw = localStorage.getItem(key);
+                var parsed = JSON.parse(raw);
+                items.push({ key: key, ts: parsed.ts || 0, size: raw.length });
+              } catch (_) {
+                items.push({ key: key, ts: 0, size: 0 });
+              }
+            }
+          }
+          items.sort(function (a, b) { return a.ts - b.ts; });
+          var toRemoveCount = Math.max(1, Math.ceil(items.length * 0.35));
+          for (var j = 0; j < toRemoveCount && j < items.length; j++) {
+            localStorage.removeItem(items[j].key);
+          }
+        } catch (e) {
+          console.warn('[ImageCache] Error during cache eviction:', e);
+        }
+      }
+
+      window.ImageCache = {
+        get: function (url) {
+          if (!storageAvailable || !url) return null;
+          var key = STORAGE_PREFIX + normalizeUrl(url);
+          try {
+            var item = localStorage.getItem(key);
+            if (!item) return null;
+            var parsed = JSON.parse(item);
+            return parsed.data || null;
+          } catch (e) {
+            return null;
+          }
+        },
+
+        set: function (url, dataUrl) {
+          if (!storageAvailable || !url || !dataUrl) return false;
+          if (dataUrl.length > 2 * 1024 * 1024) return false;
+          var key = STORAGE_PREFIX + normalizeUrl(url);
+          var payload = JSON.stringify({
+            data: dataUrl,
+            ts: Date.now(),
+            size: dataUrl.length
+          });
+
+          try {
+            localStorage.setItem(key, payload);
+            return true;
+          } catch (e) {
+            evictOldCache();
+            try {
+              localStorage.setItem(key, payload);
+              return true;
+            } catch (err) {
+              console.warn('[ImageCache] Unable to store image due to storage quota:', url);
+              return false;
+            }
+          }
+        },
+
+        fetchAndCache: function (url) {
+          var self = this;
+          var normalized = normalizeUrl(url);
+          if (!normalized || normalized.startsWith('data:')) {
+            return Promise.resolve(normalized);
+          }
+
+          var cached = self.get(normalized);
+          if (cached) {
+            return Promise.resolve(cached);
+          }
+
+          return fetch(normalized, { mode: 'cors' })
+            .then(function (response) {
+              if (!response.ok) throw new Error('Network response not ok');
+              return response.blob();
+            })
+            .then(function (blob) {
+              return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.onloadend = function () {
+                  var dataUrl = reader.result;
+                  self.set(normalized, dataUrl);
+                  resolve(dataUrl);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              });
+            })
+            .catch(function (err) {
+              return normalized;
+            });
+        },
+
+        applyToElement: function (imgEl) {
+          if (!imgEl || imgEl.nodeName !== 'IMG') return;
+          var originalSrc = imgEl.getAttribute('data-src') || imgEl.getAttribute('src');
+          if (!originalSrc || originalSrc.startsWith('data:')) return;
+
+          var normalized = normalizeUrl(originalSrc);
+          var cachedData = this.get(normalized);
+
+          if (cachedData) {
+            if (imgEl.src !== cachedData) {
+              imgEl.setAttribute('data-original-src', originalSrc);
+              imgEl.src = cachedData;
+            }
+          } else {
+            this.fetchAndCache(originalSrc).then(function (dataUrl) {
+              if (dataUrl && dataUrl.startsWith('data:') && imgEl.src !== dataUrl) {
+                imgEl.setAttribute('data-original-src', originalSrc);
+                imgEl.src = dataUrl;
+              }
+            });
+          }
+        },
+
+        cacheAllImages: function () {
+          var self = this;
+          var images = document.querySelectorAll('img');
+          images.forEach(function (img) {
+            self.applyToElement(img);
+          });
+
+          var bgElements = document.querySelectorAll('[style*="background-image"]');
+          bgElements.forEach(function (el) {
+            var style = el.style.backgroundImage;
+            var match = style.match(/url\(['"]?(.*?)['"]?\)/);
+            if (match && match[1] && !match[1].startsWith('data:')) {
+              var bgUrl = match[1];
+              var cached = self.get(bgUrl);
+              if (cached) {
+                el.style.backgroundImage = 'url("' + cached + '")';
+              } else {
+                self.fetchAndCache(bgUrl).then(function (dataUrl) {
+                  if (dataUrl && dataUrl.startsWith('data:')) {
+                    el.style.backgroundImage = 'url("' + dataUrl + '")';
+                  }
+                });
+              }
+            }
+          });
+        },
+
+        precacheStaticAssets: function () {
+          var self = this;
+          PRECACHE_ASSETS.forEach(function (assetPath) {
+            self.fetchAndCache(assetPath);
+          });
+        },
+
+        clear: function () {
+          if (!storageAvailable) return;
+          try {
+            var keysToRemove = [];
+            for (var i = 0; i < localStorage.length; i++) {
+              var key = localStorage.key(i);
+              if (key && key.startsWith(STORAGE_PREFIX)) {
+                keysToRemove.push(key);
+              }
+            }
+            keysToRemove.forEach(function (k) {
+              localStorage.removeItem(k);
+            });
+            console.log('[ImageCache] Cleared ' + keysToRemove.length + ' cached images.');
+          } catch (e) {
+            console.error('[ImageCache] Error clearing image cache:', e);
+          }
+        },
+
+        stats: function () {
+          if (!storageAvailable) return { count: 0, sizeKB: '0.00', sizeMB: '0.00' };
+          var count = 0;
+          var totalBytes = 0;
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key && key.startsWith(STORAGE_PREFIX) && key !== METADATA_KEY) {
+              count++;
+              var val = localStorage.getItem(key);
+              if (val) totalBytes += val.length;
+            }
+          }
+          return {
+            count: count,
+            sizeKB: (totalBytes / 1024).toFixed(2),
+            sizeMB: (totalBytes / (1024 * 1024)).toFixed(2)
+          };
+        },
+
+        initMutationObserver: function () {
+          var self = this;
+          if (typeof MutationObserver === 'undefined') return;
+
+          var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+              if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach(function (node) {
+                  if (node.nodeType === 1) {
+                    if (node.nodeName === 'IMG') {
+                      self.applyToElement(node);
+                    } else if (node.querySelectorAll) {
+                      var imgs = node.querySelectorAll('img');
+                      imgs.forEach(function (img) {
+                        self.applyToElement(img);
+                      });
+                    }
+                  }
+                });
+              } else if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                if (mutation.target && mutation.target.nodeName === 'IMG') {
+                  var src = mutation.target.getAttribute('src');
+                  if (src && !src.startsWith('data:')) {
+                    self.applyToElement(mutation.target);
+                  }
+                }
+              }
+            });
+          });
+
+          observer.observe(document.body || document.documentElement, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['src']
+          });
+        },
+
+        init: function () {
+          var self = this;
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () {
+              self.cacheAllImages();
+              self.precacheStaticAssets();
+              self.initMutationObserver();
+            });
+          } else {
+            self.cacheAllImages();
+            self.precacheStaticAssets();
+            self.initMutationObserver();
+          }
+        }
+      };
+    }
+
+    if (window.ImageCache) {
+      window.ImageCache.init();
+    }
+  };
+
   /**
    * ------------------------------------------------------------------------
    * Launch Functions
@@ -577,5 +878,6 @@
   initSidebarToggle();
   initMobileSidebar();
   myCustom();
+  myImageCache();
 
 })();

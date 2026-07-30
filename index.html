@@ -47,6 +47,13 @@ License: You must have a valid license from official store to legally use the th
   }
   </script>
 
+  <!-- google font preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Preload Critical LCP Hero Image -->
+  <link rel="preload" as="image" href="src/img/dummy/hero.webp" type="image/webp">
+
   <!-- Development css -->
   <link rel="stylesheet" href="src/css/style.css">
 
@@ -54,8 +61,6 @@ License: You must have a valid license from official store to legally use the th
   <!-- <link rel="stylesheet" href="dist/css/style.css"> -->
 
   <!-- google font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;700&amp;display=swap" rel="stylesheet">
 
   <!-- Favicon  -->
@@ -70,7 +75,7 @@ License: You must have a valid license from official store to legally use the th
           <div class="lg:flex lg:justify-between">
           	<div class="flex justify-between">
 	            <a href="index.html" class="flex items-center py-2">
-  <img src="src/img/logo.png" alt="GhBooster Logo" class="h-10 md:h-12 w-auto object-contain">
+  <img src="src/img/logo.png" alt="GhBooster Logo" class="h-10 md:h-12 w-auto object-contain" width="166" height="48" fetchpriority="high" decoding="async">
 </a>
 		          <!-- mobile nav -->
 	            <div class="flex flex-row items-center py-4 lg:py-0">
@@ -111,7 +116,10 @@ License: You must have a valid license from official store to legally use the th
 		      <!-- content -->
 		      <div class="flex-shrink max-w-full px-4 sm:px-12 lg:px-18 w-full sm:w-9/12 lg:w-1/2 self-center">
 		        <div class="relative overflow-hidden border-b border-gray-100">
-		          <img class="max-w-full h-auto mx-auto" src="src/img/dummy/hero.png" alt="GhBooster SMM Panel">
+		          <picture>
+		            <source srcset="src/img/dummy/hero.webp" type="image/webp">
+		            <img class="max-w-full h-auto mx-auto" src="src/img/dummy/hero.png" alt="GhBooster SMM Panel" width="650" height="558" fetchpriority="high" loading="eager" decoding="async">
+		          </picture>
 		        </div>
 		      </div><!-- end content -->
 
@@ -119,7 +127,7 @@ License: You must have a valid license from official store to legally use the th
 		      <div class="flex-shrink max-w-full px-4 w-full md:w-9/12 lg:w-1/2 self-center lg:pr-12">
 		        <div class="text-center lg:text-left mt-6 lg:mt-0">
 		          <div class="mb-12">
-		            <h1 class="text-4xl hero-title leading-normal text-black font-bold mb-4">#1 SMM Panel for<br><span data-toggle="typed" data-options='{"strings": ["Instagram Followers", "TikTok Likes", "YouTube Subscribers", "Telegram Members", "Facebook Likes"]}'></span></h1>
+		            <h1 class="text-4xl hero-title leading-normal text-black font-bold mb-4">#1 SMM Panel for<br><span data-toggle="typed" data-options='{"strings": ["Instagram Followers", "TikTok Likes", "YouTube Subscribers", "Telegram Members", "Facebook Likes"]}'>Instagram Followers</span></h1>
 		            <p class="text-gray-500 leading-relaxed font-light text-xl mx-auto pb-2">GhBooster provides ultra-fast, affordable, and automated social media growth services for creators, brands, and resellers worldwide.</p>
 		          </div>
 		          <div class="flex flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4">
@@ -601,15 +609,15 @@ License: You must have a valid license from official store to legally use the th
   
 
   <!-- Vendor Scripts -->
-  <script src="src/vendors/glightbox/dist/js/glightbox.min.js"></script>
-  <script src="src/vendors/@splidejs/splide/dist/js/splide.min.js"></script>
-  <script src="src/vendors/typed.js/lib/typed.min.js"></script>
-  <script src="src/vendors/wow.js/dist/wow.min.js"></script>
-  <script src="src/vendors/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+  <script src="src/vendors/glightbox/dist/js/glightbox.min.js" defer></script>
+  <script src="src/vendors/@splidejs/splide/dist/js/splide.min.js" defer></script>
+  <script src="src/vendors/typed.js/lib/typed.min.js" defer></script>
+  <script src="src/vendors/wow.js/dist/wow.min.js" defer></script>
+  <script src="src/vendors/smooth-scroll/dist/smooth-scroll.polyfills.min.js" defer></script>
   
   <!-- Custom Scripts -->
-  <script src="src/js/theme.js"></script>
-  <script src="src/js/api-client.js"></script>
+  <script src="src/js/theme.js" defer></script>
+  <script src="src/js/api-client.js" defer></script>
 
 </body>
 </html>

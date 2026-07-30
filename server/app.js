@@ -39,8 +39,18 @@ app.use(express.urlencoded({ extended: true }));
 // Apply Rate Limiting
 app.use('/api', globalLimiter);
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, '..')));
+// Serve static frontend files with optimal Cache-Control headers
+app.use(express.static(path.join(__dirname, '..'), {
+  maxAge: '1d',
+  etag: true,
+  setHeaders: (res, filepath) => {
+    if (filepath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (filepath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|woff|woff2|ttf|eot)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+    }
+  }
+}));
 
 // Mount API Routes (Supports /api/... and direct serverless /... paths)
 const registerAppRoutes = (prefix) => {
