@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -93,8 +94,14 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 app.get(['/llms.txt', '/.well-known/llms.txt'], (req, res) => {
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-  res.sendFile(path.join(__dirname, '..', 'llms.txt'));
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  const pubPath = path.join(__dirname, '..', 'public', 'llms.txt');
+  const rootPath = path.join(__dirname, '..', 'llms.txt');
+  if (fs.existsSync(pubPath)) {
+    res.sendFile(pubPath);
+  } else {
+    res.sendFile(rootPath);
+  }
 });
 
 // Middleware for defense-in-depth SEO protection on private dashboard routes
