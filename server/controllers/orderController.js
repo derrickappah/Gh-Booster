@@ -28,9 +28,19 @@ class OrderController {
     try {
       const results = await OrderService.createBulkOrders({
         userId: req.user.id,
-        bulkText: req.body.bulk_text || ''
+        bulkText: req.body.bulk_text || '',
+        defaultServiceId: req.body.service_id
       });
       res.json({ success: true, message: 'Bulk orders processed!', results });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  static async getBulkBatches(req, res, next) {
+    try {
+      const batches = await OrderService.getUserBulkBatches(req.user.id);
+      res.json({ success: true, batches });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });
     }

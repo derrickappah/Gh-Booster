@@ -6,6 +6,7 @@ const { validate } = require('../middleware/validator');
 const { createOrderSchema } = require('../validators/schemas');
 
 router.get('/', authenticateToken, OrderController.getOrders);
+router.get('/batches', authenticateToken, OrderController.getBulkBatches);
 router.get('/:id', authenticateToken, OrderController.getOrderById);
 router.post('/', authenticateToken, validate(createOrderSchema), OrderController.createOrder);
 router.post('/bulk', authenticateToken, OrderController.createBulkOrders);

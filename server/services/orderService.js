@@ -29,7 +29,7 @@ class OrderService {
     }));
   }
 
-  static async createOrder({ userId, serviceId, link, quantity }) {
+  static async createOrder({ userId, serviceId, link, quantity, batchId }) {
     const qty = parseInt(quantity, 10);
     if (!qty || qty <= 0) {
       throw new Error('Valid quantity greater than 0 is required');
@@ -45,7 +45,7 @@ class OrderService {
       throw new Error('Selected service not found or unavailable');
     }
 
-    const ratePer1k = parseFloat(service.rate_per_1000 || service.our_price_per_1000 || service.rate_per_1k || service.rate || 0);
+    const ratePer1k = parseFloat(service.rate_per_1k || service.rate_per_1000 || service.our_price_per_1000 || service.rate || 0);
     const serviceName = service.name;
     const totalCharge = (qty / 1000) * ratePer1k;
 
@@ -80,14 +80,12 @@ class OrderService {
     }
 
     // ATOMIC balance deduction: Use conditional update to prevent double-spend race condition.
-    // The .gte('balance', totalCharge) filter ensures the deduction only succeeds if the
-    // current balance in the database is still sufficient at the moment of the UPDATE.
     const newBalance = currentBalance - totalCharge;
     if (wallet && wallet.id) {
       const { data: updatedWallet, error: wErr } = await supabaseAdmin
         .from('wallets')
         .update({
-          balance: supabaseAdmin.rpc ? newBalance : newBalance,
+          balance: newBalance,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', userId)
@@ -96,11 +94,9 @@ class OrderService {
         .maybeSingle();
 
       if (wErr || !updatedWallet) {
-        // Race condition detected: another concurrent order depleted the balance
         throw new Error('Insufficient balance. Your balance may have changed due to another transaction. Please try again.');
       }
     } else {
-      // User has no wallet at all — should not happen normally
       throw new Error('Wallet not found. Please contact support.');
     }
 
@@ -110,6 +106,7 @@ class OrderService {
       .insert({
         user_id: userId,
         service_id: serviceId,
+        batch_id: batchId || null,
         link: link,
         quantity: qty,
         charge: totalCharge,
@@ -152,24 +149,173 @@ class OrderService {
     };
   }
 
-  static async createBulkOrders({ userId, bulkText }) {
+  static async createBulkOrders({ userId, bulkText, defaultServiceId }) {
     const lines = bulkText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     const results = [];
+    const validOrdersToPlace = [];
+    let totalChargeOfValid = 0;
+    let totalQuantityOfValid = 0;
+
+    // Fetch user wallet balance
+    const { data: wallet } = await supabaseAdmin
+      .from('wallets')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    const currentBalance = wallet ? parseFloat(wallet.balance) : 0.0;
+
     for (const line of lines) {
       const parts = line.split('|');
+      let serviceId = null;
+      let link = null;
+      let quantityStr = null;
+
       if (parts.length >= 3) {
-        const serviceId = parts[0].trim();
-        const link = parts[1].trim();
-        const quantity = parts[2].trim();
-        try {
-          const res = await OrderService.createOrder({ userId, serviceId, link, quantity });
-          results.push({ line, success: true, order_id: res.order_id });
-        } catch (e) {
-          results.push({ line, success: false, error: e.message });
+        serviceId = parts[0].trim();
+        link = parts[1].trim();
+        quantityStr = parts[2].trim();
+      } else if (parts.length === 2 && defaultServiceId) {
+        serviceId = defaultServiceId;
+        link = parts[0].trim();
+        quantityStr = parts[1].trim();
+      } else {
+        results.push({ line, success: false, error: 'Invalid format. Use "link | quantity" or "serviceId | link | quantity"' });
+        continue;
+      }
+
+      const qty = parseInt(quantityStr, 10);
+      if (isNaN(qty) || qty <= 0) {
+        results.push({ line, success: false, error: 'Invalid quantity' });
+        continue;
+      }
+
+      if (!link) {
+        results.push({ line, success: false, error: 'Link is required' });
+        continue;
+      }
+
+      // Fetch service details for rate and validation
+      try {
+        const { data: service, error: sErr } = await supabaseAdmin
+          .from('services')
+          .select('*')
+          .eq('id', serviceId)
+          .maybeSingle();
+
+        if (sErr || !service) {
+          throw new Error('Selected service not found or unavailable');
         }
+
+        if (qty < (service.min_quantity || 10)) {
+          throw new Error(`Quantity is below minimum limit (${service.min_quantity})`);
+        }
+        if (qty > (service.max_quantity || 1000000)) {
+          throw new Error(`Quantity exceeds maximum limit (${service.max_quantity})`);
+        }
+
+        const ratePer1k = parseFloat(service.rate_per_1k || service.rate_per_1000 || service.our_price_per_1000 || service.rate || 0);
+        const charge = (qty / 1000) * ratePer1k;
+
+        validOrdersToPlace.push({
+          serviceId,
+          link,
+          quantity: qty,
+          charge,
+          line
+        });
+        totalChargeOfValid += charge;
+        totalQuantityOfValid += qty;
+      } catch (err) {
+        results.push({ line, success: false, error: err.message });
       }
     }
+
+    if (validOrdersToPlace.length === 0) {
+      return results;
+    }
+
+    // Check if total charge exceeds balance
+    if (currentBalance < totalChargeOfValid) {
+      throw new Error(`Insufficient wallet balance. Total charge for all valid orders is GH₵${totalChargeOfValid.toFixed(2)}, but your balance is GH₵${currentBalance.toFixed(2)}.`);
+    }
+
+    // Create the batch record in database
+    const { data: newBatch, error: bErr } = await supabaseAdmin
+      .from('batches')
+      .insert({
+        user_id: userId,
+        service_id: defaultServiceId || null,
+        total_orders: validOrdersToPlace.length,
+        total_quantity: totalQuantityOfValid,
+        total_charge: totalChargeOfValid,
+        status: 'Processing'
+      })
+      .select()
+      .single();
+
+    if (bErr || !newBatch) {
+      console.error('Error creating batch:', bErr?.message);
+      throw new Error(`Failed to create batch record: ${bErr?.message || 'Unknown error'}`);
+    }
+
+    // Now insert each valid order referencing the batch ID
+    for (const item of validOrdersToPlace) {
+      try {
+        const res = await OrderService.createOrder({
+          userId,
+          serviceId: item.serviceId,
+          link: item.link,
+          quantity: item.quantity,
+          batchId: newBatch.id
+        });
+        results.push({ line: item.line, success: true, order_id: res.order_id });
+      } catch (err) {
+        results.push({ line: item.line, success: false, error: err.message });
+      }
+    }
+
+    // Check if some orders failed
+    const successCount = results.filter(r => r.success).length;
+    let finalStatus = 'Processing';
+    if (successCount === 0) {
+      finalStatus = 'Canceled';
+    } else if (successCount < validOrdersToPlace.length) {
+      finalStatus = 'Partial';
+    } else {
+      finalStatus = 'Completed';
+    }
+
+    // Update batch status
+    await supabaseAdmin
+      .from('batches')
+      .update({ status: finalStatus, updated_at: new Date().toISOString() })
+      .eq('id', newBatch.id);
+
     return results;
+  }
+
+  static async getUserBulkBatches(userId) {
+    const { data: batches, error } = await supabaseAdmin
+      .from('batches')
+      .select('*, services(name)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user bulk batches:', error.message);
+      return [];
+    }
+
+    return (batches || []).map(b => ({
+      id: b.id,
+      service_id: b.service_id,
+      service_name: b.services?.name || 'Multiple Services',
+      total_orders: b.total_orders,
+      total_quantity: b.total_quantity,
+      charge: parseFloat(b.total_charge || b.charge || 0),
+      status: b.status || 'Processing',
+      created_at: new Date(b.created_at).toISOString().replace('T', ' ').substring(0, 19)
+    }));
   }
 
   static async getOrderById(orderId, userId, isAdmin = false) {

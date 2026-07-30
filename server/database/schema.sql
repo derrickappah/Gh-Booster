@@ -77,11 +77,25 @@ CREATE TABLE IF NOT EXISTS public.services (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 7. ORDERS TABLE
+-- 7. BATCHES TABLE
+CREATE TABLE IF NOT EXISTS public.batches (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    service_id UUID REFERENCES public.services(id) ON DELETE SET NULL,
+    total_orders INT NOT NULL DEFAULT 0,
+    total_quantity INT NOT NULL DEFAULT 0,
+    total_charge NUMERIC(12, 4) NOT NULL DEFAULT 0.0000 CHECK (total_charge >= 0),
+    status TEXT NOT NULL DEFAULT 'Processing' CHECK (status IN ('Pending', 'Processing', 'In Progress', 'Completed', 'Partial', 'Canceled', 'Refunded')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 8. ORDERS TABLE
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     service_id UUID NOT NULL REFERENCES public.services(id) ON DELETE CASCADE,
+    batch_id UUID REFERENCES public.batches(id) ON DELETE SET NULL,
     link TEXT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     charge NUMERIC(12, 4) NOT NULL CHECK (charge >= 0),

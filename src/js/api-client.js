@@ -1525,23 +1525,214 @@ async function initReferralsPage() {
 }
 
 // BULK ORDER HANDLER
+// BULK ORDER HANDLER
 async function initBulkOrderPage() {
-  const form = document.querySelector('form');
-  if (!form) return;
+  const bulkTextarea = document.getElementById('bulk-textarea');
+  const bulkService = document.getElementById('bulk-service');
+  const lineCounter = document.getElementById('line-counter');
+  const totalLinesDisp = document.getElementById('total-lines');
+  const validOrdersDisp = document.getElementById('valid-orders');
+  const bulkTotalChargeDisp = document.getElementById('bulk-total-charge');
+  const bulkForm = document.getElementById('bulk-order-form');
+  const tableBody = document.getElementById('bulk-batches-tbody');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const textarea = form.querySelector('textarea');
-    const bulkText = textarea ? textarea.value : '';
+  let activeServices = [];
 
-    try {
-      const res = await API.request('/orders/bulk', 'POST', { bulk_text: bulkText });
-      alert(`🎉 ${res.message}\nProcessed ${res.results.length} orders.`);
-      window.location.href = '/orders.html';
-    } catch (err) {
-      alert(err.message);
+  // 1. Fetch active services
+  try {
+    const res = await API.request('/services');
+    if (res.success && res.services && bulkService) {
+      activeServices = res.services;
+      bulkService.innerHTML = activeServices.map(s => {
+        const rate = parseFloat(s.rate_per_1k || s.rate_per_1000 || s.our_price_per_1000 || 0).toFixed(2);
+        const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
+        return `<option value="${s.id}" data-rate="${rate}">[ID: ${providerId}] ${s.name} - GH₵${rate} per 1,000</option>`;
+      }).join('');
     }
-  });
+  } catch (e) {
+    console.error('Failed to load bulk services:', e);
+    showToast('Failed to load SMM services.', 'error');
+  }
+
+  // 2. Live pricing and line calculation
+  function parseBulkInput() {
+    if (!bulkTextarea || !bulkService) return;
+    const text = bulkTextarea.value.trim();
+    const lines = text ? text.split('\n') : [];
+    const lineCount = lines.length;
+    const selectedOpt = bulkService.options[bulkService.selectedIndex];
+    const ratePerThousand = parseFloat(selectedOpt ? selectedOpt.getAttribute('data-rate') : 0 || 0);
+
+    let validCount = 0;
+    let totalCost = 0;
+
+    lines.forEach(function (line) {
+      const parts = line.split('|');
+      if (parts.length >= 3) {
+        const svcId = parts[0].trim();
+        const qty = parseInt(parts[2].trim());
+        if (!isNaN(qty) && qty > 0) {
+          validCount++;
+          const svc = activeServices.find(s => String(s.id) === String(svcId));
+          const svcRate = svc ? parseFloat(svc.rate_per_1k || svc.rate_per_1000 || svc.our_price_per_1000 || 0) : ratePerThousand;
+          totalCost += (qty / 1000) * svcRate;
+        }
+      } else if (parts.length === 2) {
+        const qty = parseInt(parts[1].trim());
+        if (!isNaN(qty) && qty > 0) {
+          validCount++;
+          totalCost += (qty / 1000) * ratePerThousand;
+        }
+      }
+    });
+
+    if (lineCounter) lineCounter.textContent = lineCount + ' line' + (lineCount !== 1 ? 's' : '');
+    if (totalLinesDisp) totalLinesDisp.textContent = lineCount;
+    if (validOrdersDisp) validOrdersDisp.textContent = validCount;
+    if (bulkTotalChargeDisp) bulkTotalChargeDisp.textContent = "GH₵" + totalCost.toFixed(2);
+  }
+
+  if (bulkTextarea && bulkService) {
+    bulkTextarea.addEventListener('input', parseBulkInput);
+    bulkService.addEventListener('change', parseBulkInput);
+    parseBulkInput();
+  }
+
+  // 3. Load recent bulk batches
+  async function loadBulkBatches() {
+    if (!tableBody) return;
+    try {
+      const batchesRes = await API.request('/orders/batches');
+      if (batchesRes.success && batchesRes.batches) {
+        if (batchesRes.batches.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" class="py-8 text-center text-gray-400 font-medium">No bulk batches placed yet.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = batchesRes.batches.map(b => {
+          const statusColors = {
+            'Completed': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+            'Processing': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+            'Pending': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+            'In Progress': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+            'Partial': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+            'Canceled': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+            'Refunded': 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+          };
+          const badgeClass = statusColors[b.status] || 'bg-gray-100 text-gray-700';
+          const seed = new Date(b.created_at).getTime();
+          const batchIdNumber = (seed % 90000) + 10000;
+
+          return `
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition border-b border-gray-100 dark:border-gray-800/40">
+              <td class="py-3.5 px-4 font-bold text-pink-600 font-mono">#BATCH-${batchIdNumber}</td>
+              <td class="py-3.5 px-4 max-w-[200px] truncate" title="${escapeHtml(b.service_name)}">${escapeHtml(b.service_name)}</td>
+              <td class="py-3.5 px-4 font-semibold">${b.total_orders} Link${b.total_orders !== 1 ? 's' : ''}</td>
+              <td class="py-3.5 px-4 font-mono">${b.total_quantity.toLocaleString()}</td>
+              <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">GH₵${b.charge.toFixed(2)}</td>
+              <td class="py-3.5 px-4 text-gray-500 dark:text-gray-400">${b.created_at.substring(0, 10)}</td>
+              <td class="py-3.5 px-4"><span class="px-2.5 py-1 ${badgeClass} rounded-full font-semibold text-[11px]">${b.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-red-500 font-medium">Failed to load batches.</td>
+          </tr>
+        `;
+      }
+    } catch (e) {
+      console.error(e);
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="py-8 text-center text-red-500 font-medium">Error loading batches.</td>
+        </tr>
+      `;
+    }
+  }
+
+  loadBulkBatches();
+
+  // 4. Form submission handler
+  if (bulkForm) {
+    // Remove default or conflicting listener if any
+    const newForm = bulkForm.cloneNode(true);
+    bulkForm.parentNode.replaceChild(newForm, bulkForm);
+
+    newForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const bulkText = bulkTextarea ? bulkTextarea.value.trim() : '';
+      const selectedServiceId = bulkService ? bulkService.value : null;
+
+      if (!bulkText) {
+        showToast('Please enter mass orders.', 'warning');
+        return;
+      }
+
+      const validCount = parseInt(validOrdersDisp ? validOrdersDisp.textContent : 0) || 0;
+      if (validCount === 0) {
+        showToast('Please enter at least one valid line in link | quantity format.', 'warning');
+        return;
+      }
+
+      try {
+        const submitBtn = newForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Processing bulk orders...</span>';
+        }
+
+        const submitRes = await API.request('/orders/bulk', 'POST', {
+          bulk_text: bulkText,
+          service_id: selectedServiceId
+        });
+
+        showToast('🎉 Bulk orders submitted successfully!', 'success');
+
+        // Reload wallet balance from backend
+        try {
+          const meRes = await API.request('/auth/me');
+          if (meRes.success && meRes.user) {
+            API.setUser(meRes.user);
+            updateUserUI(meRes.user);
+          }
+        } catch (meErr) {}
+
+        // Reload batches and reset textarea
+        if (bulkTextarea) bulkTextarea.value = '';
+        parseBulkInput();
+        loadBulkBatches();
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Submit Bulk Orders</span>';
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to submit bulk orders.', 'error');
+        const submitBtn = newForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Submit Bulk Orders</span>';
+        }
+      }
+    });
+
+    // Re-bind references because of cloneNode
+    const newTextarea = newForm.querySelector('textarea');
+    const newService = newForm.querySelector('select');
+    if (newTextarea && newService) {
+      newTextarea.addEventListener('input', parseBulkInput);
+      newService.addEventListener('change', parseBulkInput);
+      // Re-assign references
+      document.getElementById('bulk-textarea').replaceWith(newTextarea);
+      document.getElementById('bulk-service').replaceWith(newService);
+    }
+  }
 }
 
 // CHILD PANEL HANDLER
