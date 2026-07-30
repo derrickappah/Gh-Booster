@@ -3348,16 +3348,20 @@ async function initAdminLogsPage() {
 
 // ADMIN SETTINGS HANDLER
 async function initAdminSettingsPage() {
-  const form = document.querySelector('form');
+  const form = document.getElementById('settings-form') || document.querySelector('form');
   if (!form) return;
 
   try {
     const res = await API.request('/admin/settings');
     if (res.success && res.settings) {
-      const inputs = form.querySelectorAll('input, select');
+      const inputs = form.querySelectorAll('input, select, textarea');
       inputs.forEach(input => {
-        if (input.name && res.settings[input.name]) {
-          input.value = res.settings[input.name];
+        if (input.name && res.settings[input.name] !== undefined) {
+          if (input.type === 'checkbox') {
+            input.checked = (res.settings[input.name] === 'true' || res.settings[input.name] === true);
+          } else {
+            input.value = res.settings[input.name];
+          }
         }
       });
     }
@@ -3365,9 +3369,17 @@ async function initAdminSettingsPage() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const formData = new FormData(form);
     const settingsObj = {};
-    formData.forEach((val, key) => { settingsObj[key] = val; });
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      if (input.name) {
+        if (input.type === 'checkbox') {
+          settingsObj[input.name] = input.checked ? 'true' : 'false';
+        } else {
+          settingsObj[input.name] = input.value;
+        }
+      }
+    });
 
     try {
       const res = await API.request('/admin/settings', 'POST', settingsObj);

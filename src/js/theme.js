@@ -890,6 +890,145 @@
     }
   };
 
+  const initWhatsAppSupport = function () {
+    const cacheKey = 'ghb_public_settings';
+    const cacheTimeKey = 'ghb_public_settings_time';
+    const cacheDuration = 5 * 60 * 1000; // 5 minutes cache
+
+    const renderWhatsAppIcon = function (settings) {
+      if (!settings || !settings.whatsapp_enabled || !settings.whatsapp_number) {
+        return;
+      }
+
+      if (document.getElementById('whatsapp-support-floating')) {
+        return;
+      }
+
+      const cleanNumber = settings.whatsapp_number.replace(/[^0-9]/g, '');
+      const waButton = document.createElement('a');
+      waButton.id = 'whatsapp-support-floating';
+      waButton.href = `https://wa.me/${cleanNumber}`;
+      waButton.target = '_blank';
+      waButton.rel = 'noopener noreferrer';
+      waButton.setAttribute('aria-label', 'Contact WhatsApp Support');
+      waButton.setAttribute('title', 'Chat with Support');
+      
+      waButton.style.cssText = `
+        position: fixed;
+        right: 24px;
+        bottom: 80px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        border-radius: 50%;
+        box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        outline: none;
+      `;
+
+      waButton.innerHTML = `
+        <svg style="width: 28px; height: 28px; fill: white;" viewBox="0 0 24 24">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.473 1.452 5.38 1.453 5.485 0 9.948-4.463 9.95-9.948.002-2.657-1.03-5.155-2.903-7.03C17.202 1.74 14.707.712 12.056.711 6.57 .711 2.106 5.174 2.103 10.66c-.001 1.96.512 3.878 1.492 5.578L2.57 20.83l4.077-1.076zm10.978-7.7c-.265-.133-1.57-.775-1.814-.863-.243-.089-.42-.133-.596.133-.176.265-.685.863-.84.1.042-.154.177-.34.33-.502.404-.775.244-1.57.133-1.814-.088-.243-.133-.42-.133-.596-.133-.176.133-.596.265-.863s.685-.685.863-.863c.177-.176.265-.265.353-.442.088-.177.044-.33-.022-.463-.066-.133-.596-1.436-.817-1.967-.215-.518-.466-.447-.685-.458l-.596-.008c-.221 0-.575.083-.884.42-.308.337-1.182 1.157-1.182 2.82 0 1.663 1.21 3.272 1.376 3.493.166.221 2.382 3.638 5.77 5.1.806.347 1.435.554 1.926.71.81.258 1.547.222 2.13.135.65-.098 1.57-.642 1.79-1.26.22-.619.22-1.15.154-1.26-.066-.109-.243-.2-.507-.333z"/>
+        </svg>
+        <span style="
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          display: flex;
+          width: 14px;
+          height: 14px;
+        ">
+          <span style="
+            position: absolute;
+            display: inline-flex;
+            width: 100%;
+            height: 100%;
+            background-color: #25D366;
+            opacity: 0.75;
+            border-radius: 50%;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+          "></span>
+          <span style="
+            position: relative;
+            display: inline-flex;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            background-color: #25D366;
+            border: 2px solid white;
+          "></span>
+        </span>
+      `;
+
+      if (!document.getElementById('whatsapp-animations-style')) {
+        const style = document.createElement('style');
+        style.id = 'whatsapp-animations-style';
+        style.innerHTML = `
+          @keyframes ping {
+            75%, 100% {
+              transform: scale(2.2);
+              opacity: 0;
+            }
+          }
+          #whatsapp-support-floating:hover {
+            transform: scale(1.1) translateY(-4px);
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.5);
+            background: linear-gradient(135deg, #128C7E 0%, #075E54 100%) !important;
+          }
+          #whatsapp-support-floating:active {
+            transform: scale(0.95) translateY(0);
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      document.body.appendChild(waButton);
+    };
+
+    const loadSettings = function () {
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = sessionStorage.getItem(cacheTimeKey);
+      const now = Date.now();
+
+      if (cached && cachedTime && (now - parseInt(cachedTime, 10) < cacheDuration)) {
+        try {
+          const settings = JSON.parse(cached);
+          renderWhatsAppIcon(settings);
+          return;
+        } catch (e) {}
+      }
+
+      fetch('/api/settings/public')
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(function (res) {
+          if (res.success && res.settings) {
+            sessionStorage.setItem(cacheKey, JSON.stringify(res.settings));
+            sessionStorage.setItem(cacheTimeKey, now.toString());
+            renderWhatsAppIcon(res.settings);
+          }
+        })
+        .catch(function (err) {
+          console.warn('Could not load WhatsApp support settings:', err.message);
+        });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadSettings);
+    } else {
+      loadSettings();
+    }
+  };
+
   /**
    * ------------------------------------------------------------------------
    * Launch Functions
@@ -904,6 +1043,7 @@
   initMobileSidebar();
   myCustom();
   registerServiceWorker();
+  initWhatsAppSupport();
 
   // Defer non-critical vendor initializations out of the main-thread critical window
   var deferLaunch = function () {
