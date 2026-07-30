@@ -81,7 +81,7 @@ app.get(['/api/health', '/health'], (req, res) => {
   });
 });
 
-// Serve robots.txt & sitemap.xml
+// Serve robots.txt, sitemap.xml & llms.txt
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
   res.sendFile(path.join(__dirname, '..', 'robots.txt'));
@@ -90,6 +90,11 @@ app.get('/robots.txt', (req, res) => {
 app.get('/sitemap.xml', (req, res) => {
   res.type('application/xml');
   res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
+});
+
+app.get(['/llms.txt', '/.well-known/llms.txt'], (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.sendFile(path.join(__dirname, '..', 'llms.txt'));
 });
 
 // Middleware for defense-in-depth SEO protection on private dashboard routes
