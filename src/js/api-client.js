@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
   const isOrderDetailPage = window.location.pathname.includes('/orders/') || currentPage === 'order-detail.html' || currentPage === 'order-detail';
-  const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard.html', 'orders.html', 'bulk-order.html', 'add-funds.html', 'tickets.html', 'account.html', 'referrals.html', 'child-panel.html', 'services.html'].includes(currentPage);
+  const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard.html', 'orders.html', 'bulk-order.html', 'add-funds.html', 'tickets.html', 'account.html', 'referrals.html', 'child-panel.html', 'services.html', 'transactions.html'].includes(currentPage);
 
   if (isProtectedPage && !token) {
     window.location.href = '/login.html';
@@ -188,6 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (currentPage === 'orders.html') initOrdersPage();
   if (currentPage === 'services.html') initServicesPage();
   if (currentPage === 'add-funds.html') initAddFundsPage();
+  if (currentPage === 'transactions.html') initTransactionsPage();
   if (currentPage === 'tickets.html') initTicketsPage();
   if (currentPage === 'account.html') initAccountPage();
   if (currentPage === 'referrals.html') initReferralsPage();
@@ -1257,6 +1258,108 @@ async function initAddFundsPage() {
         `).join('');
       }
     } catch (e) {}
+  }
+}
+
+// TRANSACTIONS PAGE HANDLER
+async function initTransactionsPage() {
+  const tableBody = document.getElementById('transactions-tbody');
+  const searchInput = document.getElementById('transaction-search');
+  const filterTabs = document.querySelectorAll('#status-filter-tabs .status-tab');
+
+  if (!tableBody) return;
+
+  let allTransactions = [];
+  let currentStatus = 'all';
+
+  const renderTable = (list) => {
+    if (!list || list.length === 0) {
+      tableBody.innerHTML = `
+        <tr class="hover:bg-gray-50/50 transition">
+          <td colspan="6" class="py-12 text-center text-gray-400 dark:text-gray-500 font-medium">No transaction records found.</td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = list.map(t => {
+      const ref = t.reference || t.id || t.payment_ref || 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+      const gateway = t.gateway || t.method || t.payment_method || 'Mobile Money';
+      const type = t.type || (t.amount >= 0 ? 'Deposit' : 'Order Payment');
+      const rawAmt = parseFloat(t.amount || 0);
+      const isPositive = rawAmt >= 0;
+      const formattedAmt = `${isPositive ? '+' : '-'}GH₵${Math.abs(rawAmt).toFixed(2)}`;
+      const dateStr = t.created_at ? new Date(t.created_at).toLocaleString() : new Date().toLocaleString();
+      const statusStr = String(t.status || 'completed').toLowerCase();
+
+      let statusBadge = '';
+      if (statusStr === 'completed' || statusStr === 'approved' || statusStr === 'success') {
+        statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">Completed</span>';
+      } else if (statusStr === 'pending' || statusStr === 'processing') {
+        statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">Pending</span>';
+      } else {
+        statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">Failed</span>';
+      }
+
+      return `
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition border-b border-gray-100 dark:border-gray-800">
+          <td class="px-6 py-4 font-mono font-bold text-gray-900 dark:text-white text-xs">${escapeHtml(String(ref))}</td>
+          <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(type)}</td>
+          <td class="px-6 py-4 font-extrabold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} text-xs">${formattedAmt}</td>
+          <td class="px-6 py-4 text-xs text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(gateway)}</td>
+          <td class="px-6 py-4 text-xs text-gray-500 dark:text-gray-400 font-mono">${escapeHtml(dateStr)}</td>
+          <td class="px-6 py-4">${statusBadge}</td>
+        </tr>
+      `;
+    }).join('');
+  };
+
+  const applyFilters = () => {
+    const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    const filtered = allTransactions.filter(t => {
+      const refMatch = (t.reference || t.id || '').toString().toLowerCase().includes(q);
+      const gwMatch = (t.gateway || t.method || '').toString().toLowerCase().includes(q);
+      const typeMatch = (t.type || '').toString().toLowerCase().includes(q);
+      const matchesSearch = !q || refMatch || gwMatch || typeMatch;
+
+      const st = String(t.status || 'completed').toLowerCase();
+      let matchesStatus = true;
+      if (currentStatus === 'completed') matchesStatus = (st === 'completed' || st === 'approved' || st === 'success');
+      else if (currentStatus === 'pending') matchesStatus = (st === 'pending' || st === 'processing');
+      else if (currentStatus === 'failed') matchesStatus = (st === 'failed' || st === 'rejected');
+
+      return matchesSearch && matchesStatus;
+    });
+
+    renderTable(filtered);
+  };
+
+  try {
+    const res = await API.request('/transactions');
+    if (res && res.success && Array.isArray(res.transactions)) {
+      allTransactions = res.transactions;
+    }
+  } catch (e) {
+    console.error('Failed to load transactions:', e);
+  }
+
+  renderTable(allTransactions);
+
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+
+  if (filterTabs) {
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterTabs.forEach(t => {
+          t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold';
+        });
+        tab.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold';
+        currentStatus = tab.getAttribute('data-status') || 'all';
+        applyFilters();
+      });
+    });
   }
 }
 
