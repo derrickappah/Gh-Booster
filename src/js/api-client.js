@@ -1310,16 +1310,13 @@ async function initAccountPage() {
     if (initialsEl) initialsEl.textContent = (user.username || user.email || 'U').charAt(0).toUpperCase();
 
     const fullNameEl = document.getElementById('account-full-name');
-    if (fullNameEl) fullNameEl.textContent = user.username ? `@${user.username}` : (user.email || 'Account Profile');
+    if (fullNameEl) fullNameEl.textContent = user.username || user.email || 'Account Profile';
 
     const emailEl = document.getElementById('account-email-display');
     if (emailEl) emailEl.textContent = user.email || 'Not available';
 
-    const usernameEl = document.getElementById('account-username-display');
-    if (usernameEl) usernameEl.textContent = user.username ? `@${user.username}` : 'N/A';
-
     const roleEl = document.getElementById('account-role-display');
-    if (roleEl) roleEl.textContent = user.role || 'Client';
+    if (roleEl) roleEl.textContent = user.role || 'User';
 
     // 2. Populate API Key
     const apiKeyInput = document.getElementById('api-key-input');
