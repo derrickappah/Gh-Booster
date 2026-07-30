@@ -467,7 +467,6 @@ function initRegisterPage() {
     const email = emailInput ? emailInput.value.trim() : '';
     const phone = phoneInput ? phoneInput.value.trim() : '';
     const password = passwordInput ? passwordInput.value.trim() : '';
-    const username = fullname || (email ? email.split('@')[0] : 'User');
     let hasError = false;
 
     if (!fullname) {
@@ -511,7 +510,7 @@ function initRegisterPage() {
     }
 
     try {
-      const res = await API.request('/auth/register', 'POST', { username, email, password, phone });
+      const res = await API.request('/auth/register', 'POST', { fullname, email, password, phone });
       API.setToken(res.token);
       API.setUser(res.user);
       window.location.href = 'dashboard.html';

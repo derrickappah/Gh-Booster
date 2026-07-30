@@ -2,44 +2,49 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 const { generateToken, generateApiKey } = require('../auth');
 
 class AuthService {
-  static async register({ username, email, password, phone }) {
+  static async register({ fullname, username, email, password, phone }) {
     const cleanEmail = email.trim().toLowerCase();
-    const cleanUsername = username.trim();
+    const cleanFullName = (fullname || username || cleanEmail.split('@')[0]).trim();
     const cleanPhone = phone ? phone.trim() : null;
+
+    // Check if email already exists in profiles
+    const { data: existingEmail } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (existingEmail) {
+      throw new Error('An account with this email address already exists. Please log in.');
+    }
 
     // 1. Pure Supabase Auth Signup
     const { data: authData, error: authErr } = await supabase.auth.signUp({
       email: cleanEmail,
       password: password,
       options: {
-        data: { username: cleanUsername, full_name: cleanUsername, phone: cleanPhone }
+        data: { username: cleanFullName, full_name: cleanFullName, phone: cleanPhone }
       }
     });
 
-    if (authErr && !authErr.message.includes('User already registered')) {
+    if (authErr) {
       throw new Error(authErr.message);
     }
 
-    let userId = authData?.user?.id;
-
+    const userId = authData?.user?.id;
     if (!userId) {
-      const { data: existingProfile } = await supabaseAdmin.from('profiles').select('id').eq('email', cleanEmail).maybeSingle();
-      if (existingProfile) {
-        userId = existingProfile.id;
-      } else {
-        throw new Error(authErr ? authErr.message : 'User creation failed in Supabase');
-      }
+      throw new Error('User creation failed in Supabase Auth.');
     }
 
     const apiKey = generateApiKey();
     const referralCode = 'ref_' + Math.random().toString(36).substring(2, 8);
 
     // 2. Create Profile in Supabase PostgreSQL
-    await supabaseAdmin.from('profiles').upsert({
+    const { error: profileErr } = await supabaseAdmin.from('profiles').insert({
       id: userId,
       email: cleanEmail,
-      full_name: cleanUsername,
-      username: cleanUsername,
+      full_name: cleanFullName,
+      username: cleanFullName,
       phone: cleanPhone,
       role: 'user',
       api_key: apiKey,
@@ -47,22 +52,31 @@ class AuthService {
       updated_at: new Date().toISOString()
     });
 
+    if (profileErr) {
+      console.error('[AuthService] Profile creation error:', profileErr.message);
+      throw new Error('Could not create user profile: ' + profileErr.message);
+    }
+
     // 3. Create Wallet in Supabase PostgreSQL with 0.00 initial balance
     const initialBalance = 0.0;
-    await supabaseAdmin.from('wallets').upsert({
+    const { error: walletErr } = await supabaseAdmin.from('wallets').insert({
       user_id: userId,
       balance: initialBalance,
       currency: 'GHS',
       updated_at: new Date().toISOString()
     });
 
-    const token = authData?.session?.access_token || generateToken({ id: userId, username: cleanUsername, role: 'user', email: cleanEmail });
+    if (walletErr) {
+      console.error('[AuthService] Wallet creation error:', walletErr.message);
+    }
+
+    const token = authData?.session?.access_token || generateToken({ id: userId, username: cleanFullName, role: 'user', email: cleanEmail });
 
     return {
       token,
       user: {
         id: userId,
-        username: cleanUsername,
+        username: cleanFullName,
         email: cleanEmail,
         phone: cleanPhone,
         balance: initialBalance,
