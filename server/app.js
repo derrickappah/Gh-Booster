@@ -23,6 +23,7 @@ const referralRoutes = require('./routes/referralRoutes');
 const childPanelRoutes = require('./routes/childPanelRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 
 const app = express();
 
@@ -102,6 +103,7 @@ const registerAppRoutes = (prefix) => {
   app.use(`${prefix}/child-panels`, childPanelRoutes);
   app.use(`${prefix}/transactions`, transactionRoutes);
   app.use(`${prefix}/payments`, paymentRoutes);
+  app.use(`${prefix}/settings`, settingsRoutes);
 };
 
 registerAppRoutes('/api');
