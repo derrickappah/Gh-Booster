@@ -931,8 +931,21 @@
         outline: none;
       `;
 
+      let imgPath = '/src/img/platforms/whatsapp.webp';
+      const scripts = document.getElementsByTagName('script');
+      for (let i = 0; i < scripts.length; i++) {
+        const srcAttr = scripts[i].getAttribute('src');
+        if (srcAttr && (srcAttr.indexOf('theme.js') !== -1 || srcAttr.indexOf('theme.min.js') !== -1)) {
+          const parts = srcAttr.split('/');
+          parts.pop(); // remove theme.js
+          parts.pop(); // remove js
+          imgPath = parts.join('/') + '/img/platforms/whatsapp.webp';
+          break;
+        }
+      }
+
       waButton.innerHTML = `
-        <img src="/public/src/img/platforms/whatsapp.webp" alt="WhatsApp" style="width: 100%; height: 100%; object-fit: contain;" />
+        <img src="${imgPath}" alt="WhatsApp" style="width: 100%; height: 100%; object-fit: contain;" />
         <span style="
           position: absolute;
           top: -2px;
