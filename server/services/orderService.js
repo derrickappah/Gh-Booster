@@ -165,21 +165,21 @@ class OrderService {
     const currentBalance = wallet ? parseFloat(wallet.balance) : 0.0;
 
     for (const line of lines) {
-      const parts = line.split('|');
+      const parts = line.split(/\s+/);
       let serviceId = null;
       let link = null;
       let quantityStr = null;
 
       if (parts.length >= 3) {
-        serviceId = parts[0].trim();
-        link = parts[1].trim();
-        quantityStr = parts[2].trim();
+        serviceId = parts[0];
+        link = parts[1];
+        quantityStr = parts[2];
       } else if (parts.length === 2 && defaultServiceId) {
         serviceId = defaultServiceId;
-        link = parts[0].trim();
-        quantityStr = parts[1].trim();
+        link = parts[0];
+        quantityStr = parts[1];
       } else {
-        results.push({ line, success: false, error: 'Invalid format. Use "link | quantity" or "serviceId | link | quantity"' });
+        results.push({ line, success: false, error: 'Invalid format. Use "link quantity" or "serviceId link quantity"' });
         continue;
       }
 

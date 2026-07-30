@@ -1701,10 +1701,10 @@ async function initBulkOrderPage() {
     let totalCost = 0;
 
     lines.forEach(function (line) {
-      const parts = line.split('|');
+      const parts = line.trim().split(/\s+/);
       if (parts.length >= 3) {
-        const svcId = parts[0].trim();
-        const qty = parseInt(parts[2].trim());
+        const svcId = parts[0];
+        const qty = parseInt(parts[2]);
         if (!isNaN(qty) && qty > 0) {
           validCount++;
           const svc = activeServices.find(s => String(s.id) === String(svcId));
@@ -1712,7 +1712,7 @@ async function initBulkOrderPage() {
           totalCost += (qty / 1000) * svcRate;
         }
       } else if (parts.length === 2) {
-        const qty = parseInt(parts[1].trim());
+        const qty = parseInt(parts[1]);
         if (!isNaN(qty) && qty > 0) {
           validCount++;
           totalCost += (qty / 1000) * ratePerThousand;
