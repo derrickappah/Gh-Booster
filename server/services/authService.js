@@ -11,7 +11,7 @@ class AuthService {
     const { data: existingEmail } = await supabaseAdmin
       .from('profiles')
       .select('id')
-      .eq('email', cleanEmail)
+      .ilike('email', cleanEmail)
       .maybeSingle();
 
     if (existingEmail) {
@@ -28,6 +28,9 @@ class AuthService {
     });
 
     if (authErr) {
+      if (authErr.message && authErr.message.toLowerCase().includes('already registered')) {
+        throw new Error('An account with this email address already exists. Please log in.');
+      }
       throw new Error(authErr.message);
     }
 
@@ -39,8 +42,8 @@ class AuthService {
     const apiKey = generateApiKey();
     const referralCode = 'ref_' + Math.random().toString(36).substring(2, 8);
 
-    // 2. Create Profile in Supabase PostgreSQL
-    const { error: profileErr } = await supabaseAdmin.from('profiles').insert({
+    // 2. Create or Upsert Profile in Supabase PostgreSQL
+    const { error: profileErr } = await supabaseAdmin.from('profiles').upsert({
       id: userId,
       email: cleanEmail,
       full_name: cleanFullName,
@@ -50,21 +53,21 @@ class AuthService {
       api_key: apiKey,
       referral_code: referralCode,
       updated_at: new Date().toISOString()
-    });
+    }, { onConflict: 'id' });
 
     if (profileErr) {
       console.error('[AuthService] Profile creation error:', profileErr.message);
       throw new Error('Could not create user profile: ' + profileErr.message);
     }
 
-    // 3. Create Wallet in Supabase PostgreSQL with 0.00 initial balance
+    // 3. Create or Upsert Wallet in Supabase PostgreSQL with 0.00 initial balance
     const initialBalance = 0.0;
-    const { error: walletErr } = await supabaseAdmin.from('wallets').insert({
+    const { error: walletErr } = await supabaseAdmin.from('wallets').upsert({
       user_id: userId,
       balance: initialBalance,
       currency: 'GHS',
       updated_at: new Date().toISOString()
-    });
+    }, { onConflict: 'user_id' });
 
     if (walletErr) {
       console.error('[AuthService] Wallet creation error:', walletErr.message);
@@ -88,28 +91,28 @@ class AuthService {
   }
 
   static async login({ username, password }) {
-    const inputStr = username.trim();
-    let emailToUse = inputStr;
+    const inputStr = (username || '').trim();
+    let emailToUse = inputStr.toLowerCase();
 
     // Resolve username to email from Supabase profiles table if input is not an email
     if (!inputStr.includes('@')) {
       let { data: profile } = await supabaseAdmin
         .from('profiles')
         .select('email')
-        .eq('username', inputStr)
+        .ilike('username', inputStr)
         .maybeSingle();
 
       if (!profile) {
         const { data: p2 } = await supabaseAdmin
           .from('profiles')
           .select('email')
-          .eq('full_name', inputStr)
+          .ilike('full_name', inputStr)
           .maybeSingle();
         profile = p2;
       }
 
       if (profile && profile.email) {
-        emailToUse = profile.email;
+        emailToUse = profile.email.toLowerCase();
       }
     }
 
@@ -149,8 +152,10 @@ class AuthService {
     if (!email) {
       throw new Error('Email is required for password reset.');
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://ghbooster.com/login.html'
+    const baseUrl = process.env.APP_URL || 'https://ghbooster.com';
+    const redirectUrl = `${baseUrl.replace(/\/$/, '')}/login.html`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+      redirectTo: redirectUrl
     });
     if (error) {
       // Log internally but don't expose to client (prevents email enumeration)

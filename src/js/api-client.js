@@ -2748,21 +2748,22 @@ async function initOrderDetailPage() {
   let orderId = urlParams.get('id');
 
   if (!orderId) {
-    const parts = window.location.pathname.split('/');
+    const cleanPath = window.location.pathname.replace(/\/+$/, '');
+    const parts = cleanPath.split('/');
     const lastPart = parts[parts.length - 1];
-    // Accept UUID-formatted ID
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-    if (uuidRegex.test(lastPart)) {
+    if (uuidRegex.test(lastPart) || /^\d+$/.test(lastPart)) {
       orderId = lastPart;
     }
   }
 
   // Update canonical and OG URL dynamically for this specific order
   if (orderId) {
+    const safeId = escapeHtml(orderId);
     const canonicalEl = document.getElementById('page-canonical');
-    if (canonicalEl) canonicalEl.setAttribute('href', `https://ghbooster.com/dashboard/orders/${orderId}`);
+    if (canonicalEl) canonicalEl.setAttribute('href', `https://ghbooster.com/dashboard/orders/${safeId}`);
     const ogUrlEl = document.getElementById('og-url');
-    if (ogUrlEl) ogUrlEl.setAttribute('content', `https://ghbooster.com/dashboard/orders/${orderId}`);
+    if (ogUrlEl) ogUrlEl.setAttribute('content', `https://ghbooster.com/dashboard/orders/${safeId}`);
   }
 
   function announce(msg) {

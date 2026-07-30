@@ -184,7 +184,7 @@ class OrderService {
 
     const { data: dbOrder, error } = await supabaseAdmin
       .from('orders')
-      .select('*, services(id, name, description, rate_per_1k, rate_per_1000, category_id, categories(name, icon))')
+      .select('*, services(id, name, description, rate_per_1k, rate_per_1000, refill_guarantee, refill_period_days, category_id, categories(name, icon))')
       .eq('id', orderId)
       .maybeSingle();
 
@@ -212,8 +212,8 @@ class OrderService {
       status: dbOrder.status || 'Processing',
       start_count: dbOrder.start_count || 0,
       remains: dbOrder.remains || 0,
-      refill_guarantee: true,
-      refill_period_days: 30,
+      refill_guarantee: dbOrder.services?.refill_guarantee !== undefined && dbOrder.services?.refill_guarantee !== null ? Boolean(dbOrder.services.refill_guarantee) : true,
+      refill_period_days: dbOrder.services?.refill_period_days || 30,
       provider_order_id: dbOrder.provider_order_id || null,
       created_at: new Date(dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19),
       updated_at: new Date(dbOrder.updated_at || dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19)
