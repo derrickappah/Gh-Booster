@@ -95,13 +95,39 @@ app.get('/sitemap.xml', (req, res) => {
 
 app.get(['/llms.txt', '/.well-known/llms.txt'], (req, res) => {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-  const pubPath = path.join(__dirname, '..', 'public', 'llms.txt');
-  const rootPath = path.join(__dirname, '..', 'llms.txt');
-  if (fs.existsSync(pubPath)) {
-    res.sendFile(pubPath);
-  } else {
-    res.sendFile(rootPath);
-  }
+  res.send(`# GhBooster SMM Panel
+
+> GhBooster is the premier Social Media Marketing (SMM) Panel providing automated, fast, and affordable growth services for Instagram, TikTok, YouTube, Telegram, Facebook, and Twitter.
+
+## Core Pages
+
+- [Home](https://www.ghbooster.com/index.html): Main landing page highlighting GhBooster features, supported platforms, instant 24/7 automated delivery, and pricing overviews.
+- [Services](https://www.ghbooster.com/services.html): Complete catalog of social media marketing services with live real-time pricing per 1,000 units, minimum/maximum order bounds, and service descriptions.
+- [API Documentation](https://www.ghbooster.com/api.html): Comprehensive API v2 reference for resellers, developers, and panel owners to automate orders, service lists, and balance checks via HTTP POST requests.
+- [FAQ](https://www.ghbooster.com/faq.html): Frequently asked questions regarding order processing, automated delivery timelines, refill guarantees, and accepted payment methods.
+- [Terms of Service](https://www.ghbooster.com/terms.html): Terms and conditions, privacy policies, refund policies, and usage guidelines for GhBooster services.
+
+## User Account & Dashboard
+
+- [Login](https://www.ghbooster.com/login.html): Secure user portal login page.
+- [Register](https://www.ghbooster.com/register.html): User account registration form to create a new GhBooster account.
+- [Dashboard](https://www.ghbooster.com/dashboard.html): Main user dashboard for placing new single orders, tracking active order status, and reviewing account metrics.
+- [Bulk Order](https://www.ghbooster.com/bulk-order.html): Bulk order interface for submitting multiple service requests simultaneously line-by-line.
+- [Orders History](https://www.ghbooster.com/orders.html): Order management page displaying order history, status (Pending, Processing, Completed, Partial, Canceled), and start/remains counts.
+- [Add Funds](https://www.ghbooster.com/add-funds.html): Payment gateway portal supporting automated deposit methods including Mobile Money (MTN, Telecel, AT), Cryptocurrencies, Paystack, Flutterwave, and credit cards.
+- [Transactions](https://www.ghbooster.com/transactions.html): Financial history listing all deposits, balance adjustments, and order debits.
+- [Support Tickets](https://www.ghbooster.com/tickets.html): Customer support portal for opening and tracking support tickets.
+- [Affiliates & Referrals](https://www.ghbooster.com/referrals.html): Referral program dashboard allowing users to earn commission by inviting new clients.
+- [Child Panel](https://www.ghbooster.com/child-panel.html): Rental platform for users to launch their own branded SMM reseller panel connected to GhBooster API.
+- [Account Settings](https://www.ghbooster.com/account.html): Profile management, API key generation, and password update page.
+
+## Key Features & Capabilities
+
+- **Instant Automated Delivery**: 24/7 automated order processing connected directly to high-capacity provider nodes.
+- **API v2 Integration**: Full compatibility with standard SMM panel API format (actions: \`services\`, \`add\`, \`status\`, \`balance\`).
+- **Multi-Platform Support**: SMM services covering Instagram, TikTok, YouTube, Telegram, Facebook, X (Twitter), Spotify, and Twitch.
+- **Reseller Friendly**: High throughput endpoints, bulk order execution, and automated child panel setup.
+`);
 });
 
 // Middleware for defense-in-depth SEO protection on private dashboard routes
