@@ -47,18 +47,12 @@ License: You must have a valid license from official store to legally use the th
   }
   </script>
 
-  <!-- google font preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Preload Critical LCP Hero Image -->
+  <!-- Preload Critical Assets (High Priority) -->
+  <link rel="preload" as="style" href="src/css/style.min.css" fetchpriority="high">
   <link rel="preload" as="image" href="src/img/dummy/hero.webp" type="image/webp" fetchpriority="high">
 
   <!-- Production CSS -->
   <link rel="stylesheet" href="src/css/style.min.css">
-
-  <!-- Production css -->
-  <!-- <link rel="stylesheet" href="dist/css/style.css"> -->
 
   <!-- Non-blocking Google font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;700&amp;display=swap" media="print" onload="this.media='all'">
