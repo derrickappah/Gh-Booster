@@ -49,9 +49,9 @@ async function authenticateToken(req, res, next) {
       return next();
     }
 
-    return res.status(403).json({ success: false, error: 'Invalid or expired session. Please login again.' });
+    return res.status(401).json({ success: false, error: 'Invalid or expired session. Please login again.' });
   } catch (err) {
-    return res.status(403).json({ success: false, error: 'Session expired or invalid token.' });
+    return res.status(401).json({ success: false, error: 'Session expired or invalid token.' });
   }
 }
 

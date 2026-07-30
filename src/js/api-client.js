@@ -142,7 +142,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard.html', 'orders.html', 'bulk-order.html', 'add-funds.html', 'tickets.html', 'account.html', 'referrals.html', 'child-panel.html', 'services.html', 'transactions.html'].includes(currentPage);
 
   if (isProtectedPage && !token) {
-    window.location.href = '/login.html';
+    const targetPath = window.location.pathname + window.location.search;
+    window.location.href = `/login.html?redirect=${encodeURIComponent(targetPath)}`;
     return;
   }
 
@@ -387,7 +388,12 @@ function initLoginPage() {
       API.setToken(res.token);
       API.setUser(res.user);
 
-      if (res.user.role === 'admin') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectUrl = urlParams.get('redirect');
+
+      if (redirectUrl && (redirectUrl.startsWith('/') || redirectUrl.startsWith('dashboard') || redirectUrl.startsWith('order-detail'))) {
+        window.location.href = redirectUrl;
+      } else if (res.user.role === 'admin') {
         window.location.href = 'admin-dashboard.html';
       } else {
         window.location.href = 'dashboard.html';

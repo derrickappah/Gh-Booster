@@ -39,15 +39,17 @@ class OrderController {
   static async getOrderById(req, res, next) {
     try {
       const orderId = req.params.id;
-      const userId = req.user.id;
-      const isAdmin = req.user.role === 'admin';
+      const userId = req.user ? req.user.id : null;
+      const isAdmin = req.user ? req.user.role === 'admin' : false;
       if (!userId) {
         return res.status(401).json({ success: false, error: 'Authentication required to view orders.' });
       }
       const order = await OrderService.getOrderById(orderId, userId, isAdmin);
       res.json({ success: true, order });
     } catch (err) {
-      res.status(err.message.includes('not found') ? 404 : 400).json({ success: false, error: err.message });
+      const msg = (err.message || '').toLowerCase();
+      const status = msg.includes('not found') ? 404 : (msg.includes('access denied') || msg.includes('permission')) ? 403 : 400;
+      res.status(status).json({ success: false, error: err.message });
     }
   }
 

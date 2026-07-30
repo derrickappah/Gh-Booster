@@ -178,50 +178,46 @@ class OrderService {
     }
 
     const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(orderId);
-    
-    let dbOrder = null;
-    if (isUuid) {
-      let query = supabaseAdmin
-        .from('orders')
-        .select('*, services(id, name, description, rate_per_1k, category_id, categories(name, icon))')
-        .eq('id', orderId);
-
-      if (!isAdmin && userId) {
-        query = query.eq('user_id', userId);
-      }
-
-      const { data, error } = await query.maybeSingle();
-      if (!error && data) {
-        dbOrder = data;
-      }
+    if (!isUuid) {
+      throw new Error('Order not found');
     }
 
-    if (dbOrder) {
-      return {
-        id: dbOrder.id,
-        user_id: dbOrder.user_id,
-        service_id: dbOrder.service_id,
-        service_name: dbOrder.services?.name || 'Social Media Service',
-        service_description: dbOrder.services?.description || 'High quality social media boosting service.',
-        category_name: dbOrder.services?.categories?.name || 'General Services',
-        category_icon: dbOrder.services?.categories?.icon || 'src/img/platforms/instagram.png',
-        rate_per_1k: parseFloat(dbOrder.services?.rate_per_1k || dbOrder.services?.rate_per_1000 || 0),
-        link: dbOrder.link,
-        quantity: dbOrder.quantity,
-        charge: parseFloat(dbOrder.total_price || dbOrder.charge || 0),
-        currency: 'GHS',
-        status: dbOrder.status || 'Processing',
-        start_count: dbOrder.start_count || 0,
-        remains: dbOrder.remains || 0,
-        refill_guarantee: true,
-        refill_period_days: 30,
-        provider_order_id: dbOrder.provider_order_id || null,
-        created_at: new Date(dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19),
-        updated_at: new Date(dbOrder.updated_at || dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19)
-      };
+    const { data: dbOrder, error } = await supabaseAdmin
+      .from('orders')
+      .select('*, services(id, name, description, rate_per_1k, rate_per_1000, category_id, categories(name, icon))')
+      .eq('id', orderId)
+      .maybeSingle();
+
+    if (error || !dbOrder) {
+      throw new Error('Order not found');
     }
 
-    throw new Error('Order not found');
+    if (!isAdmin && dbOrder.user_id !== userId) {
+      throw new Error('Access denied: You do not have permission to view this order');
+    }
+
+    return {
+      id: dbOrder.id,
+      user_id: dbOrder.user_id,
+      service_id: dbOrder.service_id,
+      service_name: dbOrder.services?.name || 'Social Media Service',
+      service_description: dbOrder.services?.description || 'High quality social media boosting service.',
+      category_name: dbOrder.services?.categories?.name || 'General Services',
+      category_icon: dbOrder.services?.categories?.icon || 'src/img/platforms/instagram.png',
+      rate_per_1k: parseFloat(dbOrder.services?.rate_per_1k || dbOrder.services?.rate_per_1000 || 0),
+      link: dbOrder.link,
+      quantity: dbOrder.quantity,
+      charge: parseFloat(dbOrder.total_price || dbOrder.charge || 0),
+      currency: 'GHS',
+      status: dbOrder.status || 'Processing',
+      start_count: dbOrder.start_count || 0,
+      remains: dbOrder.remains || 0,
+      refill_guarantee: true,
+      refill_period_days: 30,
+      provider_order_id: dbOrder.provider_order_id || null,
+      created_at: new Date(dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19),
+      updated_at: new Date(dbOrder.updated_at || dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19)
+    };
   }
 
   static async refillOrder(orderId, userId) {
