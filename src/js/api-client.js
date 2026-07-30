@@ -1120,9 +1120,9 @@ async function initServicesPage() {
       // 1. Render Category Pills with Platform Icons
       if (pillsContainer && categoriesList.length > 0) {
         pillsContainer.innerHTML = `
-          <button class="cat-pill px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active inline-flex items-center flex-shrink-0 text-xs font-semibold" data-cat="all">All Services</button>
+          <button class="cat-pill px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active inline-flex items-center flex-shrink-0 text-xs font-semibold" data-cat="all">All Services</button>
           ${categoriesList.map(c => `
-            <button class="cat-pill px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition inline-flex items-center flex-shrink-0 text-xs font-semibold" data-cat="${c.id}">
+            <button class="cat-pill px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition inline-flex items-center flex-shrink-0 text-xs font-semibold" data-cat="${c.id}">
               ${formatIconHtml(c.icon, "w-4 h-4 mr-1.5 object-contain")} ${c.name}
             </button>
           `).join('')}
@@ -1131,9 +1131,9 @@ async function initServicesPage() {
         pillsContainer.querySelectorAll('.cat-pill').forEach(btn => {
           btn.addEventListener('click', () => {
             pillsContainer.querySelectorAll('.cat-pill').forEach(b => {
-              b.className = "cat-pill px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition inline-flex items-center flex-shrink-0 text-xs font-semibold";
+              b.className = "cat-pill px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition inline-flex items-center flex-shrink-0 text-xs font-semibold";
             });
-            btn.className = "cat-pill px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active inline-flex items-center flex-shrink-0 text-xs font-semibold";
+            btn.className = "cat-pill px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active inline-flex items-center flex-shrink-0 text-xs font-semibold";
             activeCatId = btn.getAttribute('data-cat');
             applyFilters();
           });
@@ -1178,7 +1178,7 @@ async function initServicesPage() {
               <td class="py-4 px-4 text-xs font-mono text-gray-600">${min} / ${max}</td>
               <td class="py-4 px-4 text-xs text-gray-500 font-medium">Instant Start</td>
               <td class="py-4 px-4 text-center">
-                <a href="/dashboard.html" class="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg text-xs shadow-sm inline-block transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">Order</a>
+                <a href="/dashboard.html" class="px-3.5 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl text-xs shadow-sm inline-block transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">Order</a>
               </td>
             </tr>
           `;
