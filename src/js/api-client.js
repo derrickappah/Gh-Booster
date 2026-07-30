@@ -1016,8 +1016,8 @@ async function initOrdersPage() {
               <td class="py-4 px-4 font-mono text-xs text-gray-500 dark:text-gray-400">${startCount} / ${remains}</td>
               <td class="py-4 px-4 font-extrabold text-green-600 dark:text-green-400">GH₵${chargeVal}</td>
               <td class="py-4 px-4 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(o.created_at || '')}</td>
-              <td class="py-4 px-4">
-                <span class="px-2.5 py-1 rounded-full font-bold text-[11px] inline-flex items-center ${getStatusBadgeClass(o.status)}">
+              <td class="py-4 px-4 whitespace-nowrap">
+                <span class="px-2.5 py-1 rounded-full font-bold text-[11px] inline-flex items-center whitespace-nowrap ${getStatusBadgeClass(o.status)}">
                   ${escapeHtml(o.status || '')}
                 </span>
               </td>

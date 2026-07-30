@@ -187,12 +187,12 @@
 
         <!-- Filter Status Tabs -->
         <div class="flex items-center space-x-2 overflow-x-auto border-t border-gray-100 dark:border-gray-700 pt-4 text-xs font-semibold">
-          <button class="status-tab px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active" data-status="all">All</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="in-progress">In Progress</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="pending">Pending</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="completed">Completed</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="processing">Processing</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="canceled">Canceled</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active" data-status="all">All</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="in-progress">In Progress</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="pending">Pending</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="completed">Completed</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="processing">Processing</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="canceled">Canceled</button>
         </div>
 
       </div>
@@ -203,15 +203,15 @@
           <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300">
             <thead class="bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-400 font-semibold border-b border-gray-200 dark:border-gray-700 uppercase">
               <tr>
-                <th class="py-3.5 px-4">Order ID</th>
-                <th class="py-3.5 px-4">Service</th>
-                <th class="py-3.5 px-4">Target Link</th>
-                <th class="py-3.5 px-4">Quantity</th>
-                <th class="py-3.5 px-4">Start / Remainder</th>
-                <th class="py-3.5 px-4">Charge</th>
-                <th class="py-3.5 px-4">Created Date</th>
-                <th class="py-3.5 px-4">Status</th>
-                <th class="py-3.5 px-4 text-center">Action</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Order ID</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Service</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Target Link</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Quantity</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Start / Remainder</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Charge</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Created Date</th>
+                <th class="py-3.5 px-4 whitespace-nowrap">Status</th>
+                <th class="py-3.5 px-4 text-center whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody id="orders-tbody" class="divide-y divide-gray-100 dark:divide-gray-700/50">

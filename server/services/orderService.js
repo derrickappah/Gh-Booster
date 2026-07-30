@@ -123,15 +123,19 @@ class OrderService {
     }
 
     // Record transaction entry
-    await supabaseAdmin.from('transactions').insert({
+    const { error: txErr } = await supabaseAdmin.from('transactions').insert({
       user_id: userId,
       amount: -totalCharge,
       currency: 'GHS',
-      gateway: 'wallet',
-      reference: 'ord_' + Math.random().toString(36).substring(2, 10),
+      gateway: 'Wallet Balance',
+      reference: 'ord_' + newOrder.id,
       type: 'order_charge',
       status: 'completed'
     });
+
+    if (txErr) {
+      console.error('[OrderService] Transaction insert error for order charge:', txErr.message);
+    }
 
     return {
       order_id: newOrder.id,
@@ -274,15 +278,19 @@ class OrderService {
         .eq('user_id', userId);
 
       // Record refund transaction
-      await supabaseAdmin.from('transactions').insert({
+      const { error: txErr } = await supabaseAdmin.from('transactions').insert({
         user_id: userId,
         amount: chargeAmount,
         currency: 'GHS',
-        gateway: 'wallet',
-        reference: 'refund_' + Math.random().toString(36).substring(2, 10),
-        type: 'order_refund',
+        gateway: 'Wallet Balance',
+        reference: 'refund_' + orderId,
+        type: 'refund',
         status: 'completed'
       });
+
+      if (txErr) {
+        console.error('[OrderService] Transaction insert error for order refund:', txErr.message);
+      }
     }
 
     const updatedOrder = await OrderService.getOrderById(orderId, userId);

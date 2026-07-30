@@ -4601,3 +4601,12 @@ iframe.wait-autoplay {
 #sidebar.is-collapsed #icon-collapse {
   transform: rotate(180deg);
 }
+
+/* Flex & Grid Order utilities for mobile vs desktop */
+.order-1 { order: 1; }
+.order-2 { order: 2; }
+
+@media (min-width: 1024px) {
+  .lg\:order-1 { order: 1 !important; }
+  .lg\:order-2 { order: 2 !important; }
+}
