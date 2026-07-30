@@ -353,7 +353,7 @@ class AdminService {
   }
 
   static async replyTicket({ ticketId, senderId, message }) {
-    const { data: msg, error: msgErr } = await supabase.from('ticket_messages').insert([{
+    const { data: msg, error: msgErr } = await supabaseAdmin.from('ticket_messages').insert([{
       ticket_id: ticketId,
       sender_id: senderId,
       sender_role: 'admin',
@@ -362,7 +362,7 @@ class AdminService {
 
     if (msgErr) throw new Error(msgErr.message);
 
-    await supabase.from('tickets').update({ status: 'Answered', updated_at: new Date().toISOString() }).eq('id', ticketId);
+    await supabaseAdmin.from('tickets').update({ status: 'Answered', updated_at: new Date().toISOString() }).eq('id', ticketId);
 
     return msg[0];
   }

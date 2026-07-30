@@ -1238,30 +1238,7 @@ async function initServicesPage() {
 
 // ADD FUNDS & TRANSACTIONS HISTORY HANDLER
 async function initAddFundsPage() {
-  const form = document.querySelector('form');
   const tableBody = document.querySelector('tbody');
-
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const amountInput = form.querySelector('input[type="number"]');
-      const amount_usd = amountInput ? amountInput.value : 0;
-
-      try {
-        const res = await API.request('/deposits/momo', 'POST', { amount_usd });
-        alert(`🎉 ${res.message}\nRef: ${res.reference}`);
-        const user = API.getUser();
-        if (user) {
-          user.balance = res.new_balance;
-          API.setUser(user);
-          updateUserUI(user);
-        }
-        window.location.reload();
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-  }
 
   if (tableBody) {
     try {

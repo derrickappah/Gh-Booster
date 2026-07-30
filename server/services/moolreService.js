@@ -301,11 +301,11 @@ class MoolreService {
   /**
    * Verify payment status by reference from Moolre.
    */
-  static async verifyPayment({ reference }) {
+  static async verifyPayment({ reference, userId }) {
     const creds = await MoolreService.getCredentials();
 
     // Look up our local transaction (try reference first, fallback to payment_ref)
-    let { data: txn } = await supabase
+    let { data: txn } = await supabaseAdmin
       .from('transactions')
       .select('*')
       .eq('reference', reference)
@@ -317,6 +317,10 @@ class MoolreService {
     }
 
     if (!txn) throw new Error('Transaction not found: ' + reference);
+
+    if (txn.user_id !== userId) {
+      throw new Error('Access denied: Transaction does not belong to this user.');
+    }
 
     // If already completed, return current status
     if (txn.status === 'completed') {

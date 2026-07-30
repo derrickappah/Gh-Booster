@@ -70,7 +70,7 @@ class PaymentController {
   static async verifyPayment(req, res, next) {
     try {
       const { reference } = req.params;
-      const result = await MoolreService.verifyPayment({ reference });
+      const result = await MoolreService.verifyPayment({ reference, userId: req.user.id });
       res.json(result);
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });

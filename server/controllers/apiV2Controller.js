@@ -52,6 +52,11 @@ class ApiV2Controller {
           const { order } = req.query.order ? req.query : req.body;
           const { data: orderData } = await supabase.from('orders').select('*').eq('id', order).maybeSingle();
           if (!orderData) return res.status(404).json({ error: 'Order not found' });
+          
+          if (orderData.user_id !== userId) {
+            return res.status(403).json({ error: 'Access denied: You do not have permission to view this order' });
+          }
+
           return res.json({
             charge: orderData.charge,
             start_count: orderData.start_count || 0,

@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class TicketService {
   static async getUserTickets(userId) {
@@ -44,8 +44,26 @@ class TicketService {
     };
   }
 
-  static async getTicketMessages(ticketId) {
-    const { data: messages, error } = await supabase
+  static async getTicketMessages(ticketId, userId, isAdmin = false) {
+    if (!ticketId) throw new Error('Ticket ID is required');
+
+    if (!isAdmin) {
+      const { data: ticket, error: tErr } = await supabaseAdmin
+        .from('tickets')
+        .select('user_id')
+        .eq('id', ticketId)
+        .maybeSingle();
+
+      if (tErr || !ticket) {
+        throw new Error('Ticket not found');
+      }
+
+      if (ticket.user_id !== userId) {
+        throw new Error('Access denied: You do not have permission to view this ticket');
+      }
+    }
+
+    const { data: messages, error } = await supabaseAdmin
       .from('ticket_messages')
       .select('*, profiles(username)')
       .eq('ticket_id', ticketId)
@@ -55,20 +73,46 @@ class TicketService {
     return messages || [];
   }
 
-  static async addTicketMessage({ ticketId, userId, message }) {
-    const { data: msg, error } = await supabase
+  static async addTicketMessage({ ticketId, userId, message, isAdmin = false }) {
+    if (!ticketId) throw new Error('Ticket ID is required');
+    if (!message || message.trim() === '') throw new Error('Message content cannot be empty');
+
+    if (!isAdmin) {
+      const { data: ticket, error: tErr } = await supabaseAdmin
+        .from('tickets')
+        .select('user_id, status')
+        .eq('id', ticketId)
+        .maybeSingle();
+
+      if (tErr || !ticket) {
+        throw new Error('Ticket not found');
+      }
+
+      if (ticket.user_id !== userId) {
+        throw new Error('Access denied: You do not have permission to reply to this ticket');
+      }
+
+      if (ticket.status === 'Closed') {
+        throw new Error('This ticket is closed. Please open a new ticket.');
+      }
+    }
+
+    const { data: msg, error } = await supabaseAdmin
       .from('ticket_messages')
       .insert({
         ticket_id: ticketId,
         sender_id: userId,
-        sender_role: 'user',
-        message
+        sender_role: isAdmin ? 'admin' : 'user',
+        message: message.trim()
       })
       .select();
 
     if (error) throw new Error(error.message);
 
-    await supabase.from('tickets').update({ status: 'Open', updated_at: new Date().toISOString() }).eq('id', ticketId);
+    await supabaseAdmin
+      .from('tickets')
+      .update({ status: isAdmin ? 'Answered' : 'Open', updated_at: new Date().toISOString() })
+      .eq('id', ticketId);
 
     return msg[0];
   }
