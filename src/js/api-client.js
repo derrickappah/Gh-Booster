@@ -1587,10 +1587,393 @@ async function initChildPanelPage() {
 // API DOCS PAGE HANDLER
 function initApiDocsPage() {
   const user = API.getUser();
-  if (user) {
-    const keyDisps = document.querySelectorAll('.api-key-placeholder, [data-api-key]');
-    keyDisps.forEach(el => el.textContent = user.api_key || 'ghb_live_key');
+  const origin = window.location.origin;
+  const apiUrl = origin.includes('localhost') || origin.includes('127.0.0.1')
+    ? `${origin}/api/v2`
+    : 'https://ghbooster.com/api/v2';
+
+  // 1. Populate URL Input and placeholders
+  const urlInput = document.getElementById('api-url-input');
+  if (urlInput) urlInput.value = apiUrl;
+
+  const getCodeSnippet = (action, lang, endpoint, keyVal) => {
+    const key = keyVal || 'ghb_live_key';
+    
+    if (action === 'add') {
+      if (lang === 'curl') {
+        return `curl -X POST "${endpoint}" \\
+  -d "key=${key}" \\
+  -d "action=add" \\
+  -d "service=101" \\
+  -d "link=https://instagram.com/username" \\
+  -d "quantity=1000"`;
+      }
+      if (lang === 'php') {
+        return `<?php
+$ch = curl_init('${endpoint}');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'key' => '${key}',
+    'action' => 'add',
+    'service' => 101,
+    'link' => 'https://instagram.com/username',
+    'quantity' => 1000
+]);
+$response = curl_exec($ch);
+curl_close($ch);
+print_r(json_decode($response, true));
+?>`;
+      }
+      if (lang === 'python') {
+        return `import requests
+
+url = "${endpoint}"
+payload = {
+    "key": "${key}",
+    "action": "add",
+    "service": 101,
+    "link": "https://instagram.com/username",
+    "quantity": 1000
+}
+
+response = requests.post(url, data=payload)
+print(response.json())`;
+      }
+      if (lang === 'js') {
+        return `const formData = new URLSearchParams();
+formData.append('key', '${key}');
+formData.append('action', 'add');
+formData.append('service', '101');
+formData.append('link', 'https://instagram.com/username');
+formData.append('quantity', '1000');
+
+fetch('${endpoint}', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => console.log(data));`;
+      }
+    }
+    
+    if (action === 'status') {
+      if (lang === 'curl') {
+        return `curl -X POST "${endpoint}" \\
+  -d "key=${key}" \\
+  -d "action=status" \\
+  -d "order=169914"`;
+      }
+      if (lang === 'php') {
+        return `<?php
+$ch = curl_init('${endpoint}');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'key' => '${key}',
+    'action' => 'status',
+    'order' => 169914
+]);
+$response = curl_exec($ch);
+curl_close($ch);
+print_r(json_decode($response, true));
+?>`;
+      }
+      if (lang === 'python') {
+        return `import requests
+
+url = "${endpoint}"
+payload = {
+    "key": "${key}",
+    "action": "status",
+    "order": 169914
+}
+
+response = requests.post(url, data=payload)
+print(response.json())`;
+      }
+      if (lang === 'js') {
+        return `const formData = new URLSearchParams();
+formData.append('key', '${key}');
+formData.append('action', 'status');
+formData.append('order', '169914');
+
+fetch('${endpoint}', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => console.log(data));`;
+      }
+    }
+
+    if (action === 'balance') {
+      if (lang === 'curl') {
+        return `curl -X POST "${endpoint}" \\
+  -d "key=${key}" \\
+  -d "action=balance"`;
+      }
+      if (lang === 'php') {
+        return `<?php
+$ch = curl_init('${endpoint}');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'key' => '${key}',
+    'action' => 'balance'
+]);
+$response = curl_exec($ch);
+curl_close($ch);
+print_r(json_decode($response, true));
+?>`;
+      }
+      if (lang === 'python') {
+        return `import requests
+
+url = "${endpoint}"
+payload = {
+    "key": "${key}",
+    "action": "balance"
+}
+
+response = requests.post(url, data=payload)
+print(response.json())`;
+      }
+      if (lang === 'js') {
+        return `const formData = new URLSearchParams();
+formData.append('key', '${key}');
+formData.append('action', 'balance');
+
+fetch('${endpoint}', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => console.log(data));`;
+      }
+    }
+
+    if (action === 'services') {
+      if (lang === 'curl') {
+        return `curl -X POST "${endpoint}" \\
+  -d "key=${key}" \\
+  -d "action=services"`;
+      }
+      if (lang === 'php') {
+        return `<?php
+$ch = curl_init('${endpoint}');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, [
+    'key' => '${key}',
+    'action' => 'services'
+]);
+$response = curl_exec($ch);
+curl_close($ch);
+print_r(json_decode($response, true));
+?>`;
+      }
+      if (lang === 'python') {
+        return `import requests
+
+url = "${endpoint}"
+payload = {
+    "key": "${key}",
+    "action": "services"
+}
+
+response = requests.post(url, data=payload)
+print(response.json())`;
+      }
+      if (lang === 'js') {
+        return `const formData = new URLSearchParams();
+formData.append('key', '${key}');
+formData.append('action', 'services');
+
+fetch('${endpoint}', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => console.log(data));`;
+      }
+    }
+    return '';
+  };
+
+  const getSampleResponse = (action) => {
+    if (action === 'add') {
+      return `{
+  "order": 169914
+}`;
+    }
+    if (action === 'status') {
+      return `{
+  "charge": "2.5000",
+  "start_count": 14200,
+  "status": "Completed",
+  "remains": 0,
+  "currency": "GHS"
+}`;
+    }
+    if (action === 'balance') {
+      return `{
+  "balance": "150.2550",
+  "currency": "GHS"
+}`;
+    }
+    if (action === 'services') {
+      return `[
+  {
+    "service": 101,
+    "name": "Instagram Followers [Real & Active]",
+    "category": "Instagram - Followers",
+    "rate": "2.50",
+    "min": 100,
+    "max": 10000
+  },
+  {
+    "service": 102,
+    "name": "TikTok Video Likes [Instant Start]",
+    "category": "TikTok - Likes",
+    "rate": "1.20",
+    "min": 50,
+    "max": 50000
   }
+]`;
+    }
+    return '';
+  };
+
+  // State Management
+  let activeAction = 'add';
+  let activeLang = 'curl';
+  const currentKey = user ? (user.api_key || 'ghb_live_key') : 'ghb_live_key';
+
+  const updateSnippets = () => {
+    const codeDisplay = document.getElementById('code-snippet-display');
+    const responseDisplay = document.getElementById('response-snippet-display');
+    const keyInput = document.getElementById('api-key-input');
+    const keyVal = keyInput ? keyInput.value : currentKey;
+
+    if (codeDisplay) {
+      codeDisplay.textContent = getCodeSnippet(activeAction, activeLang, apiUrl, keyVal);
+    }
+    if (responseDisplay) {
+      responseDisplay.textContent = getSampleResponse(activeAction);
+    }
+  };
+
+  // 2. Populate API Key Input
+  const keyInput = document.getElementById('api-key-input');
+  if (keyInput) keyInput.value = currentKey;
+
+  updateSnippets();
+
+  // 3. Toggle API Key Visibility (Show/Hide)
+  const toggleBtn = document.getElementById('toggle-key-btn');
+  if (toggleBtn && keyInput) {
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = keyInput.type === 'password';
+      keyInput.type = isPassword ? 'text' : 'password';
+      toggleBtn.textContent = isPassword ? 'Hide' : 'Show';
+    });
+  }
+
+  // 4. Copy API Key Button
+  const copyKeyBtn = document.getElementById('copy-key-btn');
+  if (copyKeyBtn && keyInput) {
+    copyKeyBtn.addEventListener('click', () => {
+      if (keyInput.value && keyInput.value !== 'ghb_live_key') {
+        navigator.clipboard.writeText(keyInput.value);
+        showToast('API key copied to clipboard! 📋', 'success');
+      } else {
+        showToast('Please log in to copy your API key.', 'error');
+      }
+    });
+  }
+
+  // 5. Copy API URL Button
+  const copyUrlBtn = document.getElementById('copy-url-btn');
+  if (copyUrlBtn && urlInput) {
+    copyUrlBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(urlInput.value);
+      showToast('API Endpoint URL copied to clipboard! 📋', 'success');
+    });
+  }
+
+  // 6. Copy Code Snippet Button
+  const copySnippetBtn = document.getElementById('copy-snippet-btn');
+  if (copySnippetBtn) {
+    copySnippetBtn.addEventListener('click', () => {
+      const codeDisplay = document.getElementById('code-snippet-display');
+      if (codeDisplay && codeDisplay.textContent) {
+        navigator.clipboard.writeText(codeDisplay.textContent);
+        showToast('Code snippet copied to clipboard! 📋', 'success');
+      }
+    });
+  }
+
+  // 7. Regenerate API Key Button
+  const regenKeyBtn = document.getElementById('regen-key-btn');
+  if (regenKeyBtn) {
+    regenKeyBtn.onclick = null; // Clear static click action
+    regenKeyBtn.addEventListener('click', async () => {
+      if (!user) {
+        showToast('Please log in to manage your API key.', 'error');
+        return;
+      }
+
+      regenKeyBtn.disabled = true;
+      const originalHtml = regenKeyBtn.innerHTML;
+      regenKeyBtn.innerHTML = `<span>Generating...</span>`;
+
+      try {
+        const res = await API.request('/auth/generate-api-key', 'POST');
+        showToast(res.message || 'New API key generated successfully!', 'success');
+        
+        // Update local user object
+        user.api_key = res.api_key;
+        API.setUser(user);
+        
+        // Update UI state
+        if (keyInput) keyInput.value = res.api_key;
+        updateSnippets();
+      } catch (err) {
+        showToast(err.message || 'Failed to generate new API key.', 'error');
+      } finally {
+        regenKeyBtn.disabled = false;
+        regenKeyBtn.innerHTML = originalHtml;
+      }
+    });
+  }
+
+  // 8. Tabs Event Listeners
+  const actionTabs = document.querySelectorAll('.action-tab');
+  actionTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      actionTabs.forEach(t => {
+        t.classList.remove('bg-pink-600', 'text-white', 'shadow-sm');
+        t.classList.add('text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-white');
+      });
+      tab.classList.add('bg-pink-600', 'text-white', 'shadow-sm');
+      tab.classList.remove('text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-white');
+      
+      activeAction = tab.getAttribute('data-action');
+      updateSnippets();
+    });
+  });
+
+  const langTabs = document.querySelectorAll('.lang-tab');
+  langTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      langTabs.forEach(t => {
+        t.classList.remove('bg-pink-600', 'text-white', 'shadow-sm');
+        t.classList.add('text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-white');
+      });
+      tab.classList.add('bg-pink-600', 'text-white', 'shadow-sm');
+      tab.classList.remove('text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-white');
+      
+      activeLang = tab.getAttribute('data-lang');
+      updateSnippets();
+    });
+  });
 }
 
 // ADMIN DASHBOARD HANDLER
