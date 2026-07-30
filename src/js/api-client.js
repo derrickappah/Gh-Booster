@@ -1680,9 +1680,6 @@ async function initBulkOrderPage() {
       activeServices = res.services || [];
       allCategories = res.categories || [];
       renderDropdownMenu();
-      if (activeServices.length > 0) {
-        selectService(activeServices[0]);
-      }
     }
   } catch (e) {
     console.error('Failed to load bulk services:', e);
