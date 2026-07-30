@@ -174,12 +174,68 @@
           </div>
 
           <form id="bulk-order-form" class="space-y-5">
-            <!-- Service Selection -->
-            <div>
-              <label for="bulk-service" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Default Service</label>
-              <select id="bulk-service" class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
-                <option value="">Loading services...</option>
-              </select>
+            <!-- Unified Custom Searchable Service Combobox Component -->
+            <div class="relative" id="bulk-service-combobox-wrapper">
+              <input type="hidden" id="bulk-service" name="service" required>
+              
+              <label for="bulk-service-search-input" class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">Default Service</label>
+              
+              <!-- Search & Active Selection Input Box -->
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input type="text" id="bulk-service-search-input" autocomplete="off" placeholder="Search service by name, platform, or ID (e.g. TikTok, Instagram)..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
+                
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" id="bulk-combobox-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Custom Floating Dropdown Menu -->
+              <div id="bulk-service-dropdown-menu" style="max-height: 220px; overflow-y: auto;" class="hidden absolute z-50 mt-1.5 w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700/50 backdrop-blur-md">
+                <div class="p-3 text-center text-xs text-gray-400 font-medium" id="bulk-dropdown-loading-state">Loading services...</div>
+              </div>
+
+              <!-- White Theme Selected Service Summary Card -->
+              <div id="bulk-selected-service-card" class="hidden mt-4 p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center space-x-2.5 min-w-0">
+                    <img id="bulk-selected-svc-icon" src="src/img/platforms/instagram.png" class="w-6 h-6 object-contain flex-shrink-0" alt="Platform Icon">
+                    <div class="min-w-0">
+                      <div class="flex items-center space-x-2">
+                        <span id="bulk-selected-svc-badge" class="px-2 py-0.5 bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 font-mono font-bold rounded text-[10px]"></span>
+                      </div>
+                      <h4 id="bulk-selected-svc-title" class="text-xs font-bold text-gray-900 dark:text-white mt-1 leading-snug break-words"></h4>
+                    </div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <span class="text-[10px] text-gray-400 font-medium block">Price per 1k</span>
+                    <span id="bulk-selected-svc-rate" class="text-sm font-extrabold text-green-600 dark:text-green-400"></span>
+                  </div>
+                </div>
+
+                <!-- Limits Row -->
+                <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 text-[11px]">
+                  <div class="bg-gray-50 dark:bg-gray-900/60 p-2 rounded-lg border border-gray-100 dark:border-gray-700/40">
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 block font-medium">Min Quantity</span>
+                    <span id="bulk-selected-svc-min" class="font-bold text-gray-800 dark:text-gray-200"></span>
+                  </div>
+                  <div class="bg-gray-50 dark:bg-gray-900/60 p-2 rounded-lg border border-gray-100 dark:border-gray-700/40">
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 block font-medium">Max Quantity</span>
+                    <span id="bulk-selected-svc-max" class="font-bold text-gray-800 dark:text-gray-200"></span>
+                  </div>
+                </div>
+                <!-- Description -->
+                <div class="pt-2 border-t border-gray-100 dark:border-gray-700/60 text-[11px]">
+                  <span class="text-[10px] text-gray-500 dark:text-gray-400 block font-medium">Description</span>
+                  <p id="bulk-selected-svc-desc" class="text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed break-words"></p>
+                </div>
+              </div>
             </div>
 
             <!-- Format Instruction Box -->

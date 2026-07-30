@@ -1525,7 +1525,6 @@ async function initReferralsPage() {
 }
 
 // BULK ORDER HANDLER
-// BULK ORDER HANDLER
 async function initBulkOrderPage() {
   const bulkTextarea = document.getElementById('bulk-textarea');
   const bulkService = document.getElementById('bulk-service');
@@ -1536,18 +1535,154 @@ async function initBulkOrderPage() {
   const bulkForm = document.getElementById('bulk-order-form');
   const tableBody = document.getElementById('bulk-batches-tbody');
 
-  let activeServices = [];
+  const bulkServiceSearchInput = document.getElementById('bulk-service-search-input');
+  const bulkServiceDropdownMenu = document.getElementById('bulk-service-dropdown-menu');
+  const bulkComboboxChevron = document.getElementById('bulk-combobox-chevron');
+  const bulkSelectedServiceCard = document.getElementById('bulk-selected-service-card');
+  const bulkSelectedSvcTitle = document.getElementById('bulk-selected-svc-title');
+  const bulkSelectedSvcRate = document.getElementById('bulk-selected-svc-rate');
+  const bulkSelectedSvcLimitsMin = document.getElementById('bulk-selected-svc-min');
+  const bulkSelectedSvcLimitsMax = document.getElementById('bulk-selected-svc-max');
+  const bulkSelectedSvcDesc = document.getElementById('bulk-selected-svc-desc');
 
-  // 1. Fetch active services
+  let activeServices = [];
+  let allCategories = [];
+  let selectedService = null;
+
+  function getPlatformIcon(catName) {
+    const catObj = allCategories.find(c => c.name === catName);
+    if (catObj && catObj.icon) return catObj.icon;
+    const lower = (catName || '').toLowerCase();
+    if (lower.includes('instagram')) return 'src/img/platforms/instagram.png';
+    if (lower.includes('tiktok')) return 'src/img/platforms/tiktok.png';
+    if (lower.includes('youtube')) return 'src/img/platforms/youtube.png';
+    if (lower.includes('telegram')) return 'src/img/platforms/telegram.png';
+    if (lower.includes('facebook')) return 'src/img/platforms/facebook.png';
+    if (lower.includes('snapchat')) return 'src/img/platforms/snapchat.png';
+    if (lower.includes('spotify')) return 'src/img/platforms/spotify.png';
+    if (lower.includes('twitter') || lower.includes('x ')) return 'src/img/platforms/twitter.png';
+    if (lower.includes('whatsapp')) return 'src/img/platforms/whatsapp.png';
+    return 'src/img/platforms/instagram.png';
+  }
+
+  function selectService(s) {
+    if (!s) return;
+    selectedService = s;
+    if (bulkService) bulkService.value = s.id;
+    if (bulkServiceSearchInput) bulkServiceSearchInput.value = s.name;
+
+    const rate = parseFloat(s.rate_per_1000 || s.our_price_per_1000 || s.rate_per_1k || s.rate || 0);
+    const min = (s.min_quantity || 10).toLocaleString();
+    const max = (s.max_quantity || 100000).toLocaleString();
+    const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
+    const catName = s.category_name || s.categories?.name || 'General Services';
+    const icon = getPlatformIcon(catName);
+
+    const selectedSvcIcon = document.getElementById('bulk-selected-svc-icon');
+    const selectedSvcBadge = document.getElementById('bulk-selected-svc-badge');
+
+    if (bulkSelectedServiceCard) {
+      if (selectedSvcIcon) selectedSvcIcon.src = icon;
+      if (selectedSvcBadge) selectedSvcBadge.textContent = `ID: ${providerId}`;
+      if (bulkSelectedSvcTitle) bulkSelectedSvcTitle.textContent = s.name;
+      if (bulkSelectedSvcRate) bulkSelectedSvcRate.textContent = `GH₵${rate.toFixed(2)}`;
+      if (bulkSelectedSvcLimitsMin) bulkSelectedSvcLimitsMin.textContent = min;
+      if (bulkSelectedSvcLimitsMax) bulkSelectedSvcLimitsMax.textContent = max;
+      if (bulkSelectedSvcDesc) bulkSelectedSvcDesc.textContent = s.description || 'Fast automated delivery with refill guarantee.';
+      bulkSelectedServiceCard.classList.remove('hidden');
+    }
+
+    parseBulkInput();
+    closeDropdown();
+  }
+
+  function renderDropdownMenu(query = '') {
+    if (!bulkServiceDropdownMenu) return;
+
+    const q = (query || '').toLowerCase().trim();
+    let list = activeServices;
+    if (q) {
+      list = activeServices.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        (s.category_name && s.category_name.toLowerCase().includes(q)) ||
+        String(s.id).toLowerCase().includes(q)
+      );
+    }
+
+    if (list.length === 0) {
+      bulkServiceDropdownMenu.innerHTML = `<div class="p-4 text-center text-xs text-gray-400 font-medium">No matching services found for "${query}"</div>`;
+      return;
+    }
+
+    // Group by category_name
+    const grouped = {};
+    list.forEach(s => {
+      const cName = s.category_name || s.categories?.name || 'General Services';
+      if (!grouped[cName]) grouped[cName] = [];
+      grouped[cName].push(s);
+    });
+
+    let html = '';
+    for (const [catName, items] of Object.entries(grouped)) {
+      const icon = getPlatformIcon(catName);
+      html += `
+        <div class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 px-3.5 py-2 font-bold text-xs text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 flex items-center shadow-xs">
+          <img src="${icon}" class="w-4 h-4 mr-2 object-contain flex-shrink-0" alt="icon">
+          ${catName}
+        </div>
+      `;
+      html += items.map(s => {
+        const rate = parseFloat(s.rate_per_1000 || s.our_price_per_1000 || s.rate_per_1k || s.rate || 0).toFixed(2);
+        const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
+        const isSelected = selectedService && String(selectedService.id) === String(s.id);
+        const activeClass = isSelected ? 'bg-pink-50/90 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 font-bold' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200';
+
+        return `
+          <div data-svc-id="${s.id}" class="bulk-svc-option-item px-4 py-2.5 cursor-pointer text-xs transition flex items-center justify-between border-b border-gray-50 dark:border-gray-800/40 ${activeClass}">
+            <div class="flex-grow pr-3 truncate">
+              <span class="font-bold text-pink-600 dark:text-pink-400 font-mono mr-1 text-[11px]">ID: ${providerId}</span>
+              <span class="font-medium truncate">${s.name}</span>
+            </div>
+            <div class="flex items-center space-x-2 flex-shrink-0">
+              <span class="font-extrabold text-green-600 dark:text-green-400 text-xs">GH₵${rate}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    bulkServiceDropdownMenu.innerHTML = html;
+
+    // Attach click events
+    bulkServiceDropdownMenu.querySelectorAll('.bulk-svc-option-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.getAttribute('data-svc-id');
+        const target = activeServices.find(s => String(s.id) === String(id));
+        if (target) selectService(target);
+      });
+    });
+  }
+
+  function openDropdown() {
+    if (bulkServiceDropdownMenu) bulkServiceDropdownMenu.classList.remove('hidden');
+    if (bulkComboboxChevron) bulkComboboxChevron.classList.add('rotate-180');
+  }
+
+  function closeDropdown() {
+    if (bulkServiceDropdownMenu) bulkServiceDropdownMenu.classList.add('hidden');
+    if (bulkComboboxChevron) bulkComboboxChevron.classList.remove('rotate-180');
+  }
+
+  // 1. Fetch active services and categories
   try {
     const res = await API.request('/services');
-    if (res.success && res.services && bulkService) {
-      activeServices = res.services;
-      bulkService.innerHTML = activeServices.map(s => {
-        const rate = parseFloat(s.rate_per_1k || s.rate_per_1000 || s.our_price_per_1000 || 0).toFixed(2);
-        const providerId = s.service_id || s.provider_service_id || s.service || (typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id);
-        return `<option value="${s.id}" data-rate="${rate}">[ID: ${providerId}] ${s.name} - GH₵${rate} per 1,000</option>`;
-      }).join('');
+    if (res.success) {
+      activeServices = res.services || [];
+      allCategories = res.categories || [];
+      renderDropdownMenu();
+      if (activeServices.length > 0) {
+        selectService(activeServices[0]);
+      }
     }
   } catch (e) {
     console.error('Failed to load bulk services:', e);
@@ -1556,12 +1691,14 @@ async function initBulkOrderPage() {
 
   // 2. Live pricing and line calculation
   function parseBulkInput() {
-    if (!bulkTextarea || !bulkService) return;
+    if (!bulkTextarea) return;
     const text = bulkTextarea.value.trim();
     const lines = text ? text.split('\n') : [];
     const lineCount = lines.length;
-    const selectedOpt = bulkService.options[bulkService.selectedIndex];
-    const ratePerThousand = parseFloat(selectedOpt ? selectedOpt.getAttribute('data-rate') : 0 || 0);
+    
+    const ratePerThousand = selectedService 
+      ? parseFloat(selectedService.rate_per_1k || selectedService.rate_per_1000 || selectedService.our_price_per_1000 || 0)
+      : 0;
 
     let validCount = 0;
     let totalCost = 0;
@@ -1592,11 +1729,33 @@ async function initBulkOrderPage() {
     if (bulkTotalChargeDisp) bulkTotalChargeDisp.textContent = "GH₵" + totalCost.toFixed(2);
   }
 
-  if (bulkTextarea && bulkService) {
+  if (bulkTextarea) {
     bulkTextarea.addEventListener('input', parseBulkInput);
-    bulkService.addEventListener('change', parseBulkInput);
-    parseBulkInput();
   }
+
+  if (bulkServiceSearchInput) {
+    bulkServiceSearchInput.addEventListener('focus', () => {
+      renderDropdownMenu(bulkServiceSearchInput.value === (selectedService ? selectedService.name : '') ? '' : bulkServiceSearchInput.value);
+      openDropdown();
+    });
+
+    bulkServiceSearchInput.addEventListener('click', () => {
+      renderDropdownMenu(bulkServiceSearchInput.value === (selectedService ? selectedService.name : '') ? '' : bulkServiceSearchInput.value);
+      openDropdown();
+    });
+
+    bulkServiceSearchInput.addEventListener('input', () => {
+      renderDropdownMenu(bulkServiceSearchInput.value);
+      openDropdown();
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('bulk-service-combobox-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      closeDropdown();
+    }
+  });
 
   // 3. Load recent bulk batches
   async function loadBulkBatches() {
@@ -1660,11 +1819,7 @@ async function initBulkOrderPage() {
 
   // 4. Form submission handler
   if (bulkForm) {
-    // Remove default or conflicting listener if any
-    const newForm = bulkForm.cloneNode(true);
-    bulkForm.parentNode.replaceChild(newForm, bulkForm);
-
-    newForm.addEventListener('submit', async (e) => {
+    bulkForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const bulkText = bulkTextarea ? bulkTextarea.value.trim() : '';
       const selectedServiceId = bulkService ? bulkService.value : null;
@@ -1681,7 +1836,7 @@ async function initBulkOrderPage() {
       }
 
       try {
-        const submitBtn = newForm.querySelector('button[type="submit"]');
+        const submitBtn = bulkForm.querySelector('button[type="submit"]');
         if (submitBtn) {
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<span>Processing bulk orders...</span>';
@@ -1714,24 +1869,13 @@ async function initBulkOrderPage() {
         }
       } catch (err) {
         showToast(err.message || 'Failed to submit bulk orders.', 'error');
-        const submitBtn = newForm.querySelector('button[type="submit"]');
+        const submitBtn = bulkForm.querySelector('button[type="submit"]');
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = '<span>Submit Bulk Orders</span>';
         }
       }
     });
-
-    // Re-bind references because of cloneNode
-    const newTextarea = newForm.querySelector('textarea');
-    const newService = newForm.querySelector('select');
-    if (newTextarea && newService) {
-      newTextarea.addEventListener('input', parseBulkInput);
-      newService.addEventListener('change', parseBulkInput);
-      // Re-assign references
-      document.getElementById('bulk-textarea').replaceWith(newTextarea);
-      document.getElementById('bulk-service').replaceWith(newService);
-    }
   }
 }
 
