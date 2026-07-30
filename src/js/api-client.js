@@ -1302,40 +1302,104 @@ async function initTicketsPage() {
 }
 
 // ACCOUNT SETTINGS HANDLER
-function initAccountPage() {
+async function initAccountPage() {
   const user = API.getUser();
   if (user) {
+    // 1. Populate Profile Details
+    const initialsEl = document.getElementById('account-avatar-initials');
+    if (initialsEl) initialsEl.textContent = (user.username || user.email || 'U').charAt(0).toUpperCase();
+
+    const fullNameEl = document.getElementById('account-full-name');
+    if (fullNameEl) fullNameEl.textContent = user.username ? `@${user.username}` : (user.email || 'Account Profile');
+
+    const emailEl = document.getElementById('account-email-display');
+    if (emailEl) emailEl.textContent = user.email || 'Not available';
+
+    const usernameEl = document.getElementById('account-username-display');
+    if (usernameEl) usernameEl.textContent = user.username ? `@${user.username}` : 'N/A';
+
+    const roleEl = document.getElementById('account-role-display');
+    if (roleEl) roleEl.textContent = user.role || 'Client';
+
+    // 2. Populate API Key
     const apiKeyInput = document.getElementById('api-key-input');
     if (apiKeyInput) apiKeyInput.value = user.api_key || 'ghb_live_key';
+
+    // 3. Login activity session
+    const activityTbody = document.getElementById('login-activity-tbody');
+    if (activityTbody) {
+      const loginTime = user.last_login ? new Date(user.last_login).toLocaleString() : new Date().toLocaleString();
+      let userAgent = 'Web Browser';
+      if (navigator.userAgent.includes('Windows')) userAgent = 'Chrome (Windows)';
+      else if (navigator.userAgent.includes('Mac')) userAgent = 'Safari (Mac)';
+      else if (navigator.userAgent.includes('iPhone')) userAgent = 'Safari (iPhone)';
+      else if (navigator.userAgent.includes('Android')) userAgent = 'Chrome (Android)';
+
+      activityTbody.innerHTML = `
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition border-b border-gray-100 dark:border-gray-800">
+          <td class="px-6 py-4 font-mono font-medium text-gray-900 dark:text-white">${escapeHtml(loginTime)}</td>
+          <td class="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">${escapeHtml(userAgent)}</td>
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-1 text-[10px] font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 border border-green-300 dark:border-green-800 rounded-full">
+              Current Session
+            </span>
+          </td>
+        </tr>
+      `;
+    }
   }
 
-  const passForm = document.getElementById('password-form');
-  if (passForm) {
-    passForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const inputs = passForm.querySelectorAll('input[type="password"]');
-      const currentPassword = inputs[0]?.value;
-      const newPassword = inputs[1]?.value;
-
-      try {
-        const res = await API.request('/auth/update-password', 'POST', { currentPassword, newPassword });
-        alert(res.message);
-      } catch (err) {
-        alert(err.message);
+  // Copy API Key Button
+  const copyBtn = document.getElementById('copy-api-key-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const apiKeyInput = document.getElementById('api-key-input');
+      if (apiKeyInput && apiKeyInput.value) {
+        navigator.clipboard.writeText(apiKeyInput.value);
+        showToast('API key copied to clipboard! 📋', 'success');
       }
     });
   }
 
+  // Generate API Key Button
   const genKeyBtn = document.getElementById('generate-api-key-btn');
   if (genKeyBtn) {
     genKeyBtn.addEventListener('click', async () => {
       try {
         const res = await API.request('/auth/generate-api-key', 'POST');
-        alert(res.message);
+        showToast(res.message || 'New API key generated successfully!', 'success');
         const apiKeyInput = document.getElementById('api-key-input');
         if (apiKeyInput) apiKeyInput.value = res.api_key;
+        if (user) {
+          user.api_key = res.api_key;
+          API.setUser(user);
+        }
       } catch (err) {
-        alert(err.message);
+        showToast(err.message || 'Failed to generate API key', 'error');
+      }
+    });
+  }
+
+  // Password Form Submit
+  const passForm = document.getElementById('password-form');
+  if (passForm) {
+    passForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPassword = document.getElementById('current-password-input')?.value;
+      const newPassword = document.getElementById('new-password-input')?.value;
+      const confirmPassword = document.getElementById('confirm-password-input')?.value;
+
+      if (!newPassword || newPassword !== confirmPassword) {
+        showToast('New passwords do not match.', 'warning');
+        return;
+      }
+
+      try {
+        const res = await API.request('/auth/update-password', 'POST', { currentPassword, newPassword });
+        showToast(res.message || 'Password updated successfully!', 'success');
+        passForm.reset();
+      } catch (err) {
+        showToast(err.message || 'Failed to update password', 'error');
       }
     });
   }
