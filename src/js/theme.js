@@ -297,6 +297,21 @@
     // Custom logic
   };
 
+  // Register Service Worker for PWA installability
+  const registerServiceWorker = function () {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(function (registration) {
+            console.log('[PWA] ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(function (err) {
+            console.error('[PWA] ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+  };
+
   // Sidebar Toggle Logic — with localStorage persistence and mobile auto-expand
   let expandSidebarGlobal = null;
   const initSidebarToggle = function () {
@@ -888,6 +903,7 @@
   initSidebarToggle();
   initMobileSidebar();
   myCustom();
+  registerServiceWorker();
 
   // Defer non-critical vendor initializations out of the main-thread critical window
   var deferLaunch = function () {

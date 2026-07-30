@@ -21,9 +21,9 @@ try {
     fs.mkdirSync(targetDir, { recursive: true });
   }
 
-  // Copy all .html files, robots.txt, sitemap.xml, and llms.txt
+  // Copy all .html files, robots.txt, sitemap.xml, llms.txt, manifest.json, and service-worker.js
   fs.readdirSync(root).forEach(file => {
-    if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'llms.txt') {
+    if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'llms.txt' || file === 'manifest.json' || file === 'service-worker.js') {
       fs.copyFileSync(path.join(root, file), path.join(targetDir, file));
     }
   });
