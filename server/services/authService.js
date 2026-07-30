@@ -4,17 +4,18 @@ const { generateToken, generateApiKey } = require('../auth');
 class AuthService {
   static async register({ fullname, username, email, password, phone }) {
     const cleanEmail = email.trim().toLowerCase();
-    const cleanFullName = (fullname || username || cleanEmail.split('@')[0]).trim();
+    const baseName = (fullname || username || cleanEmail.split('@')[0]).trim();
+    const cleanFullName = fullname ? fullname.trim() : baseName;
     const cleanPhone = phone ? phone.trim() : null;
 
     // Check if email already exists in profiles
-    const { data: existingEmail } = await supabaseAdmin
+    const { data: existingEmailProfile } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .ilike('email', cleanEmail)
       .maybeSingle();
 
-    if (existingEmail) {
+    if (existingEmailProfile) {
       throw new Error('An account with this email address already exists. Please log in.');
     }
 
@@ -28,15 +29,34 @@ class AuthService {
     });
 
     if (authErr) {
-      if (authErr.message && authErr.message.toLowerCase().includes('already registered')) {
+      const msg = (authErr.message || '').toLowerCase();
+      if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('user_already_exists')) {
         throw new Error('An account with this email address already exists. Please log in.');
       }
       throw new Error(authErr.message);
     }
 
+    // Check if Supabase returned an existing user (identities array is empty when user already exists)
+    if (authData?.user?.identities && authData.user.identities.length === 0) {
+      throw new Error('An account with this email address already exists. Please log in.');
+    }
+
     const userId = authData?.user?.id;
     if (!userId) {
       throw new Error('User creation failed in Supabase Auth.');
+    }
+
+    // Ensure a unique username for profiles table
+    let targetUsername = (username || cleanFullName || cleanEmail.split('@')[0]).trim().replace(/\s+/g, '_').toLowerCase();
+    const { data: existingUserCheck } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('username', targetUsername)
+      .neq('id', userId)
+      .maybeSingle();
+
+    if (existingUserCheck) {
+      targetUsername = `${targetUsername}_${Math.floor(100 + Math.random() * 900)}`;
     }
 
     const apiKey = generateApiKey();
@@ -47,7 +67,7 @@ class AuthService {
       id: userId,
       email: cleanEmail,
       full_name: cleanFullName,
-      username: cleanFullName,
+      username: targetUsername,
       phone: cleanPhone,
       role: 'user',
       api_key: apiKey,
@@ -57,6 +77,10 @@ class AuthService {
 
     if (profileErr) {
       console.error('[AuthService] Profile creation error:', profileErr.message);
+      const pMsg = (profileErr.message || '').toLowerCase();
+      if (pMsg.includes('profiles_pkey') || pMsg.includes('profiles_email_key') || pMsg.includes('duplicate key')) {
+        throw new Error('An account with this email address already exists. Please log in.');
+      }
       throw new Error('Could not create user profile: ' + profileErr.message);
     }
 
@@ -73,13 +97,14 @@ class AuthService {
       console.error('[AuthService] Wallet creation error:', walletErr.message);
     }
 
-    const token = authData?.session?.access_token || generateToken({ id: userId, username: cleanFullName, role: 'user', email: cleanEmail });
+    const token = authData?.session?.access_token || generateToken({ id: userId, username: targetUsername, role: 'user', email: cleanEmail });
 
     return {
       token,
       user: {
         id: userId,
-        username: cleanFullName,
+        username: targetUsername,
+        full_name: cleanFullName,
         email: cleanEmail,
         phone: cleanPhone,
         balance: initialBalance,
