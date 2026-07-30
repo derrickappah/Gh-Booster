@@ -997,6 +997,82 @@
         document.head.appendChild(style);
       }
 
+      // Make it draggable
+      let isDragging = false;
+      let startX, startY;
+      let initialLeft, initialTop;
+
+      const onStart = function (e) {
+        isDragging = false;
+        const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+        
+        startX = clientX;
+        startY = clientY;
+        
+        const rect = waButton.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        
+        waButton.style.transition = 'none';
+        
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      };
+
+      const onMove = function (e) {
+        const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+        
+        const deltaX = clientX - startX;
+        const deltaY = clientY - startY;
+        
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+          isDragging = true;
+        }
+        
+        if (isDragging) {
+          e.preventDefault(); // Prevent scrolling on mobile while dragging
+          
+          let newLeft = initialLeft + deltaX;
+          let newTop = initialTop + deltaY;
+          
+          const rect = waButton.getBoundingClientRect();
+          const padding = 10;
+          const maxLeft = window.innerWidth - rect.width - padding;
+          const maxTop = window.innerHeight - rect.height - padding;
+          
+          newLeft = Math.max(padding, Math.min(newLeft, maxLeft));
+          newTop = Math.max(padding, Math.min(newTop, maxTop));
+          
+          waButton.style.left = newLeft + 'px';
+          waButton.style.top = newTop + 'px';
+          waButton.style.right = 'auto';
+          waButton.style.bottom = 'auto';
+        }
+      };
+
+      const onEnd = function (e) {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+        
+        waButton.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      };
+
+      waButton.addEventListener('mousedown', onStart);
+      waButton.addEventListener('touchstart', onStart, { passive: true });
+
+      // Click handler to prevent redirect if dragged
+      waButton.addEventListener('click', function (e) {
+        if (isDragging) {
+          e.preventDefault();
+        }
+      });
+
       document.body.appendChild(waButton);
     };
 
