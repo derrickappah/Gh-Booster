@@ -915,8 +915,6 @@
       
       waButton.style.cssText = `
         position: fixed;
-        right: 24px;
-        bottom: 80px;
         z-index: 9999;
         display: flex;
         align-items: center;
@@ -930,6 +928,26 @@
         cursor: pointer;
         outline: none;
       `;
+
+      const savedLeft = localStorage.getItem('ghb_wa_pos_left');
+      const savedTop = localStorage.getItem('ghb_wa_pos_top');
+
+      if (savedLeft && savedTop) {
+        let leftVal = parseFloat(savedLeft);
+        let topVal = parseFloat(savedTop);
+        const padding = 10;
+        const maxLeft = window.innerWidth - 56 - padding;
+        const maxTop = window.innerHeight - 56 - padding;
+        
+        leftVal = Math.max(padding, Math.min(leftVal, maxLeft));
+        topVal = Math.max(padding, Math.min(topVal, maxTop));
+        
+        waButton.style.left = leftVal + 'px';
+        waButton.style.top = topVal + 'px';
+      } else {
+        waButton.style.right = '24px';
+        waButton.style.bottom = '80px';
+      }
 
       let imgPath = '/src/img/platforms/whatsapp.webp';
       const scripts = document.getElementsByTagName('script');
@@ -1061,6 +1079,12 @@
         document.removeEventListener('touchend', onEnd);
         
         waButton.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        
+        if (isDragging) {
+          const rect = waButton.getBoundingClientRect();
+          localStorage.setItem('ghb_wa_pos_left', rect.left + 'px');
+          localStorage.setItem('ghb_wa_pos_top', rect.top + 'px');
+        }
       };
 
       waButton.addEventListener('mousedown', onStart);
