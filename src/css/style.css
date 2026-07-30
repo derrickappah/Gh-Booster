@@ -4723,6 +4723,200 @@ iframe.wait-autoplay {
   scrollbar-color: #374151 #111827;
 }
 
+/* ==========================================================================
+   GhBooster Custom Responsive Sidebar & Topbar Navigation Rules
+   ========================================================================== */
+
+/* Mobile Sidebar Drawer (< 768px) */
+
+@media (max-width: 767px) {
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 50 !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    width: 16rem !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: transform;
+  }
+
+  #sidebar-footer {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom)) !important;
+  }
+
+  #sidebar.-translate-x-full {
+    transform: translateX(-100%) !important;
+  }
+
+  #sidebar.translate-x-0 {
+    transform: translateX(0) !important;
+  }
+
+  #sidebar.hidden {
+    display: none !important;
+  }
+
+  #toggle-sidebar {
+    display: none !important;
+  }
+
+  #mobile-hamburger-btn {
+    display: flex !important;
+  }
+}
+
+/* Mobile backdrop fade */
+
+#mobile-sidebar-backdrop {
+  transition: opacity 0.3s ease !important;
+}
+
+#mobile-sidebar-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#mobile-sidebar-backdrop:not(.hidden) {
+  opacity: 1;
+}
+
+/* Desktop Sticky Sidebar (>= 768px) */
+
+@media (min-width: 768px) {
+  #sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    left: auto !important;
+    bottom: auto !important;
+    right: auto !important;
+    z-index: 40 !important;
+    height: 100vh !important;
+    width: 16rem !important;
+    transform: none !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: width;
+    overflow: hidden !important;
+  }
+
+  #sidebar.is-collapsed {
+    width: 4.5rem !important;
+  }
+
+  #mobile-hamburger-btn {
+    display: none !important;
+  }
+
+  #mobile-sidebar-backdrop {
+    display: none !important;
+  }
+
+  #toggle-sidebar {
+    display: flex !important;
+  }
+}
+
+/* Sidebar text fade on collapse/expand */
+
+.sidebar-text {
+  transition: opacity 0.2s ease, width 0.2s ease;
+  opacity: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+#sidebar.is-collapsed .sidebar-text {
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+/* Sidebar nav link hover — lift + bg glow */
+
+.sidebar-link {
+  transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease !important;
+  will-change: transform;
+}
+
+.sidebar-link:hover {
+  transform: translateX(3px);
+}
+
+#sidebar.is-collapsed .sidebar-link:hover {
+  transform: none;
+}
+
+/* Brand logo smooth opacity on collapse */
+
+#brand-full {
+  transition: opacity 0.2s ease, max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  max-width: 200px;
+  overflow: hidden;
+}
+
+#sidebar.is-collapsed #brand-full {
+  opacity: 0;
+  max-width: 0;
+  pointer-events: none;
+}
+
+/* When collapsed: center the toggle button */
+
+#sidebar.is-collapsed #brand-header {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Toggle button icon swap animation */
+
+#icon-collapse, #icon-expand {
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+#icon-collapse {
+  transform: rotate(0deg);
+}
+
+#sidebar.is-collapsed #icon-collapse {
+  transform: rotate(180deg);
+}
+
+/* Flex & Grid Order utilities for mobile vs desktop */
+
+.order-1 {
+  order: 1;
+}
+
+.order-2 {
+  order: 2;
+}
+
+@media (min-width: 1024px) {
+  .lg\:order-1 {
+    order: 1 !important;
+  }
+
+  .lg\:order-2 {
+    order: 2 !important;
+  }
+}
+
+/* Hero responsive title size for mobile phones only */
+
+@media (max-width: 639px) {
+  .hero-title {
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
+  }
+}
+
 /*! purgecss end ignore */
 
 @media (min-width: 1280px) {
