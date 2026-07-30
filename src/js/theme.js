@@ -866,18 +866,29 @@
    * ------------------------------------------------------------------------
    */
    
+  // Immediate handlers for critical interactive UI elements
   myBacktotop();
-  myPreloader();
   menu_Mobile();
-  myLightbox();
-  mySplidejs();
   myTyped();
-  myWow();
-  mySmooth();
-  myScrollspy();
   initSidebarToggle();
   initMobileSidebar();
   myCustom();
-  myImageCache();
+
+  // Defer non-critical vendor initializations out of the main-thread critical window
+  var deferLaunch = function () {
+    myPreloader();
+    myLightbox();
+    mySplidejs();
+    myWow();
+    mySmooth();
+    myScrollspy();
+    myImageCache();
+  };
+
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    window.requestIdleCallback(deferLaunch, { timeout: 1000 });
+  } else {
+    setTimeout(deferLaunch, 100);
+  }
 
 })();
