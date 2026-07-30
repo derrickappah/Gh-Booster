@@ -131,10 +131,30 @@ class AuthService {
     };
   }
 
-  static async updatePassword(newPassword) {
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+  static async forgotPassword(email) {
+    if (!email) {
+      throw new Error('Email is required for password reset.');
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://ghbooster.com/login.html'
+    });
+    if (error) {
+      // Log internally but don't expose to client (prevents email enumeration)
+      console.warn('[AuthService] Password reset request error:', error.message);
+    }
+    return { message: 'Password reset email sent if account exists.' };
+  }
+
+  static async updatePassword(userId, newPassword) {
+    if (!userId) {
+      throw new Error('User ID is required to update password.');
+    }
+    if (!newPassword || newPassword.length < 6) {
+      throw new Error('New password must be at least 6 characters.');
+    }
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword });
     if (error) throw new Error(error.message);
-    return { message: 'Password updated successfully in Supabase!' };
+    return { message: 'Password updated successfully!' };
   }
 
   static async generateApiKey(userId) {

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const env = require('./config/env');
 const { authenticateToken, requireRole } = require('./middleware/authMiddleware');
 
@@ -20,7 +21,7 @@ function generateToken(user) {
 }
 
 function generateApiKey() {
-  return 'ghb_live_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return 'ghb_live_' + crypto.randomBytes(24).toString('hex');
 }
 
 module.exports = {

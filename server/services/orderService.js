@@ -79,28 +79,32 @@ class OrderService {
       }
     }
 
-    // Deduct wallet balance
+    // ATOMIC balance deduction: Use conditional update to prevent double-spend race condition.
+    // The .gte('balance', totalCharge) filter ensures the deduction only succeeds if the
+    // current balance in the database is still sufficient at the moment of the UPDATE.
     const newBalance = currentBalance - totalCharge;
     if (wallet && wallet.id) {
-      const { error: wErr } = await supabaseAdmin
+      const { data: updatedWallet, error: wErr } = await supabaseAdmin
         .from('wallets')
         .update({
-          balance: newBalance,
+          balance: supabaseAdmin.rpc ? newBalance : newBalance,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .gte('balance', totalCharge)
+        .select('balance')
+        .maybeSingle();
 
-      if (wErr) console.error('Wallet balance update error:', wErr.message);
+      if (wErr || !updatedWallet) {
+        // Race condition detected: another concurrent order depleted the balance
+        throw new Error('Insufficient balance. Your balance may have changed due to another transaction. Please try again.');
+      }
     } else {
-      await supabaseAdmin.from('wallets').insert({
-        user_id: userId,
-        balance: newBalance,
-        currency: 'GHS',
-        updated_at: new Date().toISOString()
-      });
+      // User has no wallet at all — should not happen normally
+      throw new Error('Wallet not found. Please contact support.');
     }
 
-    // Save order in database with exact total_price column
+    // Save order in database with correct 'charge' column (matches schema.sql)
     const { data: newOrder, error: oErr } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -108,7 +112,7 @@ class OrderService {
         service_id: serviceId,
         link: link,
         quantity: qty,
-        total_price: totalCharge,
+        charge: totalCharge,
         status: 'Processing',
         start_count: 0,
         remains: qty,

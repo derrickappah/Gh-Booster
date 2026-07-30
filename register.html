@@ -37,7 +37,7 @@
       </div>
 
       <!-- Register Form -->
-      <form id="signup-form" action="#" method="POST" class="space-y-4" novalidate>
+      <form id="signup-form" action="#" method="POST" class="space-y-4">
         <!-- Full Name -->
         <div>
           <label for="fullname" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Full Name</label>
@@ -47,7 +47,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <input type="text" id="fullname" name="fullname" placeholder="John Doe" class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+            <input type="text" id="fullname" name="fullname" required placeholder="John Doe" class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
           </div>
           <p class="error-msg text-xs text-red-500 dark:text-red-400 font-medium mt-1 hidden" id="fullname-error">Please enter your Full Name.</p>
         </div>
@@ -61,7 +61,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <input type="email" id="email" name="email" placeholder="john@example.com" class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+            <input type="email" id="email" name="email" required placeholder="john@example.com" class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
           </div>
           <p class="error-msg text-xs text-red-500 dark:text-red-400 font-medium mt-1 hidden" id="email-error">Please enter a valid Email Address.</p>
         </div>
@@ -89,7 +89,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <input type="password" id="password" name="password" placeholder="••••••••" class="w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+            <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" class="w-full pl-11 pr-11 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
             <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none" aria-label="Toggle password visibility">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 eye-closed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -108,7 +108,7 @@
           <label class="flex items-start cursor-pointer">
             <input type="checkbox" id="terms" name="terms" class="w-4 h-4 mt-0.5 text-pink-600 border-gray-300 dark:border-gray-700 rounded focus:ring-pink-500 cursor-pointer flex-shrink-0">
             <span class="ml-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-              I agree to GhBooster's <a href="terms.html" class="hidden underline font-medium hover:text-gray-800 dark:hover:text-gray-200">Terms of Service</a> and <a href="terms.html" class="hidden underline font-medium hover:text-gray-800 dark:hover:text-gray-200">Privacy Policy</a>.
+              I agree to GhBooster's <a href="terms.html" class="underline font-medium hover:text-gray-800 dark:hover:text-gray-200">Terms of Service</a> and <a href="terms.html" class="underline font-medium hover:text-gray-800 dark:hover:text-gray-200">Privacy Policy</a>.
             </span>
           </label>
           <p class="error-msg text-xs text-red-500 dark:text-red-400 font-medium mt-1 hidden" id="terms-error">You must agree to the Terms of Service to continue.</p>

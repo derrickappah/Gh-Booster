@@ -34,10 +34,28 @@ class AuthController {
     });
   }
 
+  static async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+      if (!email || !email.includes('@')) {
+        // Always return success to prevent email enumeration
+        return res.json({ success: true, message: 'If an account exists with this email, a password reset link has been sent.' });
+      }
+      await AuthService.forgotPassword(email.trim().toLowerCase());
+      res.json({ success: true, message: 'If an account exists with this email, a password reset link has been sent.' });
+    } catch (err) {
+      // Always return success to prevent email enumeration
+      res.json({ success: true, message: 'If an account exists with this email, a password reset link has been sent.' });
+    }
+  }
+
   static async updatePassword(req, res, next) {
     try {
       const { newPassword } = req.body;
-      const result = await AuthService.updatePassword(newPassword);
+      if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ success: false, error: 'New password must be at least 6 characters.' });
+      }
+      const result = await AuthService.updatePassword(req.user.id, newPassword);
       res.json({ success: true, ...result });
     } catch (err) {
       next(err);

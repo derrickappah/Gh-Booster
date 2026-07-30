@@ -319,17 +319,32 @@ function initLoginPage() {
   }
 
   if (forgotLink) {
-    forgotLink.addEventListener('click', (e) => {
+    forgotLink.addEventListener('click', async (e) => {
       e.preventDefault();
       const userEmail = (emailInput ? emailInput.value.trim() : '');
+      
+      if (!userEmail || !userEmail.includes('@')) {
+        if (alertContainer && alertText) {
+          alertText.textContent = 'Please enter your email address above, then click "Forgot password?" to receive a reset link.';
+          alertContainer.classList.remove('hidden');
+          alertContainer.className = 'p-3.5 rounded-xl text-xs font-semibold mb-5 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 flex items-center space-x-2';
+        } else {
+          alert('Please enter your registered email address above first.');
+        }
+        return;
+      }
+
+      // Attempt actual password reset via Supabase
+      try {
+        await API.request('/auth/forgot-password', 'POST', { email: userEmail });
+      } catch (_) {
+        // Silently ignore errors to prevent email enumeration attacks
+      }
+
       if (alertContainer && alertText) {
-        alertText.textContent = userEmail 
-          ? `Password reset link sent to ${userEmail}. Please check your email inbox.` 
-          : 'To reset your password, please enter your email address above or contact support@ghbooster.com.';
+        alertText.textContent = `If an account exists for ${userEmail}, a password reset link has been sent. Please check your inbox and spam folder.`;
         alertContainer.classList.remove('hidden');
-        alertContainer.className = 'p-3.5 rounded-xl text-xs font-semibold mb-5 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 flex items-center space-x-2';
-      } else {
-        alert('To reset your password, please enter your registered email address or contact support@ghbooster.com');
+        alertContainer.className = 'p-3.5 rounded-xl text-xs font-semibold mb-5 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50 flex items-center space-x-2';
       }
     });
   }
@@ -3122,7 +3137,7 @@ async function initOrderDetailPage() {
         openLinkBtn.removeAttribute('aria-disabled');
         openLinkBtn.title = 'Open Target Link in New Tab';
       } else {
-        openLinkBtn.href = 'javascript:void(0)';
+        openLinkBtn.removeAttribute('href');
         openLinkBtn.classList.add('opacity-40', 'pointer-events-none');
         openLinkBtn.setAttribute('aria-disabled', 'true');
         openLinkBtn.title = 'No valid web link available';

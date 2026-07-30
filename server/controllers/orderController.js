@@ -39,8 +39,11 @@ class OrderController {
   static async getOrderById(req, res, next) {
     try {
       const orderId = req.params.id;
-      const userId = req.user ? req.user.id : null;
-      const isAdmin = req.user && req.user.role === 'admin';
+      const userId = req.user.id;
+      const isAdmin = req.user.role === 'admin';
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Authentication required to view orders.' });
+      }
       const order = await OrderService.getOrderById(orderId, userId, isAdmin);
       res.json({ success: true, order });
     } catch (err) {
@@ -51,7 +54,10 @@ class OrderController {
   static async refillOrder(req, res, next) {
     try {
       const orderId = req.params.id;
-      const userId = req.user ? req.user.id : null;
+      const userId = req.user.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Authentication required.' });
+      }
       const result = await OrderService.refillOrder(orderId, userId);
       res.json({ success: true, ...result });
     } catch (err) {
@@ -62,7 +68,10 @@ class OrderController {
   static async cancelOrder(req, res, next) {
     try {
       const orderId = req.params.id;
-      const userId = req.user ? req.user.id : null;
+      const userId = req.user.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Authentication required.' });
+      }
       const result = await OrderService.cancelOrder(orderId, userId);
       res.json({ success: true, ...result });
     } catch (err) {
