@@ -148,13 +148,15 @@
         autoplay: true,
         interval: 2500,
         pauseOnHover: true,
-        perPage: 6,
+        perPage: 8,
         perMove: 1,
-        gap: 24,
+        gap: 16,
         breakpoints: {
-          1200: { perPage: 4 },
-          768: { perPage: 3 },
-          500: { perPage: 2 }
+          1200: { perPage: 7, gap: 12 },
+          992: { perPage: 6, gap: 12 },
+          768: { perPage: 5, gap: 8 },
+          500: { perPage: 4, gap: 6 },
+          380: { perPage: 4, gap: 4 }
         }
       });
       postslider.mount();
