@@ -4610,3 +4610,11 @@ iframe.wait-autoplay {
   .lg\:order-1 { order: 1 !important; }
   .lg\:order-2 { order: 2 !important; }
 }
+
+/* Hero responsive title size for mobile */
+@media (max-width: 767px) {
+  .hero-title {
+    font-size: 1.5rem !important;
+    line-height: 2rem !important;
+  }
+}
