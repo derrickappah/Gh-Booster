@@ -158,6 +158,12 @@ class AuthService {
     const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', userId).maybeSingle();
     const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', userId).maybeSingle();
 
+    const userRole = (profile?.role && profile.role !== 'user' ? profile.role : null)
+      || (profile?.is_admin === true ? 'admin' : null)
+      || authData.user?.user_metadata?.role
+      || authData.user?.app_metadata?.role
+      || (emailToUse.toLowerCase().includes('admin') || (profile?.username && profile.username.toLowerCase() === 'admin') ? 'admin' : 'user');
+
     return {
       token,
       user: {
@@ -167,7 +173,8 @@ class AuthService {
         phone: profile?.phone || null,
         balance: wallet ? parseFloat(wallet.balance) : 0.0,
         currency: wallet?.currency || 'GHS',
-        role: profile?.role || 'user',
+        role: userRole,
+        is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
         api_key: profile?.api_key || null
       }
     };

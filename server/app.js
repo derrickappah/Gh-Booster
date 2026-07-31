@@ -78,13 +78,13 @@ app.use('/api', globalLimiter);
 
 // Serve static frontend files with optimal Cache-Control headers
 app.use(express.static(path.join(__dirname, '..'), {
-  maxAge: '1d',
+  maxAge: 0,
   etag: true,
   setHeaders: (res, filepath) => {
-    if (filepath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    } else if (filepath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|woff|woff2|ttf|eot)$/)) {
-      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+    if (filepath.endsWith('.html') || filepath.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    } else if (filepath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico|css|woff|woff2|ttf|eot)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
     }
   }
 }));

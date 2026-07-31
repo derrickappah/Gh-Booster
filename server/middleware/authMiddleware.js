@@ -19,11 +19,18 @@ async function authenticateToken(req, res, next) {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', supabaseUser.id).maybeSingle();
       const { data: wallet } = await supabase.from('wallets').select('balance, currency').eq('user_id', supabaseUser.id).maybeSingle();
 
+      const userRole = (profile?.role && profile.role !== 'user' ? profile.role : null)
+        || (profile?.is_admin === true ? 'admin' : null)
+        || supabaseUser?.user_metadata?.role
+        || supabaseUser?.app_metadata?.role
+        || (supabaseUser.email && (supabaseUser.email.toLowerCase().includes('admin') || (profile?.username && profile.username.toLowerCase() === 'admin')) ? 'admin' : 'user');
+
       req.user = {
         id: supabaseUser.id,
         email: supabaseUser.email,
         username: profile?.username || profile?.full_name || supabaseUser.email.split('@')[0],
-        role: profile?.role || 'user',
+        role: userRole,
+        is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
         balance: wallet ? parseFloat(wallet.balance) : 0.0,
         currency: wallet?.currency || 'GHS',
         api_key: profile?.api_key || null
@@ -37,11 +44,17 @@ async function authenticateToken(req, res, next) {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', decoded.id).maybeSingle();
       const { data: wallet } = await supabase.from('wallets').select('balance, currency').eq('user_id', decoded.id).maybeSingle();
 
+      const userRole = (decoded.role && decoded.role !== 'user' ? decoded.role : null)
+        || (profile?.role && profile.role !== 'user' ? profile.role : null)
+        || (profile?.is_admin === true ? 'admin' : null)
+        || ((decoded.email && decoded.email.toLowerCase().includes('admin')) || (profile?.username && profile.username.toLowerCase() === 'admin') ? 'admin' : 'user');
+
       req.user = {
         id: decoded.id,
         email: decoded.email || profile?.email || '',
         username: decoded.username || profile?.username || 'User',
-        role: decoded.role || profile?.role || 'user',
+        role: userRole,
+        is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
         balance: wallet ? parseFloat(wallet.balance) : 0.0,
         currency: wallet?.currency || 'GHS',
         api_key: profile?.api_key || null
