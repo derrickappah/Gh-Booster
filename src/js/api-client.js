@@ -166,6 +166,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         API.logout();
       }
     }
+
+    // Dynamic Admin Probe: If logged in user isn't marked as admin locally, verify against backend admin endpoint
+    const currentUser = API.getUser();
+    if (currentUser && !isAdminUser(currentUser)) {
+      try {
+        const adminProbe = await API.request('/admin/stats');
+        if (adminProbe && adminProbe.success) {
+          currentUser.role = 'admin';
+          currentUser.is_admin = true;
+          API.setUser(currentUser);
+          updateUserUI(currentUser);
+        }
+      } catch (_) {}
+    }
   }
 
   // Global Logout Interceptor for Sign Out links
@@ -250,56 +264,64 @@ function updateUserUI(user) {
     el.textContent = user.email || '';
   });
 
-  // Inject/unhide Admin Panel link into sidebar if user is an admin
+  // Inject/unhide Admin Panel links in sidebar and footer if user is an admin
   const isAdmin = isAdminUser(user);
 
   if (isAdmin) {
+    const currentPage = window.location.pathname.split('/').pop() || '';
+    const isAdminPage = currentPage.startsWith('admin-');
+    const targetHref = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
+    const targetLabel = isAdminPage ? 'User Dashboard' : 'Admin Control Panel';
+
+    // 1. Sidebar Navigation Link (#sidebar-nav)
     const navs = document.querySelectorAll('#sidebar-nav, nav[aria-label="Main Navigation"], aside nav');
     navs.forEach(nav => {
       let adminLink = nav.querySelector('#admin-sidebar-link');
-      const currentPage = window.location.pathname.split('/').pop() || '';
-      const isAdminPage = currentPage.startsWith('admin-');
-      const targetHref = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
-      const targetLabel = isAdminPage ? 'User Dashboard' : 'Admin Panel';
-
       if (!adminLink) {
         adminLink = document.createElement('a');
         adminLink.id = 'admin-sidebar-link';
-        adminLink.className = `sidebar-link flex items-center px-4 py-3 text-sm font-bold text-pink-400 bg-pink-950/40 border border-pink-500/30 hover:bg-pink-900/50 hover:text-white rounded-lg transition group mt-1 mb-1`;
-
-        adminLink.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-pink-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          <span class="sidebar-text truncate">${targetLabel}</span>
-        `;
-
         const firstLink = nav.querySelector('a');
-        if (firstLink) {
-          nav.insertBefore(adminLink, firstLink);
-        } else {
-          nav.prepend(adminLink);
-        }
-      } else {
-        const textSpan = adminLink.querySelector('.sidebar-text');
-        if (textSpan) {
-          textSpan.textContent = targetLabel;
-        }
+        if (firstLink) nav.insertBefore(adminLink, firstLink);
+        else nav.prepend(adminLink);
       }
 
       adminLink.href = targetHref;
+      adminLink.className = `sidebar-link flex items-center px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 rounded-lg shadow-md shadow-pink-600/30 transition group mt-1 mb-2`;
+      adminLink.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-white group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        <span class="sidebar-text truncate">${targetLabel}</span>
+      `;
       adminLink.classList.remove('hidden');
       adminLink.style.display = '';
     });
 
-    // Also add to header user dropdown if present
+    // 2. Sidebar Footer Link (#sidebar-footer)
+    const footers = document.querySelectorAll('#sidebar-footer');
+    footers.forEach(footer => {
+      let footerLink = footer.querySelector('#admin-footer-link');
+      if (!footerLink) {
+        footerLink = document.createElement('a');
+        footerLink.id = 'admin-footer-link';
+        footer.insertBefore(footerLink, footer.firstChild);
+      }
+      footerLink.href = targetHref;
+      footerLink.className = `sidebar-link flex items-center px-4 py-3 text-sm font-bold text-pink-400 hover:text-white hover:bg-pink-900/40 rounded-lg transition group border border-pink-500/30 mb-2`;
+      footerLink.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-pink-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        <span class="sidebar-text truncate">${targetLabel}</span>
+      `;
+      footerLink.classList.remove('hidden');
+      footerLink.style.display = '';
+    });
+
+    // 3. Header User Dropdown Link
     const userMenus = document.querySelectorAll('#user-menu, .user-dropdown-menu');
     userMenus.forEach(menu => {
       let adminDropLink = menu.querySelector('#admin-dropdown-link');
-      const currentPage = window.location.pathname.split('/').pop() || '';
-      const isAdminPage = currentPage.startsWith('admin-');
-      const targetHref = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
-
       if (!adminDropLink) {
         adminDropLink = document.createElement('a');
         adminDropLink.id = 'admin-dropdown-link';
@@ -312,7 +334,7 @@ function updateUserUI(user) {
       adminDropLink.style.display = '';
     });
   } else {
-    document.querySelectorAll('#admin-sidebar-link, #admin-dropdown-link').forEach(el => {
+    document.querySelectorAll('#admin-sidebar-link, #admin-footer-link, #admin-dropdown-link').forEach(el => {
       el.classList.add('hidden');
     });
   }
