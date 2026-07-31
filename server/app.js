@@ -28,42 +28,18 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const app = express();
 
 // Security Hardening & Compression
-const allowedOrigins = [
-  'https://ghbooster.com',
-  'https://www.ghbooster.com',
-  // Allow localhost for development
-  ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:5000'] : [])
-];
-
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://jdvzcmexrkkiutbwbxos.supabase.co"],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"]
-    }
-  },
-  crossOriginEmbedderPolicy: false  // Needed for external images
-}));
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like server-to-server or mobile apps)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    if (
+      origin.includes('ghbooster') ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1')
+    ) {
       return callback(null, true);
     }
-    // In development, allow any localhost origin
-    if (process.env.NODE_ENV !== 'production' && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
+    return callback(null, true);
   },
   credentials: true
 }));
