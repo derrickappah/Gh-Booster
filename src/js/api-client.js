@@ -4,9 +4,9 @@
  * Replaces ALL static/hardcoded data across all 26 user and admin pages with live API data.
  */
 
-const API_BASE_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+var API_BASE_URL = window.API_BASE_URL || (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
   ? `${window.location.origin}/api`
-  : '/api';
+  : '/api');
 
 // ── Global Toast Notification System ─────────────────────────────────────────
 function showToast(message, type = 'success', duration = 5000) {

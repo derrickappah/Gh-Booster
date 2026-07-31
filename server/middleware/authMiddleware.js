@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -15,9 +15,9 @@ async function authenticateToken(req, res, next) {
     const { data: { user: supabaseUser }, error } = await supabase.auth.getUser(token);
 
     if (!error && supabaseUser) {
-      // Fetch profile & wallet from Supabase DB
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', supabaseUser.id).maybeSingle();
-      const { data: wallet } = await supabase.from('wallets').select('balance, currency').eq('user_id', supabaseUser.id).maybeSingle();
+      // Fetch profile & wallet from Supabase DB using supabaseAdmin (bypasses RLS)
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', supabaseUser.id).maybeSingle();
+      const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', supabaseUser.id).maybeSingle();
 
       const userRole = (profile?.role && profile.role !== 'user' ? profile.role : null)
         || (profile?.is_admin === true ? 'admin' : null)
@@ -41,8 +41,8 @@ async function authenticateToken(req, res, next) {
     // 2. Fallback JWT custom verification
     const decoded = jwt.verify(token, env.JWT_SECRET);
     if (decoded && decoded.id) {
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', decoded.id).maybeSingle();
-      const { data: wallet } = await supabase.from('wallets').select('balance, currency').eq('user_id', decoded.id).maybeSingle();
+      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', decoded.id).maybeSingle();
+      const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', decoded.id).maybeSingle();
 
       const userRole = (decoded.role && decoded.role !== 'user' ? decoded.role : null)
         || (profile?.role && profile.role !== 'user' ? profile.role : null)
