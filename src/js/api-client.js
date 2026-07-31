@@ -297,28 +297,10 @@ function updateUserUI(user) {
       adminLink.style.display = '';
     });
 
-    // 2. Sidebar Footer Link (#sidebar-footer)
-    const footers = document.querySelectorAll('#sidebar-footer');
-    footers.forEach(footer => {
-      let footerLink = footer.querySelector('#admin-footer-link');
-      if (!footerLink) {
-        footerLink = document.createElement('a');
-        footerLink.id = 'admin-footer-link';
-        footer.insertBefore(footerLink, footer.firstChild);
-      }
-      footerLink.href = targetHref;
-      footerLink.className = `sidebar-link flex items-center px-4 py-3 text-sm font-bold text-pink-400 hover:text-white hover:bg-pink-900/40 rounded-lg transition group border border-pink-500/30 mb-2`;
-      footerLink.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-pink-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-        <span class="sidebar-text truncate">${targetLabel}</span>
-      `;
-      footerLink.classList.remove('hidden');
-      footerLink.style.display = '';
-    });
+    // Remove any footer links at the bottom of the sidebar
+    document.querySelectorAll('#admin-footer-link').forEach(el => el.remove());
 
-    // 3. Header User Dropdown Link
+    // 2. Header User Dropdown Link
     const userMenus = document.querySelectorAll('#user-menu, .user-dropdown-menu');
     userMenus.forEach(menu => {
       let adminDropLink = menu.querySelector('#admin-dropdown-link');
