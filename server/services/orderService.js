@@ -194,7 +194,7 @@ class OrderService {
         batch_id: batchId || null,
         link: link,
         quantity: qty,
-        charge: totalCharge,
+        total_price: totalCharge,
         status: 'Processing',
         start_count: 0,
         remains: qty,

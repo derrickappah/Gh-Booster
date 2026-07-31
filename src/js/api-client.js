@@ -1016,6 +1016,7 @@ async function initOrdersPage() {
           const chargeVal = parseFloat(o.charge || 0).toFixed(2);
           const startCount = (o.start_count || 0).toLocaleString();
           const remains = (o.remains || 0).toLocaleString();
+          const isNonFinalized = nonFinalizedStatuses.includes((o.status || '').toLowerCase());
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50">
@@ -1041,12 +1042,53 @@ async function initOrdersPage() {
                   ${escapeHtml(o.status || '')}
                 </span>
               </td>
-              <td class="py-4 px-4 text-center">
-                ${o.provider_order_id ? `<button type="button" data-refill-id="${encodeURIComponent(o.id)}" class="btn-refill-order px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Request refill for order ${escapeHtml(String(shortId))}">Refill</button>` : `<span class="text-gray-400 text-[11px]" aria-hidden="true">—</span>`}
+              <td class="py-4 px-4 text-center whitespace-nowrap">
+                <div class="inline-flex items-center space-x-1.5 justify-center">
+                  ${isNonFinalized ? `
+                    <button type="button" data-sync-id="${encodeURIComponent(o.id)}" class="btn-sync-order px-2.5 py-1 bg-pink-50 dark:bg-pink-900/30 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-600 dark:text-pink-400 font-semibold rounded text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 inline-flex items-center" aria-label="Sync order status for ${escapeHtml(String(shortId))}">
+                      <svg class="w-3 h-3 mr-1 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Sync
+                    </button>
+                  ` : ''}
+                  ${(o.status || '').toLowerCase() === 'completed' && o.provider_order_id ? `
+                    <button type="button" data-refill-id="${encodeURIComponent(o.id)}" class="btn-refill-order px-2.5 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Request refill for order ${escapeHtml(String(shortId))}">Refill</button>
+                  ` : ''}
+                  ${!isNonFinalized && (o.status || '').toLowerCase() !== 'completed' ? `<span class="text-gray-400 text-[11px]" aria-hidden="true">—</span>` : ''}
+                </div>
               </td>
             </tr>
           `;
         }).join('');
+
+        // Attach Sync action handlers
+        tableBody.querySelectorAll('.btn-sync-order').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            try {
+              btn.disabled = true;
+              btn.innerHTML = `
+                <svg class="animate-spin w-3 h-3 mr-1 stroke-current" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Syncing...
+              `;
+              await pollOrdersStatus();
+              showToast('Order status synced successfully!', 'success');
+            } catch (err) {
+              showToast(err.message || 'Sync failed', 'error');
+            } finally {
+              btn.disabled = false;
+              btn.innerHTML = `
+                <svg class="w-3 h-3 mr-1 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Sync
+              `;
+            }
+          });
+        });
 
         // Attach Refill handlers
         tableBody.querySelectorAll('.btn-refill-order').forEach(btn => {
@@ -1056,9 +1098,9 @@ async function initOrdersPage() {
               btn.disabled = true;
               btn.textContent = 'Requesting...';
               const r = await API.request(`/orders/${id}/refill`, 'POST');
-              alert(`Refill requested! ${r.message || ''}`);
+              showToast(`Refill requested! ${r.message || ''}`, 'success');
             } catch (err) {
-              alert(err.message || 'Refill failed');
+              showToast(err.message || 'Refill failed', 'error');
             } finally {
               btn.disabled = false;
               btn.textContent = 'Refill';
@@ -1175,6 +1217,27 @@ async function initOrdersPage() {
       });
 
       startPolling();
+
+      const syncAllBtn = document.getElementById('btn-sync-all-orders');
+      if (syncAllBtn) {
+        syncAllBtn.addEventListener('click', async () => {
+          const spinIcon = document.getElementById('icon-sync-spin');
+          const syncText = document.getElementById('text-sync-btn');
+          try {
+            syncAllBtn.disabled = true;
+            if (spinIcon) spinIcon.classList.add('animate-spin');
+            if (syncText) syncText.textContent = 'Syncing...';
+            await pollOrdersStatus();
+            showToast('Orders status synced successfully!', 'success');
+          } catch (err) {
+            showToast(err.message || 'Sync failed', 'error');
+          } finally {
+            syncAllBtn.disabled = false;
+            if (spinIcon) spinIcon.classList.remove('animate-spin');
+            if (syncText) syncText.textContent = 'Sync';
+          }
+        });
+      }
     }
   } catch (e) {
     console.error('Failed to load orders:', e);
