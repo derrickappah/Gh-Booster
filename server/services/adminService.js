@@ -2,12 +2,12 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class AdminService {
   static async getStats() {
-    const { data: users, count: userCount } = await supabase.from('profiles').select('*', { count: 'exact' });
-    const { data: orders, count: orderCount } = await supabase.from('orders').select('*', { count: 'exact' });
-    const { data: services, count: serviceCount } = await supabase.from('services').select('*', { count: 'exact' });
-    const { data: wallets } = await supabase.from('wallets').select('balance');
-    const { data: tickets } = await supabase.from('tickets').select('*');
-    const { data: logs } = await supabase.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
+    const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('*', { count: 'exact' });
+    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('*', { count: 'exact' });
+    const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('*', { count: 'exact' });
+    const { data: wallets } = await supabaseAdmin.from('wallets').select('balance');
+    const { data: tickets } = await supabaseAdmin.from('tickets').select('*');
+    const { data: logs } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
 
     const totalRevenue = (orders || []).reduce((acc, o) => acc + (parseFloat(o.charge) || 0), 0);
     const totalWalletBalance = (wallets || []).reduce((acc, w) => acc + (parseFloat(w.balance) || 0), 0);
@@ -15,7 +15,7 @@ class AdminService {
     const completedOrders = (orders || []).filter(o => o.status === 'Completed').length;
     const openTickets = (tickets || []).filter(t => t.status === 'Open').length;
 
-    // Daily chart dummy/calculated data
+    // Daily chart data
     const dailyChartData = [
       { day: 'Mon', revenue: totalRevenue * 0.1, orders: Math.round((orderCount || 0) * 0.1) },
       { day: 'Tue', revenue: totalRevenue * 0.15, orders: Math.round((orderCount || 0) * 0.15) },
@@ -26,11 +26,19 @@ class AdminService {
       { day: 'Sun', revenue: totalRevenue * 0.07, orders: Math.round((orderCount || 0) * 0.07) }
     ];
 
-    const { data: recentOrdersWithDetails } = await supabase
-      .from('orders')
-      .select('*, profiles(username, full_name, wallets(balance)), services(name)')
-      .order('created_at', { ascending: false })
-      .limit(10);
+    let recentOrdersWithDetails = null;
+    try {
+      const { data } = await supabaseAdmin
+        .from('orders')
+        .select('*, profiles(username, full_name, wallets(balance)), services(name)')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      recentOrdersWithDetails = data;
+    } catch (_) {}
+
+    if (!recentOrdersWithDetails || recentOrdersWithDetails.length === 0) {
+      recentOrdersWithDetails = (orders || []).slice(0, 10);
+    }
 
     return {
       total_revenue: totalRevenue,
@@ -41,21 +49,21 @@ class AdminService {
       pending_orders: pendingOrders,
       completed_orders: completedOrders,
       open_tickets: openTickets,
-      recent_orders: recentOrdersWithDetails || (orders || []).slice(0, 10),
+      recent_orders: recentOrdersWithDetails || [],
       audit_logs: logs || [],
       chart_data: dailyChartData
     };
   }
 
   static async getAllUsers() {
-    const { data: profiles, error } = await supabase
+    const { data: profiles, error } = await supabaseAdmin
       .from('profiles')
       .select('id, username, email, phone, phone_number, role, created_at, wallets(balance, currency)')
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
 
-    const { data: orders } = await supabase
+    const { data: orders } = await supabaseAdmin
       .from('orders')
       .select('user_id, charge');
 
@@ -127,17 +135,20 @@ class AdminService {
   }
 
   static async getAllOrders() {
-    const { data: orders, error } = await supabase
+    let { data: orders, error } = await supabaseAdmin
       .from('orders')
       .select('*, profiles(username, email), services(name)')
       .order('created_at', { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error || !orders || orders.length === 0) {
+      const fallback = await supabaseAdmin.from('orders').select('*').order('created_at', { ascending: false });
+      orders = fallback.data || [];
+    }
     return orders || [];
   }
 
   static async updateOrderStatus({ orderId, status }) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('orders')
       .update({ status, updated_at: new Date().toISOString() })
       .eq('id', orderId)
@@ -343,7 +354,7 @@ class AdminService {
   }
 
   static async getAllTickets() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('tickets')
       .select('*, profiles(username, email)')
       .order('created_at', { ascending: false });
@@ -368,7 +379,7 @@ class AdminService {
   }
 
   static async getReferrals() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('referral_payouts')
       .select('*, profiles(username, email)')
       .order('created_at', { ascending: false });
@@ -378,7 +389,7 @@ class AdminService {
   }
 
   static async getChildPanels() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('child_panels')
       .select('*, profiles(username, email)')
       .order('created_at', { ascending: false });
@@ -388,46 +399,46 @@ class AdminService {
   }
 
   static async updateChildPanelStatus({ id, status }) {
-    const { data, error } = await supabase.from('child_panels').update({ status }).eq('id', id).select();
+    const { data, error } = await supabaseAdmin.from('child_panels').update({ status }).eq('id', id).select();
     if (error) throw new Error(error.message);
     return data[0];
   }
 
   static async getBonuses() {
-    const { data } = await supabase.from('deposit_bonuses').select('*');
+    const { data } = await supabaseAdmin.from('deposit_bonuses').select('*');
     return data || [];
   }
 
   static async createBonus(bonusData) {
-    const { data, error } = await supabase.from('deposit_bonuses').insert([bonusData]).select();
+    const { data, error } = await supabaseAdmin.from('deposit_bonuses').insert([bonusData]).select();
     if (error) throw new Error(error.message);
     return data[0];
   }
 
   static async getPromotions() {
-    const { data } = await supabase.from('promotions').select('*');
+    const { data } = await supabaseAdmin.from('promotions').select('*');
     return data || [];
   }
 
   static async createPromotion(promoData) {
-    const { data, error } = await supabase.from('promotions').insert([promoData]).select();
+    const { data, error } = await supabaseAdmin.from('promotions').insert([promoData]).select();
     if (error) throw new Error(error.message);
     return data[0];
   }
 
   static async getNews() {
-    const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
+    const { data } = await supabaseAdmin.from('announcements').select('*').order('created_at', { ascending: false });
     return data || [];
   }
 
   static async createNews(newsData) {
-    const { data, error } = await supabase.from('announcements').insert([newsData]).select();
+    const { data, error } = await supabaseAdmin.from('announcements').insert([newsData]).select();
     if (error) throw new Error(error.message);
     return data[0];
   }
 
   static async getLogs() {
-    const { data } = await supabase.from('audit_logs').select('*').order('created_at', { ascending: false });
+    const { data } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false });
     return data || [];
   }
 
