@@ -981,6 +981,8 @@ async function initOrdersPage() {
   const tableBody = document.getElementById('orders-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
+  const nonFinalizedStatuses = ['processing', 'pending', 'in progress', 'in-progress'];
+
   function getPlatformIconByService(serviceName) {
     const lower = (serviceName || '').toLowerCase();
     if (lower.includes('instagram')) return 'src/img/platforms/instagram.png';
@@ -1153,7 +1155,6 @@ async function initOrdersPage() {
       }
 
       // ── Status Polling for Non-Finalized Orders ──────────────────────────────
-      const nonFinalizedStatuses = ['processing', 'pending', 'in progress', 'in-progress'];
       let pollTimer = null;
 
       function hasNonFinalizedOrders(list) {
@@ -1241,6 +1242,7 @@ async function initOrdersPage() {
     }
   } catch (e) {
     console.error('Failed to load orders:', e);
+    tableBody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-red-500 font-medium">Failed to load orders. ${escapeHtml(e.message || '')}</td></tr>`;
   }
 }
 
