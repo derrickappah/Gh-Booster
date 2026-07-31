@@ -217,6 +217,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (currentPage === 'admin-settings.html') initAdminSettingsPage();
 });
 
+function isAdminUser(user) {
+  if (!user) return false;
+  if (user.is_admin === true) return true;
+  const role = String(user.role || '').toLowerCase().trim();
+  return role === 'admin' || role === 'super_admin' || role === 'superadmin' || role.includes('admin');
+}
+
 function updateUserUI(user) {
   if (!user) return;
 
@@ -235,24 +242,28 @@ function updateUserUI(user) {
     el.textContent = user.email || '';
   });
 
-  // Inject Admin Panel link into sidebar if user is an admin
-  if (user.role === 'admin') {
+  // Inject/unhide Admin Panel link into sidebar if user is an admin
+  const isAdmin = isAdminUser(user);
+
+  if (isAdmin) {
     const navs = document.querySelectorAll('#sidebar-nav, nav[aria-label="Main Navigation"], aside nav');
     navs.forEach(nav => {
-      if (!nav.querySelector('#admin-sidebar-link')) {
-        const adminLink = document.createElement('a');
+      let adminLink = nav.querySelector('#admin-sidebar-link');
+      const currentPage = window.location.pathname.split('/').pop() || '';
+      const isAdminPage = currentPage.startsWith('admin-');
+      const targetHref = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
+      const targetLabel = isAdminPage ? 'User Dashboard' : 'Admin Panel';
+
+      if (!adminLink) {
+        adminLink = document.createElement('a');
         adminLink.id = 'admin-sidebar-link';
-        const currentPage = window.location.pathname.split('/').pop() || '';
-        const isAdminPage = currentPage.startsWith('admin-');
-        
-        adminLink.href = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
         adminLink.className = `sidebar-link flex items-center px-4 py-3 text-sm font-bold text-pink-400 bg-pink-950/40 border border-pink-500/30 hover:bg-pink-900/50 hover:text-white rounded-lg transition group mt-1 mb-1`;
 
         adminLink.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-pink-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <span class="sidebar-text truncate">${isAdminPage ? 'User Dashboard' : 'Admin Panel'}</span>
+          <span class="sidebar-text truncate">${targetLabel}</span>
         `;
 
         const firstLink = nav.querySelector('a');
@@ -261,22 +272,40 @@ function updateUserUI(user) {
         } else {
           nav.prepend(adminLink);
         }
+      } else {
+        const textSpan = adminLink.querySelector('.sidebar-text');
+        if (textSpan) {
+          textSpan.textContent = targetLabel;
+        }
       }
+
+      adminLink.href = targetHref;
+      adminLink.classList.remove('hidden');
+      adminLink.style.display = '';
     });
 
     // Also add to header user dropdown if present
     const userMenus = document.querySelectorAll('#user-menu, .user-dropdown-menu');
     userMenus.forEach(menu => {
-      if (!menu.querySelector('#admin-dropdown-link')) {
-        const adminDropLink = document.createElement('a');
+      let adminDropLink = menu.querySelector('#admin-dropdown-link');
+      const currentPage = window.location.pathname.split('/').pop() || '';
+      const isAdminPage = currentPage.startsWith('admin-');
+      const targetHref = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
+
+      if (!adminDropLink) {
+        adminDropLink = document.createElement('a');
         adminDropLink.id = 'admin-dropdown-link';
-        const currentPage = window.location.pathname.split('/').pop() || '';
-        const isAdminPage = currentPage.startsWith('admin-');
-        adminDropLink.href = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
         adminDropLink.className = 'block px-4 py-2 text-sm text-pink-600 dark:text-pink-400 font-bold hover:bg-pink-50 dark:hover:bg-pink-900/30 rounded-lg transition';
-        adminDropLink.innerHTML = isAdminPage ? `👤 User Dashboard` : `🛡️ Admin Panel`;
         menu.insertBefore(adminDropLink, menu.firstChild);
       }
+      adminDropLink.href = targetHref;
+      adminDropLink.innerHTML = isAdminPage ? `👤 User Dashboard` : `🛡️ Admin Panel`;
+      adminDropLink.classList.remove('hidden');
+      adminDropLink.style.display = '';
+    });
+  } else {
+    document.querySelectorAll('#admin-sidebar-link, #admin-dropdown-link').forEach(el => {
+      el.classList.add('hidden');
     });
   }
 }
@@ -393,7 +422,7 @@ function initLoginPage() {
 
       if (redirectUrl && (redirectUrl.startsWith('/') || redirectUrl.startsWith('dashboard') || redirectUrl.startsWith('order-detail'))) {
         window.location.href = redirectUrl;
-      } else if (res.user.role === 'admin') {
+      } else if (isAdminUser(res.user)) {
         window.location.href = 'admin-dashboard.html';
       } else {
         window.location.href = 'dashboard.html';

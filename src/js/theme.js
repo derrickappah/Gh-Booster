@@ -341,11 +341,11 @@
         sidebarFooter.classList.remove('p-4');
         sidebarFooter.classList.add('px-2', 'py-4');
       }
-      sidebarLinks.forEach(function (el) {
+      document.querySelectorAll('.sidebar-link').forEach(function (el) {
         el.classList.remove('px-4');
         el.classList.add('justify-center', 'px-0');
       });
-      sidebarIcons.forEach(function (el) {
+      document.querySelectorAll('.sidebar-icon').forEach(function (el) {
         el.classList.remove('mr-3');
       });
       // Text and logo are hidden via CSS transition (opacity/width)
@@ -367,11 +367,11 @@
         sidebarFooter.classList.remove('px-2');
         sidebarFooter.classList.add('p-4');
       }
-      sidebarLinks.forEach(function (el) {
+      document.querySelectorAll('.sidebar-link').forEach(function (el) {
         el.classList.remove('justify-center', 'px-0');
         el.classList.add('px-4');
       });
-      sidebarIcons.forEach(function (el) {
+      document.querySelectorAll('.sidebar-icon').forEach(function (el) {
         el.classList.add('mr-3');
       });
       // Text and logo are shown via CSS transition (opacity/width)
