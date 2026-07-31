@@ -29,6 +29,91 @@ class OrderService {
     }));
   }
 
+  static async syncUserOrdersStatus(userId) {
+    const nonFinalizedStatuses = ['processing', 'pending', 'in progress', 'in-progress'];
+
+    // Fetch user orders from database
+    const { data: rawOrders, error } = await supabaseAdmin
+      .from('orders')
+      .select('*, services(name)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('[OrderService] Error fetching user orders for sync:', error.message);
+      return [];
+    }
+
+    const ordersToSync = (rawOrders || []).filter(o => {
+      const st = (o.status || '').toLowerCase();
+      return nonFinalizedStatuses.includes(st) && o.provider_order_id;
+    });
+
+    if (ordersToSync.length > 0) {
+      await Promise.all(ordersToSync.map(async (order) => {
+        try {
+          const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
+          if (!providerStatusRes || providerStatusRes.error) return;
+
+          let newStatus = providerStatusRes.status || order.status;
+          // Normalize common status casing
+          const statusLower = (newStatus || '').toLowerCase();
+          if (statusLower === 'completed') newStatus = 'Completed';
+          else if (statusLower === 'processing') newStatus = 'Processing';
+          else if (statusLower === 'pending') newStatus = 'Pending';
+          else if (statusLower === 'in progress' || statusLower === 'in-progress') newStatus = 'In Progress';
+          else if (statusLower === 'canceled' || statusLower === 'cancelled') newStatus = 'Canceled';
+          else if (statusLower === 'partial') newStatus = 'Partial';
+          else if (statusLower === 'refunded') newStatus = 'Refunded';
+
+          const newStartCount = providerStatusRes.start_count !== undefined && providerStatusRes.start_count !== null
+            ? parseInt(providerStatusRes.start_count, 10)
+            : order.start_count;
+          const newRemains = providerStatusRes.remains !== undefined && providerStatusRes.remains !== null
+            ? parseInt(providerStatusRes.remains, 10)
+            : order.remains;
+
+          const hasChanged = newStatus !== order.status || newStartCount !== order.start_count || newRemains !== order.remains;
+
+          if (hasChanged) {
+            const updatePayload = {
+              status: newStatus,
+              start_count: newStartCount,
+              remains: newRemains,
+              updated_at: new Date().toISOString()
+            };
+
+            await supabaseAdmin
+              .from('orders')
+              .update(updatePayload)
+              .eq('id', order.id);
+
+            // Update in-memory reference for return value
+            order.status = newStatus;
+            order.start_count = newStartCount;
+            order.remains = newRemains;
+          }
+        } catch (err) {
+          console.error(`[OrderService] Error syncing provider order #${order.provider_order_id}:`, err.message);
+        }
+      }));
+    }
+
+    return (rawOrders || []).map(o => ({
+      id: o.id,
+      service_id: o.service_id,
+      service_name: o.services?.name || 'SMM Service',
+      link: o.link,
+      quantity: o.quantity,
+      charge: parseFloat(o.total_price || o.charge || 0),
+      status: o.status || 'Processing',
+      start_count: o.start_count || 0,
+      remains: o.remains || 0,
+      provider_order_id: o.provider_order_id || null,
+      created_at: new Date(o.created_at).toISOString().replace('T', ' ').substring(0, 19)
+    }));
+  }
+
   static async createOrder({ userId, serviceId, link, quantity, batchId }) {
     const qty = parseInt(quantity, 10);
     if (!qty || qty <= 0) {

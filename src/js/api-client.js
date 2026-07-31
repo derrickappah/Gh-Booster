@@ -1109,6 +1109,72 @@ async function initOrdersPage() {
           });
         });
       }
+
+      // ── Status Polling for Non-Finalized Orders ──────────────────────────────
+      const nonFinalizedStatuses = ['processing', 'pending', 'in progress', 'in-progress'];
+      let pollTimer = null;
+
+      function hasNonFinalizedOrders(list) {
+        return (list || []).some(o => nonFinalizedStatuses.includes((o.status || '').toLowerCase()));
+      }
+
+      async function pollOrdersStatus() {
+        if (document.hidden) return;
+        if (!hasNonFinalizedOrders(ordersList)) {
+          stopPolling();
+          return;
+        }
+
+        try {
+          const resSync = await API.request('/orders/sync-status');
+          if (resSync.success && resSync.orders) {
+            const newOrders = resSync.orders;
+            const oldMap = new Map(ordersList.map(o => [String(o.id), o]));
+
+            newOrders.forEach(no => {
+              const oo = oldMap.get(String(no.id));
+              if (oo && oo.status !== no.status) {
+                const shortId = typeof no.id === 'string' && no.id.length > 8 ? no.id.substring(0, 8) : no.id;
+                const toastType = (no.status === 'Completed') ? 'success' : (no.status === 'Canceled' || no.status === 'Refunded') ? 'warning' : 'info';
+                showToast(`Order #${shortId} status updated to ${no.status}`, toastType);
+              }
+            });
+
+            ordersList = newOrders;
+            applyOrderFilters();
+
+            if (!hasNonFinalizedOrders(ordersList)) {
+              stopPolling();
+            }
+          }
+        } catch (err) {
+          console.warn('[Orders Poller] Status sync error:', err.message);
+        }
+      }
+
+      function startPolling() {
+        if (!pollTimer && hasNonFinalizedOrders(ordersList)) {
+          pollTimer = setInterval(pollOrdersStatus, 10000);
+        }
+      }
+
+      function stopPolling() {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopPolling();
+        } else if (hasNonFinalizedOrders(ordersList)) {
+          pollOrdersStatus();
+          startPolling();
+        }
+      });
+
+      startPolling();
     }
   } catch (e) {
     console.error('Failed to load orders:', e);

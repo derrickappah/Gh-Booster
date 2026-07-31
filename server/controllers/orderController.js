@@ -10,6 +10,15 @@ class OrderController {
     }
   }
 
+  static async syncOrderStatus(req, res, next) {
+    try {
+      const orders = await OrderService.syncUserOrdersStatus(req.user.id);
+      res.json({ success: true, orders });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async createOrder(req, res, next) {
     try {
       const result = await OrderService.createOrder({
