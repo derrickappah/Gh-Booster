@@ -136,7 +136,11 @@ const API = {
 // Initialize Dynamic UI & Data Binding
 document.addEventListener('DOMContentLoaded', async () => {
   const token = API.getToken();
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  let pageSeg = (window.location.pathname.split('/').filter(Boolean).pop() || 'index.html').toLowerCase();
+  if (!pageSeg.endsWith('.html') && !pageSeg.includes('.')) {
+    pageSeg = pageSeg + '.html';
+  }
+  const currentPage = pageSeg;
 
   const isOrderDetailPage = window.location.pathname.includes('/orders/') || currentPage === 'order-detail.html' || currentPage === 'order-detail';
   const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard.html', 'orders.html', 'bulk-order.html', 'add-funds.html', 'tickets.html', 'account.html', 'referrals.html', 'child-panel.html', 'services.html', 'transactions.html'].includes(currentPage);
