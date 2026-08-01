@@ -1793,32 +1793,116 @@ async function initTransactionsPage() {
   const tableBody = document.getElementById('transactions-tbody');
   const searchInput = document.getElementById('transaction-search');
   const filterTabs = document.querySelectorAll('#status-filter-tabs .status-tab');
+  const countBadge = document.getElementById('transactions-count-badge');
+  const pageSizeSelect = document.getElementById('transactions-page-size');
+  const prevBtn = document.getElementById('transactions-prev-btn');
+  const nextBtn = document.getElementById('transactions-next-btn');
+  const pageButtonsContainer = document.getElementById('transactions-page-buttons');
+  const pageInfo = document.getElementById('transactions-page-info');
+  const syncBtn = document.getElementById('btn-sync-transactions');
 
   if (!tableBody) return;
 
   let allTransactions = [];
   let currentStatus = 'all';
+  let currentPage = 1;
+  let pageSize = pageSizeSelect ? parseInt(pageSizeSelect.value, 10) || 10 : 10;
+  let currentFilteredList = [];
 
-  const renderTable = (list) => {
-    if (!list || list.length === 0) {
+  const updatePaginationUI = (totalItems) => {
+    const totalPages = Math.ceil(totalItems / pageSize) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const start = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, totalItems);
+
+    if (pageInfo) {
+      pageInfo.textContent = `Showing ${start.toLocaleString()} to ${end.toLocaleString()} of ${totalItems.toLocaleString()} transactions`;
+    }
+
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+    if (pageButtonsContainer) {
+      pageButtonsContainer.innerHTML = '';
+      const maxButtons = 5;
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage + 1 < maxButtons) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = i === currentPage
+          ? 'px-3 py-1 bg-pink-600 text-white font-bold rounded-xl text-xs transition shadow-sm'
+          : 'px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition text-xs';
+        btn.textContent = i;
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          renderCurrentPage();
+        });
+        pageButtonsContainer.appendChild(btn);
+      }
+    }
+  };
+
+  const renderCurrentPage = () => {
+    updatePaginationUI(currentFilteredList.length);
+
+    if (!currentFilteredList || currentFilteredList.length === 0) {
+      const q = searchInput ? searchInput.value.trim() : '';
       tableBody.innerHTML = `
-        <tr class="hover:bg-gray-50/50 transition">
-          <td colspan="6" class="py-12 text-center text-gray-400 dark:text-gray-500 font-medium">No transaction records found.</td>
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition">
+          <td colspan="6" class="py-12 text-center text-gray-400 dark:text-gray-500 font-medium space-y-3">
+            <p>No transaction records found${q ? ` for "${escapeHtml(q)}"` : ''}.</p>
+            ${q || currentStatus !== 'all' ? `
+              <button type="button" id="reset-tx-search-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-2xl shadow transition">Clear Search & Filters</button>
+            ` : ''}
+          </td>
         </tr>
       `;
+      const resetBtn = document.getElementById('reset-tx-search-btn');
+      if (resetBtn) {
+        resetBtn.onclick = () => {
+          if (searchInput) searchInput.value = '';
+          currentStatus = 'all';
+          filterTabs.forEach(t => {
+            if (t.getAttribute('data-status') === 'all') {
+              t.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500';
+            } else {
+              t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500';
+            }
+          });
+          applyFilters();
+        };
+      }
       return;
     }
 
-    tableBody.innerHTML = list.map(t => {
+    const pageItems = currentFilteredList.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    tableBody.innerHTML = pageItems.map(t => {
       const ref = t.reference || t.id || t.payment_ref || 'TXN-' + Math.floor(100000 + Math.random() * 900000);
       const gateway = t.gateway || t.method || t.payment_method || 'Mobile Money';
-      const type = t.type || (t.amount >= 0 ? 'Deposit' : 'Order Payment');
+      const rawType = (t.type || (t.amount >= 0 ? 'Deposit' : 'Order Payment')).trim();
       const rawAmt = parseFloat(t.amount || 0);
       const isPositive = rawAmt >= 0;
       const formattedAmt = `${isPositive ? '+' : '-'}GH₵${Math.abs(rawAmt).toFixed(2)}`;
       const dateStr = t.created_at ? new Date(t.created_at).toLocaleString() : new Date().toLocaleString();
       const statusStr = String(t.status || 'completed').toLowerCase();
 
+      // Type Badge
+      let typeBadge = '<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">Order Payment</span>';
+      if (rawType.toLowerCase().includes('deposit')) {
+        typeBadge = '<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300">Deposit</span>';
+      } else if (rawType.toLowerCase().includes('refund')) {
+        typeBadge = '<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">Refund</span>';
+      }
+
+      // Status Badge
       let statusBadge = '';
       if (statusStr === 'completed' || statusStr === 'approved' || statusStr === 'success') {
         statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">Completed</span>';
@@ -1830,20 +1914,38 @@ async function initTransactionsPage() {
 
       return `
         <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition border-b border-gray-100 dark:border-gray-800">
-          <td class="px-6 py-4 font-mono font-bold text-gray-900 dark:text-white text-xs">${escapeHtml(String(ref))}</td>
-          <td class="px-6 py-4 font-medium text-gray-800 dark:text-gray-200 text-xs">${escapeHtml(type)}</td>
-          <td class="px-6 py-4 font-extrabold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} text-xs">${formattedAmt}</td>
-          <td class="px-6 py-4 text-xs text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(gateway)}</td>
-          <td class="px-6 py-4 text-xs text-gray-500 dark:text-gray-400 font-mono">${escapeHtml(dateStr)}</td>
-          <td class="px-6 py-4">${statusBadge}</td>
+          <td class="px-4 py-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs">
+            <div class="inline-flex items-center space-x-1">
+              <span>#${escapeHtml(String(ref))}</span>
+              <button type="button" class="btn-copy-tx-ref p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-ref="${escapeHtml(String(ref))}" title="Copy Reference" aria-label="Copy Reference">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </button>
+            </div>
+          </td>
+          <td class="px-4 py-4">${typeBadge}</td>
+          <td class="px-4 py-4 font-extrabold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} text-xs">${formattedAmt}</td>
+          <td class="px-4 py-4 text-xs text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(gateway)}</td>
+          <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400 font-mono">${escapeHtml(dateStr)}</td>
+          <td class="px-4 py-4">${statusBadge}</td>
         </tr>
       `;
     }).join('');
+
+    // Attach Copy Reference buttons
+    tableBody.querySelectorAll('.btn-copy-tx-ref').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const text = btn.getAttribute('data-copy-ref');
+        if (text) {
+          const ok = await copyToClipboard(text);
+          if (ok) showToast('Transaction reference copied to clipboard!');
+        }
+      });
+    });
   };
 
   const applyFilters = () => {
     const q = (searchInput ? searchInput.value : '').toLowerCase().trim();
-    const filtered = allTransactions.filter(t => {
+    currentFilteredList = allTransactions.filter(t => {
       const refMatch = (t.reference || t.id || '').toString().toLowerCase().includes(q);
       const gwMatch = (t.gateway || t.method || '').toString().toLowerCase().includes(q);
       const typeMatch = (t.type || '').toString().toLowerCase().includes(q);
@@ -1858,19 +1960,64 @@ async function initTransactionsPage() {
       return matchesSearch && matchesStatus;
     });
 
-    renderTable(filtered);
+    if (countBadge) {
+      countBadge.textContent = `${currentFilteredList.length.toLocaleString()} ${currentFilteredList.length === 1 ? 'Transaction' : 'Transactions'}`;
+    }
+
+    currentPage = 1;
+    renderCurrentPage();
   };
 
-  try {
-    const res = await API.request('/transactions');
-    if (res && res.success && Array.isArray(res.transactions)) {
-      allTransactions = res.transactions;
+  async function fetchTransactions() {
+    try {
+      const res = await API.request('/transactions');
+      if (res && res.success && Array.isArray(res.transactions)) {
+        allTransactions = res.transactions;
+      }
+    } catch (e) {
+      console.error('Failed to load transactions:', e);
     }
-  } catch (e) {
-    console.error('Failed to load transactions:', e);
+    applyFilters();
   }
 
-  renderTable(allTransactions);
+  // Event Listeners for Pagination
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener('change', () => {
+      pageSize = parseInt(pageSizeSelect.value, 10) || 10;
+      currentPage = 1;
+      renderCurrentPage();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderCurrentPage();
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(currentFilteredList.length / pageSize) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderCurrentPage();
+      }
+    });
+  }
+
+  // Sync Button Handler
+  if (syncBtn) {
+    syncBtn.addEventListener('click', async () => {
+      const icon = document.getElementById('icon-sync-tx');
+      if (icon) icon.classList.add('animate-spin');
+      await fetchTransactions();
+      showToast('Transactions history updated!', 'success');
+      if (icon) icon.classList.remove('animate-spin');
+    });
+  }
 
   if (searchInput) {
     searchInput.addEventListener('input', applyFilters);
@@ -1880,14 +2027,16 @@ async function initTransactionsPage() {
     filterTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         filterTabs.forEach(t => {
-          t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold';
+          t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500';
         });
-        tab.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold';
+        tab.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500';
         currentStatus = tab.getAttribute('data-status') || 'all';
         applyFilters();
       });
     });
   }
+
+  await fetchTransactions();
 }
 
 // TICKETS PAGE HANDLER
