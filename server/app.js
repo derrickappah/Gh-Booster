@@ -49,10 +49,100 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Apply Rate Limiting
+// Apply Rate Limiting to /api
 app.use('/api', globalLimiter);
 
-// Serve static frontend files with optimal Cache-Control headers
+// 1. 301 Permanent Redirect middleware for legacy .html URLs
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') && req.method === 'GET') {
+    if (req.path === '/index.html') {
+      const query = req.url.slice(req.path.length);
+      return res.redirect(301, '/' + query);
+    }
+    if (req.path === '/api.html') {
+      const query = req.url.slice(req.path.length);
+      return res.redirect(301, '/api-docs' + query);
+    }
+    const cleanPath = req.path.slice(0, -5);
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, cleanPath + query);
+  }
+  next();
+});
+
+// 2. Clean Extensionless Page Routes Mapping (Serves HTML when requested by browser)
+const pageRoutesMap = {
+  '/': 'index.html',
+  '/dashboard': 'dashboard.html',
+  '/login': 'login.html',
+  '/register': 'register.html',
+  '/orders': 'orders.html',
+  '/add-funds': 'add-funds.html',
+  '/wallet': 'add-funds.html',
+  '/account': 'account.html',
+  '/profile': 'account.html',
+  '/services': 'services.html',
+  '/bulk-order': 'bulk-order.html',
+  '/transactions': 'transactions.html',
+  '/tickets': 'tickets.html',
+  '/referrals': 'referrals.html',
+  '/child-panel': 'child-panel.html',
+  '/api-docs': 'api.html',
+  '/faq': 'faq.html',
+  '/terms': 'terms.html',
+  '/reviews': 'reviews.html',
+  '/blog': 'blog.html',
+  '/order-detail': 'order-detail.html',
+  '/admin-dashboard': 'admin-dashboard.html',
+  '/admin-users': 'admin-users.html',
+  '/admin-orders': 'admin-orders.html',
+  '/admin-services': 'admin-services.html',
+  '/admin-providers': 'admin-providers.html',
+  '/admin-deposits': 'admin-deposits.html',
+  '/admin-transactions': 'admin-transactions.html',
+  '/admin-payments': 'admin-payments.html',
+  '/admin-tickets': 'admin-tickets.html',
+  '/admin-referrals': 'admin-referrals.html',
+  '/admin-child-panels': 'admin-child-panels.html',
+  '/admin-bonuses': 'admin-bonuses.html',
+  '/admin-promotions': 'admin-promotions.html',
+  '/admin-news': 'admin-news.html',
+  '/admin-logs': 'admin-logs.html',
+  '/admin-settings': 'admin-settings.html',
+  '/blog-instagram-followers': 'blog-instagram-followers.html',
+  '/blog-telegram-members': 'blog-telegram-members.html',
+  '/blog-tiktok-views': 'blog-tiktok-views.html',
+  '/blog-youtube-subscribers': 'blog-youtube-subscribers.html',
+  '/review-aba-ecommerce-case-study': 'review-aba-ecommerce-case-study.html',
+  '/review-ghbooster-smm': 'review-ghbooster-smm.html'
+};
+
+Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {
+  app.get(routePath, (req, res, next) => {
+    // If request accepts html (browser navigation), serve the HTML file
+    if (req.accepts('html')) {
+      if (routePath.startsWith('/dashboard') || routePath.startsWith('/admin-')) {
+        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+      }
+      return res.sendFile(path.join(__dirname, '..', htmlFileName));
+    }
+    next();
+  });
+});
+
+// Middleware for defense-in-depth SEO protection on private dashboard routes
+app.use(['/dashboard', '/dashboard/*'], (req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  next();
+});
+
+// Fallback to order-detail.html for order detail views
+app.get(['/dashboard/orders/:id', '/order-detail'], (req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.sendFile(path.join(__dirname, '..', 'order-detail.html'));
+});
+
+// 3. Serve static assets (js, css, images, etc.)
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
   etag: true,
@@ -65,7 +155,7 @@ app.use(express.static(path.join(__dirname, '..'), {
   }
 }));
 
-// Mount API Routes (Supports /api/... and direct serverless /... paths)
+// 4. Mount API Routes (Supports /api/... and direct serverless /... paths)
 const registerAppRoutes = (prefix) => {
   app.use(`${prefix}/auth`, authRoutes);
   app.use(`${prefix}/services`, serviceRoutes);
@@ -108,62 +198,11 @@ app.get('/sitemap.xml', (req, res) => {
 
 app.get(['/llms.txt', '/.well-known/llms.txt'], (req, res) => {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-  res.send(`# GhBooster SMM Panel
-
-> GhBooster is the premier Social Media Marketing (SMM) Panel providing automated, fast, and affordable growth services for Instagram, TikTok, YouTube, Telegram, Facebook, and Twitter.
-
-## Core Pages
-
-- [Home](https://www.ghbooster.com/index.html): Main landing page highlighting GhBooster features, supported platforms, instant 24/7 automated delivery, and pricing overviews.
-- [Services](https://www.ghbooster.com/services.html): Complete catalog of social media marketing services with live real-time pricing per 1,000 units, minimum/maximum order bounds, and service descriptions.
-- [API Documentation](https://www.ghbooster.com/api.html): Comprehensive API v2 reference for resellers, developers, and panel owners to automate orders, service lists, and balance checks via HTTP POST requests.
-- [FAQ](https://www.ghbooster.com/faq.html): Frequently asked questions regarding order processing, automated delivery timelines, refill guarantees, and accepted payment methods.
-- [Terms of Service](https://www.ghbooster.com/terms.html): Terms and conditions, privacy policies, refund policies, and usage guidelines for GhBooster services.
-
-## User Account & Dashboard
-
-- [Login](https://www.ghbooster.com/login.html): Secure user portal login page.
-- [Register](https://www.ghbooster.com/register.html): User account registration form to create a new GhBooster account.
-- [Dashboard](https://www.ghbooster.com/dashboard.html): Main user dashboard for placing new single orders, tracking active order status, and reviewing account metrics.
-- [Bulk Order](https://www.ghbooster.com/bulk-order.html): Bulk order interface for submitting multiple service requests simultaneously line-by-line.
-- [Orders History](https://www.ghbooster.com/orders.html): Order management page displaying order history, status (Pending, Processing, Completed, Partial, Canceled), and start/remains counts.
-- [Add Funds](https://www.ghbooster.com/add-funds.html): Payment gateway portal supporting automated deposit methods including Mobile Money (MTN, Telecel, AT), Cryptocurrencies, Paystack, Flutterwave, and credit cards.
-- [Transactions](https://www.ghbooster.com/transactions.html): Financial history listing all deposits, balance adjustments, and order debits.
-- [Support Tickets](https://www.ghbooster.com/tickets.html): Customer support portal for opening and tracking support tickets.
-- [Affiliates & Referrals](https://www.ghbooster.com/referrals.html): Referral program dashboard allowing users to earn commission by inviting new clients.
-- [Child Panel](https://www.ghbooster.com/child-panel.html): Rental platform for users to launch their own branded SMM reseller panel connected to GhBooster API.
-- [Account Settings](https://www.ghbooster.com/account.html): Profile management, API key generation, and password update page.
-
-## Key Features & Capabilities
-
-- **Instant Automated Delivery**: 24/7 automated order processing connected directly to high-capacity provider nodes.
-- **API v2 Integration**: Full compatibility with standard SMM panel API format (actions: \`services\`, \`add\`, \`status\`, \`balance\`).
-- **Multi-Platform Support**: SMM services covering Instagram, TikTok, YouTube, Telegram, Facebook, X (Twitter), Spotify, and Twitch.
-- **Reseller Friendly**: High throughput endpoints, bulk order execution, and automated child panel setup.
-`);
-});
-
-// Middleware for defense-in-depth SEO protection on private dashboard routes
-app.use(['/dashboard', '/dashboard/*'], (req, res, next) => {
-  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-  next();
-});
-
-// Fallback to order-detail.html for order detail views
-app.get(['/dashboard/orders/:id', '/order-detail.html', '/order-detail'], (req, res) => {
-  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-  res.sendFile(path.join(__dirname, '..', 'order-detail.html'));
-});
-
-
-// Fallback to index.html for root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'llms.txt'));
 });
 
 // Handling 404 & Errors
 app.use(notFoundHandler);
 app.use(errorHandler);
-
 
 module.exports = app;

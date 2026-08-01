@@ -98,7 +98,7 @@ const API = {
   logout: () => {
     localStorage.removeItem('ghb_token');
     localStorage.removeItem('ghb_user');
-    window.location.href = '/login.html';
+    window.location.href = '/login';
   },
 
   async request(endpoint, method = 'GET', data = null) {
@@ -136,18 +136,18 @@ const API = {
 // Initialize Dynamic UI & Data Binding
 document.addEventListener('DOMContentLoaded', async () => {
   const token = API.getToken();
-  let pageSeg = (window.location.pathname.split('/').filter(Boolean).pop() || 'index.html').toLowerCase();
-  if (!pageSeg.endsWith('.html') && !pageSeg.includes('.')) {
-    pageSeg = pageSeg + '.html';
+  let rawSeg = (window.location.pathname.split('/').filter(Boolean).pop() || 'index').toLowerCase();
+  if (rawSeg.endsWith('.html')) {
+    rawSeg = rawSeg.slice(0, -5);
   }
-  const currentPage = pageSeg;
+  const currentPage = rawSeg;
 
-  const isOrderDetailPage = window.location.pathname.includes('/orders/') || currentPage === 'order-detail.html' || currentPage === 'order-detail';
-  const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard.html', 'orders.html', 'bulk-order.html', 'add-funds.html', 'tickets.html', 'account.html', 'referrals.html', 'child-panel.html', 'services.html', 'transactions.html'].includes(currentPage);
+  const isOrderDetailPage = window.location.pathname.includes('/orders/') || currentPage === 'order-detail';
+  const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard', 'orders', 'bulk-order', 'add-funds', 'wallet', 'tickets', 'account', 'profile', 'referrals', 'child-panel', 'services', 'transactions'].includes(currentPage);
 
   if (isProtectedPage && !token) {
     const targetPath = window.location.pathname + window.location.search;
-    window.location.href = `/login.html?redirect=${encodeURIComponent(targetPath)}`;
+    window.location.href = `/login?redirect=${encodeURIComponent(targetPath)}`;
     return;
   }
 
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Global Logout Interceptor for Sign Out links
   document.addEventListener('click', (e) => {
-    const logoutBtn = e.target.closest('a[data-action="logout"], a[href="login.html"], a[href="/login.html"], .logout-btn, #logout-btn');
+    const logoutBtn = e.target.closest('a[data-action="logout"], a[href="login"], a[href="/login"], a[href="login.html"], a[href="/login.html"], .logout-btn, #logout-btn');
     if (logoutBtn && API.getToken()) {
       const text = (logoutBtn.textContent || '').trim().toLowerCase();
       if (text.includes('sign out') || text.includes('log out') || logoutBtn.getAttribute('data-action') === 'logout' || logoutBtn.classList.contains('logout-btn')) {
@@ -200,39 +200,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Page Specific Handlers
   if (isOrderDetailPage) initOrderDetailPage();
-  if (currentPage === 'index.html' || currentPage === '') initPublicHomePage();
-  if (currentPage === 'login.html') initLoginPage();
-  if (currentPage === 'register.html') initRegisterPage();
-  if (currentPage === 'dashboard.html') initDashboardPage();
-  if (currentPage === 'orders.html') initOrdersPage();
-  if (currentPage === 'services.html') initServicesPage();
-  if (currentPage === 'add-funds.html') initAddFundsPage();
-  if (currentPage === 'transactions.html') initTransactionsPage();
-  if (currentPage === 'tickets.html') initTicketsPage();
-  if (currentPage === 'account.html') initAccountPage();
-  if (currentPage === 'referrals.html') initReferralsPage();
-  if (currentPage === 'bulk-order.html') initBulkOrderPage();
-  if (currentPage === 'child-panel.html') initChildPanelPage();
-  if (currentPage === 'api.html') initApiDocsPage();
-
+  if (currentPage === 'index' || currentPage === '') initPublicHomePage();
+  if (currentPage === 'login') initLoginPage();
+  if (currentPage === 'register') initRegisterPage();
+  if (currentPage === 'dashboard') initDashboardPage();
+  if (currentPage === 'orders') initOrdersPage();
+  if (currentPage === 'services') initServicesPage();
+  if (currentPage === 'add-funds' || currentPage === 'wallet') initAddFundsPage();
+  if (currentPage === 'transactions') initTransactionsPage();
+  if (currentPage === 'tickets') initTicketsPage();
+  if (currentPage === 'account' || currentPage === 'profile') initAccountPage();
+  if (currentPage === 'referrals') initReferralsPage();
+  if (currentPage === 'bulk-order') initBulkOrderPage();
+  if (currentPage === 'child-panel') initChildPanelPage();
+  if (currentPage === 'api' || currentPage === 'api-docs') initApiDocsPage();
 
   // Admin Pages Handlers
-  if (currentPage === 'admin-dashboard.html') initAdminDashboard();
-  if (currentPage === 'admin-users.html') initAdminUsersPage();
-  if (currentPage === 'admin-orders.html') initAdminOrdersPage();
-  if (currentPage === 'admin-services.html') initAdminServicesPage();
-  if (currentPage === 'admin-providers.html') initAdminProvidersPage();
-  if (currentPage === 'admin-deposits.html') initAdminDepositsPage();
-  if (currentPage === 'admin-transactions.html') initAdminTransactionsPage();
-  if (currentPage === 'admin-payments.html') initAdminPaymentsPage();
-  if (currentPage === 'admin-tickets.html') initAdminTicketsPage();
-  if (currentPage === 'admin-referrals.html') initAdminReferralsPage();
-  if (currentPage === 'admin-child-panels.html') initAdminChildPanelsPage();
-  if (currentPage === 'admin-bonuses.html') initAdminBonusesPage();
-  if (currentPage === 'admin-promotions.html') initAdminPromotionsPage();
-  if (currentPage === 'admin-news.html') initAdminNewsPage();
-  if (currentPage === 'admin-logs.html') initAdminLogsPage();
-  if (currentPage === 'admin-settings.html') initAdminSettingsPage();
+  if (currentPage === 'admin-dashboard') initAdminDashboard();
+  if (currentPage === 'admin-users') initAdminUsersPage();
+  if (currentPage === 'admin-orders') initAdminOrdersPage();
+  if (currentPage === 'admin-services') initAdminServicesPage();
+  if (currentPage === 'admin-providers') initAdminProvidersPage();
+  if (currentPage === 'admin-deposits') initAdminDepositsPage();
+  if (currentPage === 'admin-transactions') initAdminTransactionsPage();
+  if (currentPage === 'admin-payments') initAdminPaymentsPage();
+  if (currentPage === 'admin-tickets') initAdminTicketsPage();
+  if (currentPage === 'admin-referrals') initAdminReferralsPage();
+  if (currentPage === 'admin-child-panels') initAdminChildPanelsPage();
+  if (currentPage === 'admin-bonuses') initAdminBonusesPage();
+  if (currentPage === 'admin-promotions') initAdminPromotionsPage();
+  if (currentPage === 'admin-news') initAdminNewsPage();
+  if (currentPage === 'admin-logs') initAdminLogsPage();
+  if (currentPage === 'admin-settings') initAdminSettingsPage();
 });
 
 function isAdminUser(user) {
@@ -272,9 +271,9 @@ function updateUserUI(user) {
   const isAdmin = isAdminUser(user);
 
   if (isAdmin) {
-    const currentPage = window.location.pathname.split('/').pop() || '';
+    const currentPage = (window.location.pathname.split('/').filter(Boolean).pop() || '').toLowerCase();
     const isAdminPage = currentPage.startsWith('admin-');
-    const targetHref = isAdminPage ? 'dashboard.html' : 'admin-dashboard.html';
+    const targetHref = isAdminPage ? '/dashboard' : '/admin-dashboard';
     const targetLabel = isAdminPage ? 'User Dashboard' : 'Admin Control Panel';
 
     // 1. Sidebar Navigation Link (#sidebar-nav)
@@ -439,9 +438,9 @@ function initLoginPage() {
       if (redirectUrl && (redirectUrl.startsWith('/') || redirectUrl.startsWith('dashboard') || redirectUrl.startsWith('order-detail'))) {
         window.location.href = redirectUrl;
       } else if (isAdminUser(res.user)) {
-        window.location.href = 'admin-dashboard.html';
+        window.location.href = '/admin-dashboard';
       } else {
-        window.location.href = 'dashboard.html';
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       if (alertContainer && alertText) {
@@ -558,7 +557,7 @@ function initRegisterPage() {
       const res = await API.request('/auth/register', 'POST', { fullname, email, password, phone });
       API.setToken(res.token);
       API.setUser(res.user);
-      window.location.href = 'dashboard.html';
+      window.location.href = '/dashboard';
     } catch (err) {
       if (alertContainer && alertText) {
         alertText.textContent = err.message || 'Registration failed. Please try again.';
@@ -1005,7 +1004,7 @@ async function initDashboardPage() {
             const safeDate = escapeHtml(o.created_at || '');
             return `
               <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50 text-xs">
-                <td class="py-3.5 px-4 font-mono font-bold text-pink-600 dark:text-pink-400"><a href="/order-detail.html?id=${encodeURIComponent(o.id)}" class="hover:underline">#${escapeHtml(String(shortId))}</a></td>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600 dark:text-pink-400"><a href="/order-detail?id=${encodeURIComponent(o.id)}" class="hover:underline">#${escapeHtml(String(shortId))}</a></td>
                 <td class="py-3.5 px-4 font-medium text-gray-900 dark:text-white truncate max-w-xs">${safeName}</td>
                 <td class="py-3.5 px-4"><a href="${safeLink}" target="_blank" rel="noopener noreferrer" class="text-pink-600 dark:text-pink-400 hover:underline font-mono truncate max-w-[150px] inline-block">${safeLink}</a></td>
                 <td class="py-3.5 px-4 font-semibold text-gray-900 dark:text-white">${(o.quantity || 0).toLocaleString()}</td>
@@ -1375,7 +1374,7 @@ async function initServicesPage() {
               <td class="py-4 px-4 text-xs font-mono text-gray-600">${min} / ${max}</td>
               <td class="py-4 px-4 text-xs text-gray-500 font-medium">Instant Start</td>
               <td class="py-4 px-4 text-center">
-                <a href="/dashboard.html" class="px-3.5 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl text-xs shadow-sm inline-block transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">Order</a>
+                <a href="/dashboard" class="px-3.5 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl text-xs shadow-sm inline-block transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">Order</a>
               </td>
             </tr>
           `;
@@ -3916,8 +3915,8 @@ async function initOrderDetailPage() {
             "@type": "BreadcrumbList",
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
-              { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://ghbooster.com/dashboard.html" },
-              { "@type": "ListItem", "position": 3, "name": "Orders", "item": "https://ghbooster.com/orders.html" },
+              { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://ghbooster.com/dashboard" },
+              { "@type": "ListItem", "position": 3, "name": "Orders", "item": "https://ghbooster.com/orders" },
               { "@type": "ListItem", "position": 4, "name": `Order #${shortId}`, "item": orderUrl }
             ]
           },
@@ -4052,7 +4051,7 @@ async function initOrderDetailPage() {
     if (svcIdTag) svcIdTag.textContent = order.service_id ? `ID: #${order.service_id}` : 'ID: —';
 
     const ticketLink = document.getElementById('open-ticket-link');
-    if (ticketLink) ticketLink.href = `/tickets.html?order_id=${encodeURIComponent(order.id)}`;
+    if (ticketLink) ticketLink.href = `/tickets?order_id=${encodeURIComponent(order.id)}`;
 
     // Refill Button Availability
     const refillBtn = document.getElementById('trigger-refill-btn');

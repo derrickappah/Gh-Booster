@@ -59,7 +59,7 @@ class OrderController {
     try {
       const orderId = req.params.id;
       const userId = req.user ? req.user.id : null;
-      const isAdmin = req.user ? req.user.role === 'admin' : false;
+      const isAdmin = req.user ? (req.user.role === 'admin' || req.user.role === 'super_admin' || req.user.is_admin === true) : false;
       if (!userId) {
         return res.status(401).json({ success: false, error: 'Authentication required to view orders.' });
       }

@@ -476,7 +476,7 @@ class OrderService {
       service_name: dbOrder.services?.name || 'Social Media Service',
       service_description: dbOrder.services?.description || 'High quality social media boosting service.',
       category_name: dbOrder.services?.categories?.name || 'General Services',
-      category_icon: dbOrder.services?.categories?.icon || 'src/img/platforms/instagram.png',
+      category_icon: dbOrder.services?.categories?.icon || '/src/img/platforms/instagram.png',
       rate_per_1k: parseFloat(dbOrder.services?.rate_per_1k || dbOrder.services?.rate_per_1000 || 0),
       link: dbOrder.link,
       quantity: dbOrder.quantity,

@@ -2279,7 +2279,7 @@ video {
 }
 
 .from-blue-700 {
-  --tw-gradient-from:#68e1fd; var(--tw-gradient-from-position);
+  --tw-gradient-from:#68e1fd var(--tw-gradient-from-position);
   --tw-gradient-to:rgb(255 255 255 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to);
 }
