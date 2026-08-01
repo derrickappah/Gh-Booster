@@ -52,7 +52,37 @@ app.use(express.urlencoded({ extended: true }));
 // Apply Rate Limiting to /api
 app.use('/api', globalLimiter);
 
-// 1. 301 Permanent Redirect middleware for legacy .html URLs
+// Function to register API endpoints under a prefix
+const registerAppRoutes = (prefix) => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/services`, serviceRoutes);
+  app.use(`${prefix}/orders`, orderRoutes);
+  app.use(`${prefix}/deposits`, depositRoutes);
+  app.use(`${prefix}/tickets`, ticketRoutes);
+  app.use(`${prefix}/admin`, adminRoutes);
+  app.use(`${prefix}/v2`, apiV2Routes);
+  app.use(`${prefix}/news`, newsRoutes);
+  app.use(`${prefix}/referrals`, referralRoutes);
+  app.use(`${prefix}/child-panels`, childPanelRoutes);
+  app.use(`${prefix}/transactions`, transactionRoutes);
+  app.use(`${prefix}/payments`, paymentRoutes);
+  app.use(`${prefix}/settings`, settingsRoutes);
+};
+
+// 1. Mount API Routes for /api prefix FIRST so API requests return JSON immediately
+registerAppRoutes('/api');
+
+// Health Check Endpoints
+app.get(['/api/health', '/health'], (req, res) => {
+  res.json({
+    success: true,
+    status: 'operational',
+    message: 'GhBooster Express Backend powered by Supabase PostgreSQL & Auth',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 2. 301 Permanent Redirect middleware for legacy .html URLs
 app.use((req, res, next) => {
   if (req.path.endsWith('.html') && req.method === 'GET') {
     if (req.path === '/index.html') {
@@ -70,7 +100,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 2. Clean Extensionless Page Routes Mapping (Serves HTML when requested by browser)
+// 3. Clean Extensionless Page Routes Mapping (Serves HTML when requested by browser)
 const pageRoutesMap = {
   '/': 'index.html',
   '/dashboard': 'dashboard.html',
@@ -119,7 +149,6 @@ const pageRoutesMap = {
 
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {
   app.get(routePath, (req, res, next) => {
-    // If request accepts html (browser navigation), serve the HTML file
     if (req.accepts('html')) {
       if (routePath.startsWith('/dashboard') || routePath.startsWith('/admin-')) {
         res.setHeader('X-Robots-Tag', 'noindex, nofollow');
@@ -142,7 +171,7 @@ app.get(['/dashboard/orders/:id', '/order-detail'], (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'order-detail.html'));
 });
 
-// 3. Serve static assets (js, css, images, etc.)
+// 4. Serve static assets (js, css, images, etc.)
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
   etag: true,
@@ -155,35 +184,8 @@ app.use(express.static(path.join(__dirname, '..'), {
   }
 }));
 
-// 4. Mount API Routes (Supports /api/... and direct serverless /... paths)
-const registerAppRoutes = (prefix) => {
-  app.use(`${prefix}/auth`, authRoutes);
-  app.use(`${prefix}/services`, serviceRoutes);
-  app.use(`${prefix}/orders`, orderRoutes);
-  app.use(`${prefix}/deposits`, depositRoutes);
-  app.use(`${prefix}/tickets`, ticketRoutes);
-  app.use(`${prefix}/admin`, adminRoutes);
-  app.use(`${prefix}/v2`, apiV2Routes);
-  app.use(`${prefix}/news`, newsRoutes);
-  app.use(`${prefix}/referrals`, referralRoutes);
-  app.use(`${prefix}/child-panels`, childPanelRoutes);
-  app.use(`${prefix}/transactions`, transactionRoutes);
-  app.use(`${prefix}/payments`, paymentRoutes);
-  app.use(`${prefix}/settings`, settingsRoutes);
-};
-
-registerAppRoutes('/api');
+// 5. Root level API routes fallback
 registerAppRoutes('');
-
-// Health Check Endpoints
-app.get(['/api/health', '/health'], (req, res) => {
-  res.json({
-    success: true,
-    status: 'operational',
-    message: 'GhBooster Express Backend powered by Supabase PostgreSQL & Auth',
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Serve robots.txt, sitemap.xml & llms.txt
 app.get('/robots.txt', (req, res) => {
