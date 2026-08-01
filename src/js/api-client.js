@@ -1587,7 +1587,7 @@ async function initServicesPage() {
           const searchQ = searchInput ? searchInput.value.trim() : '';
           tableBody.innerHTML = `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition">
-              <td colspan="6" class="py-12 text-center text-gray-400 font-medium space-y-3">
+              <td colspan="5" class="py-12 text-center text-gray-400 font-medium space-y-3">
                 <p>No matching services found${searchQ ? ` for "${escapeHtml(searchQ)}"` : ''}.</p>
                 ${searchQ || activeCatId !== 'all' ? `
                   <button type="button" id="reset-svc-search-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-2xl shadow transition">Clear Search & Filters</button>
@@ -1629,14 +1629,6 @@ async function initServicesPage() {
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50">
-              <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs">
-                <div class="inline-flex items-center space-x-1">
-                  <span>#${escapeHtml(String(providerId))}</span>
-                  <button type="button" class="btn-copy-svc-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-id="${escapeHtml(String(providerId))}" title="Copy Service ID" aria-label="Copy Service ID">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                  </button>
-                </div>
-              </td>
               <td class="py-4 px-4">
                 <div class="font-bold text-gray-900 dark:text-white text-xs flex items-center">
                   ${formatIconHtml(iconPath)}

@@ -1215,7 +1215,7 @@
         const query = searchInput ? searchInput.value.trim() : '';
         tableBody.innerHTML = `
           <tr>
-            <td colspan="6" class="py-12 text-center text-gray-400 font-medium space-y-3">
+            <td colspan="5" class="py-12 text-center text-gray-400 font-medium space-y-3">
               <p>No active services found${query ? ` matching "${query}"` : ''}.</p>
               ${query || activeCat !== 'all' ? `
                 <button type="button" id="reset-public-search-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-xl shadow transition">Clear Search & Filters</button>
@@ -1247,14 +1247,6 @@
 
         return `
           <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition border-b border-gray-100 dark:border-gray-800">
-            <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs">
-              <div class="inline-flex items-center space-x-1">
-                <span>#${providerId}</span>
-                <button type="button" class="btn-copy-public-svc p-1 text-gray-400 hover:text-pink-600 transition rounded" data-copy="${providerId}" title="Copy Service ID" aria-label="Copy Service ID">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                </button>
-              </div>
-            </td>
             <td class="py-4 px-4">
               <div class="space-y-1">
                 <div class="font-bold text-gray-900 dark:text-white text-sm leading-snug">${s.name}</div>
