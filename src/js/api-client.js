@@ -2565,21 +2565,6 @@ async function initBulkOrderPage() {
   }
 
   await loadBulkBatches();
-}n="7" class="py-8 text-center text-red-500 font-medium">Failed to load batches.</td>
-          </tr>
-        `;
-      }
-    } catch (e) {
-      console.error(e);
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="7" class="py-8 text-center text-red-500 font-medium">Error loading batches.</td>
-        </tr>
-      `;
-    }
-  }
-
-  loadBulkBatches();
 
   // 4. Form submission handler
   if (bulkForm) {
