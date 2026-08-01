@@ -2801,23 +2801,22 @@ async function initAdminOrdersPage() {
           else if (svcLower.includes('telegram')) platformIcon = 'src/img/platforms/telegram.png';
           else if (svcLower.includes('spotify')) platformIcon = 'src/img/platforms/spotify.png';
 
-          let selectStyle = 'bg-yellow-50 border-yellow-200 text-yellow-800';
-          let badgeStyle = 'bg-yellow-100 text-yellow-800';
-          let dotStyle = 'bg-yellow-500';
+          let dotStyle = 'bg-gray-500';
+          if (statusLower === 'completed') dotStyle = 'bg-green-500';
+          else if (statusLower === 'processing') dotStyle = 'bg-blue-500';
+          else if (statusLower === 'in progress' || statusLower === 'in-progress') dotStyle = 'bg-purple-500';
+          else if (statusLower === 'pending') dotStyle = 'bg-yellow-500';
+          else if (statusLower === 'partial') dotStyle = 'bg-orange-500';
+          else if (statusLower === 'canceled' || statusLower === 'refunded') dotStyle = 'bg-red-500';
 
-          if (statusLower === 'completed') {
-            selectStyle = 'bg-green-50 border-green-200 text-green-800';
-            badgeStyle = 'bg-green-100 text-green-800';
-            dotStyle = 'bg-green-500';
-          } else if (statusLower === 'in progress' || statusLower === 'in-progress' || statusLower === 'processing') {
-            selectStyle = 'bg-blue-50 border-blue-200 text-blue-800';
-            badgeStyle = 'bg-blue-100 text-blue-800';
-            dotStyle = 'bg-blue-500';
-          } else if (statusLower === 'canceled' || statusLower === 'refunded') {
-            selectStyle = 'bg-red-50 border-red-200 text-red-800';
-            badgeStyle = 'bg-red-100 text-red-800';
-            dotStyle = 'bg-red-500';
-          }
+          let statusDisplay = status;
+          if (statusLower === 'in-progress' || statusLower === 'in progress') statusDisplay = 'In Progress';
+          else if (statusLower === 'processing') statusDisplay = 'Processing';
+          else if (statusLower === 'pending') statusDisplay = 'Pending';
+          else if (statusLower === 'completed') statusDisplay = 'Completed';
+          else if (statusLower === 'canceled') statusDisplay = 'Canceled';
+          else if (statusLower === 'refunded') statusDisplay = 'Refunded';
+          else if (statusLower === 'partial') statusDisplay = 'Partial';
 
           return `
             <tr class="admin-order-row hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
@@ -2840,17 +2839,19 @@ async function initAdminOrdersPage() {
               <td class="py-4 px-4 font-extrabold text-gray-900">GH₵${charge}</td>
               <td class="py-4 px-4 text-gray-500 text-xs">${escapeHtml(createdAt)}</td>
               <td class="py-4 px-4">
-                <span class="px-2.5 py-1 ${badgeStyle} rounded-full font-bold text-[11px] inline-flex items-center">
+                <span class="px-2.5 py-1 ${getStatusBadgeClass(o.status)} rounded-full font-bold text-[11px] inline-flex items-center">
                   <span class="w-1.5 h-1.5 rounded-full ${dotStyle} mr-1.5 animate-pulse" aria-hidden="true"></span>
-                  ${escapeHtml(status)}
+                  ${escapeHtml(statusDisplay)}
                 </span>
               </td>
               <td class="py-4 px-4">
-                <select class="status-select py-1 px-2 border font-bold rounded text-xs focus:outline-none ${selectStyle}">
-                  <option value="Completed" ${statusLower === 'completed' ? 'selected' : ''}>Completed</option>
-                  <option value="In Progress" ${['in progress', 'in-progress', 'processing'].includes(statusLower) ? 'selected' : ''}>In Progress</option>
+                <select class="status-select py-1 px-2 border border-gray-300 text-gray-900 font-bold rounded text-xs focus:outline-none bg-white">
+                  <option value="Processing" ${statusLower === 'processing' ? 'selected' : ''}>Processing</option>
+                  <option value="In Progress" ${['in progress', 'in-progress'].includes(statusLower) ? 'selected' : ''}>In Progress</option>
                   <option value="Pending" ${statusLower === 'pending' ? 'selected' : ''}>Pending</option>
-                  <option value="Canceled" ${['canceled', 'refunded'].includes(statusLower) ? 'selected' : ''}>Canceled & Refund</option>
+                  <option value="Completed" ${statusLower === 'completed' ? 'selected' : ''}>Completed</option>
+                  <option value="Partial" ${statusLower === 'partial' ? 'selected' : ''}>Partial</option>
+                  <option value="Canceled" ${['canceled', 'refunded'].includes(statusLower) ? 'selected' : ''}>Canceled &amp; Refund</option>
                 </select>
               </td>
               <td class="py-4 px-4 text-center space-x-1">
