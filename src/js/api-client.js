@@ -955,6 +955,7 @@ async function initDashboardPage() {
       const user   = API.getUser();
 
       const showAlert = (msg, success = false) => {
+        showToast(msg, success ? 'success' : 'error');
         if (!alertEl) return;
         alertEl.className = `rounded-xl p-3.5 text-xs font-semibold border ${
           success
