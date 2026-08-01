@@ -9,6 +9,39 @@
   <!-- Title & Description -->
   <title>User Dashboard | GhBooster - #1 SMM Panel</title>
   <meta name="description" content="Manage your GhBooster SMM Panel account, place new orders, view order status, add funds, and access reseller API.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" id="page-canonical" href="https://ghbooster.com/dashboard">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" content="User Dashboard | GhBooster SMM Panel">
+  <meta property="og:description" content="Manage your GhBooster account, place new orders, track fulfillment status, and top up your wallet.">
+  <meta property="og:url" content="https://ghbooster.com/dashboard">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" content="User Dashboard | GhBooster SMM Panel">
+  <meta name="twitter:description" content="Manage your GhBooster account, place new orders, track fulfillment status, and top up your wallet.">
+  <meta name="twitter:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json" id="schema-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://ghbooster.com/dashboard" }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -154,8 +187,8 @@
           <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
 
-        <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <!-- Header Title -->
+        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-3 md:hidden">
@@ -230,22 +263,22 @@
               <span class="pl-4 pr-1 text-gray-500 dark:text-gray-400 font-bold text-sm select-none flex-shrink-0">
                 GH₵
               </span>
-              <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="0.00" value="15"
+              <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="0.00" value="15" aria-label="Deposit Amount in GHS"
                 class="w-full py-3.5 px-2 bg-transparent text-gray-900 dark:text-white text-base font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
             </div>
 
             <!-- Quick-pick amounts -->
             <div class="flex flex-row gap-2" id="quick-amounts">
-              <button type="button" data-amount="15"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 transition">₵15</button>
-              <button type="button" data-amount="50"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵50</button>
-              <button type="button" data-amount="100" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵100</button>
-              <button type="button" data-amount="200" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵200</button>
-              <button type="button" data-amount="500" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵500</button>
+              <button type="button" data-amount="15"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵15</button>
+              <button type="button" data-amount="50"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵50</button>
+              <button type="button" data-amount="100" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵100</button>
+              <button type="button" data-amount="200" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵200</button>
+              <button type="button" data-amount="500" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵500</button>
             </div>
 
             <!-- Submit Button -->
             <button type="submit" id="deposit-submit-btn"
-              class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white font-bold text-sm rounded-2xl shadow-lg shadow-green-600/20 hover:shadow-green-600/40 transition-all duration-200 flex items-center justify-center gap-2">
+              class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white font-bold text-sm rounded-2xl shadow-lg shadow-green-600/20 hover:shadow-green-600/40 transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -365,6 +398,7 @@
                   <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">Min/Max limits apply</span>
                 </div>
                 <input type="number" id="quantity-input" value="1000" min="10" max="500000" class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+                <span id="quantity-validation-msg" class="text-[11px] font-bold text-red-500 mt-1 block hidden"></span>
               </div>
             </div>
 
@@ -398,7 +432,7 @@
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm border-collapse">
+          <table class="w-full text-left text-sm border-collapse" aria-label="Recent Orders table">
             <thead>
               <tr class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold border-b border-gray-200 dark:border-gray-700">
                 <th class="py-3 px-4">Order ID</th>
@@ -422,88 +456,21 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
-      Copyright © GhBooster SMM Panel | All rights reserved.
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      Copyright &copy; <span id="footer-year"></span> GhBooster SMM Panel | All rights reserved.
     </footer>
 
   </div>
 
-  <!-- Dynamic Charge & Collapsible Sidebar Script -->
-  
-  
-
-
-  
-
-
-  
-
+  <!-- Dynamic Scripts -->
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
-
-  
-
-
-  
-
-
-  
-
-
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-      // Category Dropdown
-      const categoryBtn = document.getElementById('category-btn');
-      const categoryDropdown = document.getElementById('category-dropdown');
-      const categoryInput = document.getElementById('category');
-      const selectedCatDisp = document.getElementById('selected-category-display');
-      const catOptions = document.querySelectorAll('.category-option');
-
-      if (categoryBtn && categoryDropdown) {
-        categoryBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          categoryDropdown.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', function () {
-          categoryDropdown.classList.add('hidden');
-        });
-
-        catOptions.forEach(function (opt) {
-          opt.addEventListener('click', function () {
-            const val = opt.getAttribute('data-value');
-            const label = opt.getAttribute('data-label');
-            const icon = opt.getAttribute('data-icon');
-
-            categoryInput.value = val;
-            selectedCatDisp.innerHTML = '<img src="' + icon + '" alt="' + val + '" class="w-4 h-4 object-contain flex-shrink-0"> <span class="font-medium text-gray-900 truncate">' + label + '</span>';
-            categoryDropdown.classList.add('hidden');
-          });
-        });
-      }
-
-      // Dynamic Order Calculation
-      const serviceSelect = document.getElementById('service');
-      const quantityInput = document.getElementById('quantity');
-      const totalChargeDisplay = document.getElementById('total-charge');
-      const orderForm = document.getElementById('order-form');
-
-      function calculateCharge() {
-        if (!serviceSelect || !quantityInput || !totalChargeDisplay) return;
-        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-        const ratePerThousand = parseFloat(selectedOption.getAttribute('data-rate') || 0);
-        const qty = parseInt(quantityInput.value) || 0;
-        const total = (qty / 1000) * ratePerThousand;
-        totalChargeDisplay.textContent = "GH₵" + total.toFixed(2);
-      }
-
-      if (serviceSelect && quantityInput) {
-        serviceSelect.addEventListener('change', calculateCharge);
-        quantityInput.addEventListener('input', calculateCharge);
-      }
-
-    });
+    const yr = document.getElementById('footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>;
   </script>
 </body>
 </html>

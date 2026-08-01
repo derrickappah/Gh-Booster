@@ -620,6 +620,16 @@ async function initDashboardPage() {
       allServices = res.services || [];
       allCategories = res.categories || [];
       renderDropdownMenu();
+
+      // Check for URL query param ?service=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetServiceId = urlParams.get('service');
+      if (targetServiceId && allServices.length > 0) {
+        const found = allServices.find(s => String(s.id) === String(targetServiceId) || String(s.service_id) === String(targetServiceId) || String(s.provider_service_id) === String(targetServiceId));
+        if (found) {
+          selectService(found);
+        }
+      }
     }
   } catch (e) {
     console.error('Failed to load services:', e);
@@ -787,9 +797,27 @@ async function initDashboardPage() {
   function updateCharge() {
     if (!selectedService || !qtyInput || !chargeDisplay) return;
     const rate = parseFloat(selectedService.rate_per_1000 || selectedService.our_price_per_1000 || selectedService.rate_per_1k || selectedService.rate || 0);
+    const minQty = parseInt(selectedService.min_quantity || selectedService.min || 1, 10);
+    const maxQty = parseInt(selectedService.max_quantity || selectedService.max || 1000000, 10);
     const qty = parseInt(qtyInput.value || 0, 10);
+    const validationMsg = document.getElementById('quantity-validation-msg');
+
+    if (qty > 0 && minQty && qty < minQty) {
+      if (validationMsg) {
+        validationMsg.textContent = `Quantity must be at least ${minQty.toLocaleString()}.`;
+        validationMsg.classList.remove('hidden');
+      }
+    } else if (qty > 0 && maxQty && qty > maxQty) {
+      if (validationMsg) {
+        validationMsg.textContent = `Quantity cannot exceed ${maxQty.toLocaleString()}.`;
+        validationMsg.classList.remove('hidden');
+      }
+    } else {
+      if (validationMsg) validationMsg.classList.add('hidden');
+    }
+
     const total = (qty / 1000) * rate;
-    chargeDisplay.textContent = `GH₵${total.toFixed(4)}`;
+    chargeDisplay.textContent = `GH₵${total.toFixed(2)}`;
   }
 
   if (qtyInput) qtyInput.addEventListener('input', updateCharge);
@@ -805,8 +833,17 @@ async function initDashboardPage() {
       const orderSubmitBtn = document.getElementById('order-submit-btn');
 
       if (!service_id || !link || !quantity || isNaN(quantity) || quantity <= 0) {
-        alert('Please select a service, target link, and valid quantity.');
+        showToast('Please select a service, target link, and valid quantity.', 'warning');
         return;
+      }
+
+      if (selectedService) {
+        const minQty = parseInt(selectedService.min_quantity || selectedService.min || 1, 10);
+        const maxQty = parseInt(selectedService.max_quantity || selectedService.max || 1000000, 10);
+        if (quantity < minQty || quantity > maxQty) {
+          showToast(`Quantity must be between ${minQty.toLocaleString()} and ${maxQty.toLocaleString()}.`, 'warning');
+          return;
+        }
       }
 
       if (orderSubmitBtn) {
@@ -816,16 +853,16 @@ async function initDashboardPage() {
 
       try {
         const res = await API.request('/orders', 'POST', { service_id, link, quantity });
-        alert(`🎉 ${res.message}\nOrder ID: #${res.order_id}\nCharge: GH₵${res.charge.toFixed(2)}`);
+        showToast(`🎉 ${res.message || 'Order placed successfully!'} Order ID: #${res.order_id}`, 'success');
         const user = API.getUser();
         if (user && res.new_balance !== undefined) {
           user.balance = res.new_balance;
           API.setUser(user);
           updateUserUI(user);
         }
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 1200);
       } catch (err) {
-        alert(err.message);
+        showToast(err.message || 'Failed to place order', 'error');
       } finally {
         if (orderSubmitBtn) {
           orderSubmitBtn.disabled = false;
@@ -1000,15 +1037,32 @@ async function initDashboardPage() {
           tableBody.innerHTML = orders.slice(0, 5).map(o => {
             const shortId = typeof o.id === 'string' && o.id.length > 8 ? o.id.substring(0, 8) : o.id;
             const chargeVal = parseFloat(o.charge || 0).toFixed(2);
-            const safeLink = escapeHtml(o.link || '');
+            const safeLink = sanitizeUrl(o.link);
             const safeName = escapeHtml(o.service_name || '');
             const safeStatus = escapeHtml(o.status || '');
             const safeDate = escapeHtml(o.created_at || '');
+
             return `
               <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50 text-xs">
-                <td class="py-3.5 px-4 font-mono font-bold text-pink-600 dark:text-pink-400"><a href="/order-detail?id=${encodeURIComponent(o.id)}" class="hover:underline">#${escapeHtml(String(shortId))}</a></td>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600 dark:text-pink-400">
+                  <div class="inline-flex items-center space-x-1">
+                    <a href="/dashboard/orders/${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(shortId))}">#${escapeHtml(String(shortId))}</a>
+                    <button type="button" class="btn-copy-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-text="${escapeHtml(String(o.id))}" title="Copy Order ID" aria-label="Copy Order ID">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </button>
+                  </div>
+                </td>
                 <td class="py-3.5 px-4 font-medium text-gray-900 dark:text-white truncate max-w-xs">${safeName}</td>
-                <td class="py-3.5 px-4"><a href="${safeLink}" target="_blank" rel="noopener noreferrer" class="text-pink-600 dark:text-pink-400 hover:underline font-mono truncate max-w-[150px] inline-block">${safeLink}</a></td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center space-x-1">
+                    ${safeLink ? `<a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 dark:text-pink-400 hover:underline font-mono truncate max-w-[150px] inline-block">${escapeHtml(o.link || '')}</a>` : `<span class="text-gray-400 font-mono truncate block max-w-[150px]">${escapeHtml(o.link || '—')}</span>`}
+                    ${o.link ? `
+                      <button type="button" class="btn-copy-link p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-link="${escapeHtml(o.link)}" title="Copy Link URL" aria-label="Copy Target Link">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                      </button>
+                    ` : ''}
+                  </div>
+                </td>
                 <td class="py-3.5 px-4 font-semibold text-gray-900 dark:text-white">${(o.quantity || 0).toLocaleString()}</td>
                 <td class="py-3.5 px-4 font-extrabold text-green-600 dark:text-green-400">GH₵${chargeVal}</td>
                 <td class="py-3.5 px-4"><span class="px-2.5 py-1 font-bold rounded-full text-[11px] inline-flex items-center ${getStatusBadgeClass(o.status)}">${safeStatus}</span></td>
@@ -1016,13 +1070,33 @@ async function initDashboardPage() {
               </tr>
             `;
           }).join('');
+
+          // Attach Copy ID & Link handlers
+          tableBody.querySelectorAll('.btn-copy-id').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const text = btn.getAttribute('data-copy-text');
+              if (text) {
+                const ok = await copyToClipboard(text);
+                if (ok) showToast('Order ID copied to clipboard!');
+              }
+            });
+          });
+
+          tableBody.querySelectorAll('.btn-copy-link').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const link = btn.getAttribute('data-copy-link');
+              if (link) {
+                const ok = await copyToClipboard(link);
+                if (ok) showToast('Target URL copied to clipboard!');
+              }
+            });
+          });
         }
       }
     }
   } catch (e) {}
 }
 
-// ORDERS HISTORY DYNAMIC RENDERER
 // ORDERS HISTORY DYNAMIC RENDERER
 async function initOrdersPage() {
   const tableBody = document.getElementById('orders-tbody') || document.querySelector('tbody');
@@ -1461,6 +1535,7 @@ async function initServicesPage() {
   const tableBody = document.getElementById('services-tbody') || document.querySelector('tbody');
   const searchInput = document.getElementById('service-search') || document.getElementById('search-service-input') || document.querySelector('input[type="search"], input[placeholder*="Search"]');
   const pillsContainer = document.querySelector('.cat-pill')?.parentElement;
+  const countBadge = document.getElementById('services-count-badge');
 
   if (!tableBody) return;
 
@@ -1504,12 +1579,39 @@ async function initServicesPage() {
 
       // 2. Render Table Function
       const renderTable = (list) => {
+        if (countBadge) {
+          countBadge.textContent = `${list.length.toLocaleString()} ${list.length === 1 ? 'Service' : 'Services'}`;
+        }
+
         if (!list || list.length === 0) {
+          const searchQ = searchInput ? searchInput.value.trim() : '';
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
-              <td colspan="6" class="py-12 text-center text-gray-400 font-medium">No matching services found.</td>
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition">
+              <td colspan="6" class="py-12 text-center text-gray-400 font-medium space-y-3">
+                <p>No matching services found${searchQ ? ` for "${escapeHtml(searchQ)}"` : ''}.</p>
+                ${searchQ || activeCatId !== 'all' ? `
+                  <button type="button" id="reset-svc-search-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-2xl shadow transition">Clear Search & Filters</button>
+                ` : ''}
+              </td>
             </tr>
           `;
+          const resetBtn = document.getElementById('reset-svc-search-btn');
+          if (resetBtn) {
+            resetBtn.onclick = () => {
+              if (searchInput) searchInput.value = '';
+              activeCatId = 'all';
+              if (pillsContainer) {
+                pillsContainer.querySelectorAll('.cat-pill').forEach(b => {
+                  if (b.getAttribute('data-cat') === 'all') {
+                    b.className = "cat-pill px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active inline-flex items-center flex-shrink-0 text-xs font-semibold";
+                  } else {
+                    b.className = "cat-pill px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition inline-flex items-center flex-shrink-0 text-xs font-semibold";
+                  }
+                });
+              }
+              applyFilters();
+            };
+          }
           return;
         }
 
@@ -1522,29 +1624,57 @@ async function initServicesPage() {
           const min = (s.min_quantity || 100).toLocaleString();
           const max = (s.max_quantity || 100000).toLocaleString();
           const desc = s.description || 'Fast execution with high retention guarantee.';
+          const hasRefill = s.refill || s.refill_guarantee || (s.refill_period_days && s.refill_period_days > 0);
+          const refillDays = s.refill_period_days || 30;
 
           return `
-            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
-              <td class="py-4 px-4 font-mono font-bold text-pink-600 text-xs">ID: ${escapeHtml(String(providerId))}</td>
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50">
+              <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs">
+                <div class="inline-flex items-center space-x-1">
+                  <span>#${escapeHtml(String(providerId))}</span>
+                  <button type="button" class="btn-copy-svc-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-id="${escapeHtml(String(providerId))}" title="Copy Service ID" aria-label="Copy Service ID">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  </button>
+                </div>
+              </td>
               <td class="py-4 px-4">
-                <div class="font-bold text-gray-900 text-xs flex items-center">
+                <div class="font-bold text-gray-900 dark:text-white text-xs flex items-center">
                   ${formatIconHtml(iconPath)}
                   ${escapeHtml(s.name || '')}
                 </div>
                 <div class="flex items-center space-x-2 mt-1">
-                  <span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-semibold rounded text-[10px]">${escapeHtml(catName)}</span>
+                  <span class="px-2 py-0.5 bg-pink-50 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 font-semibold rounded text-[10px]">${escapeHtml(catName)}</span>
                 </div>
-                <p class="text-[11px] text-gray-400 mt-1 max-w-sm">${escapeHtml(desc)}</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1 max-w-sm leading-relaxed">${escapeHtml(desc)}</p>
               </td>
-              <td class="py-4 px-4 font-extrabold text-green-600 text-sm">GH₵${rate}</td>
-              <td class="py-4 px-4 text-xs font-mono text-gray-600">${min} / ${max}</td>
-              <td class="py-4 px-4 text-xs text-gray-500 font-medium">Instant Start</td>
+              <td class="py-4 px-4 font-extrabold text-green-600 dark:text-green-400 text-sm">GH₵${rate}</td>
+              <td class="py-4 px-4 text-xs font-mono text-gray-600 dark:text-gray-300">${min} / ${max}</td>
+              <td class="py-4 px-4 text-xs font-medium">
+                ${hasRefill ? `
+                  <span class="px-2.5 py-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold rounded-full text-[10px] inline-flex items-center">
+                    🛡️ ${refillDays}d Refill
+                  </span>
+                ` : `
+                  <span class="text-gray-400 dark:text-gray-500 text-[11px]">⚡ Instant Start</span>
+                `}
+              </td>
               <td class="py-4 px-4 text-center">
-                <a href="/dashboard" class="px-3.5 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl text-xs shadow-sm inline-block transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">Order</a>
+                <a href="/dashboard?service=${encodeURIComponent(s.id)}" class="px-3.5 py-1.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl text-xs shadow-sm inline-block transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">Order</a>
               </td>
             </tr>
           `;
         }).join('');
+
+        // Attach Copy Service ID handlers
+        tableBody.querySelectorAll('.btn-copy-svc-id').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const text = btn.getAttribute('data-copy-id');
+            if (text) {
+              const ok = await copyToClipboard(text);
+              if (ok) showToast(`Service ID #${text} copied to clipboard!`);
+            }
+          });
+        });
       };
 
       function applyFilters() {
@@ -1559,7 +1689,9 @@ async function initServicesPage() {
           filtered = filtered.filter(s => 
             s.name.toLowerCase().includes(query) || 
             (s.category_name && s.category_name.toLowerCase().includes(query)) ||
-            String(s.id).toLowerCase().includes(query)
+            String(s.id).toLowerCase().includes(query) ||
+            (s.service_id && String(s.service_id).toLowerCase().includes(query)) ||
+            (s.provider_service_id && String(s.provider_service_id).toLowerCase().includes(query))
           );
         }
 
