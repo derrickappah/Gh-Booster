@@ -469,29 +469,40 @@ class OrderService {
       throw new Error('Access denied: You do not have permission to view this order');
     }
 
-    return {
-      id: dbOrder.id,
-      user_id: dbOrder.user_id,
-      service_id: dbOrder.service_id,
-      service_name: dbOrder.services?.name || 'Social Media Service',
-      service_description: dbOrder.services?.description || 'High quality social media boosting service.',
-      category_name: dbOrder.services?.categories?.name || 'General Services',
-      category_icon: dbOrder.services?.categories?.icon || '/src/img/platforms/instagram.png',
-      rate_per_1k: parseFloat(dbOrder.services?.rate_per_1k || dbOrder.services?.rate_per_1000 || 0),
-      link: dbOrder.link,
-      quantity: dbOrder.quantity,
-      charge: parseFloat(dbOrder.total_price || dbOrder.charge || 0),
-      currency: 'GHS',
-      status: dbOrder.status || 'Processing',
-      start_count: dbOrder.start_count || 0,
-      remains: dbOrder.remains || 0,
-      refill_guarantee: dbOrder.services?.refill_guarantee !== undefined && dbOrder.services?.refill_guarantee !== null ? Boolean(dbOrder.services.refill_guarantee) : true,
-      refill_period_days: dbOrder.services?.refill_period_days || 30,
-      provider_order_id: dbOrder.provider_order_id || null,
-      created_at: new Date(dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19),
-      updated_at: new Date(dbOrder.updated_at || dbOrder.created_at).toISOString().replace('T', ' ').substring(0, 19)
-    };
-  }
+      const formatDate = (d) => {
+        if (!d) return new Date().toISOString().replace('T', ' ').substring(0, 19);
+        try {
+          const parsed = new Date(d);
+          if (isNaN(parsed.getTime())) return String(d).substring(0, 19);
+          return parsed.toISOString().replace('T', ' ').substring(0, 19);
+        } catch (e) {
+          return String(d).substring(0, 19);
+        }
+      };
+
+      return {
+        id: dbOrder.id,
+        user_id: dbOrder.user_id,
+        service_id: dbOrder.service_id,
+        service_name: dbOrder.services?.name || 'Social Media Service',
+        service_description: dbOrder.services?.description || 'High quality social media boosting service.',
+        category_name: dbOrder.services?.categories?.name || 'General Services',
+        category_icon: dbOrder.services?.categories?.icon || '/src/img/platforms/instagram.png',
+        rate_per_1k: parseFloat(dbOrder.services?.rate_per_1k || dbOrder.services?.rate_per_1000 || 0),
+        link: dbOrder.link,
+        quantity: dbOrder.quantity,
+        charge: parseFloat(dbOrder.total_price || dbOrder.charge || 0),
+        currency: 'GHS',
+        status: dbOrder.status || 'Processing',
+        start_count: dbOrder.start_count || 0,
+        remains: dbOrder.remains || 0,
+        refill_guarantee: dbOrder.services?.refill_guarantee !== undefined && dbOrder.services?.refill_guarantee !== null ? Boolean(dbOrder.services.refill_guarantee) : false,
+        refill_period_days: dbOrder.services?.refill_period_days || 30,
+        provider_order_id: dbOrder.provider_order_id || null,
+        created_at: formatDate(dbOrder.created_at),
+        updated_at: formatDate(dbOrder.updated_at || dbOrder.created_at)
+      };
+    }
 
   static async refillOrder(orderId, userId) {
     const order = await OrderService.getOrderById(orderId, userId);

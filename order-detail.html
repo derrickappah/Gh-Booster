@@ -181,10 +181,17 @@
     <!-- Top Header Bar -->
     <header class="sticky top-0 z-30 h-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
       <div class="flex items-center space-x-3">
-        <!-- Mobile Logo (visible on mobile only) -->
-        <a href="/dashboard" class="flex items-center md:hidden">
-          <img src="/src/img/logo.png" alt="GhBooster Logo" width="140" height="32" class="h-8 w-auto object-contain">
-        </a>
+        <!-- Mobile Navigation Back Button & Logo -->
+        <div class="flex items-center space-x-2 md:hidden">
+          <a href="/orders" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" title="Back to Orders History" aria-label="Back to Orders History">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </a>
+          <a href="/dashboard" class="flex items-center">
+            <img src="/src/img/logo.png" alt="GhBooster Logo" width="140" height="32" class="h-8 w-auto object-contain">
+          </a>
+        </div>
 
         <!-- Desktop Breadcrumbs (hidden on mobile) -->
         <div class="hidden md:flex items-center space-x-3">
@@ -229,12 +236,13 @@
       <div id="order-skeleton" class="space-y-6 animate-pulse" aria-busy="true" aria-live="polite" role="status" aria-label="Loading order details">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-28"></div>
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-32"></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
-          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24 sm:col-span-2 lg:col-span-1"></div>
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
         </div>
       </div>
 
@@ -276,7 +284,14 @@
             <div class="flex items-center text-xs text-gray-400 space-x-4 pt-1 flex-wrap gap-y-1">
               <span>Placed: <strong class="text-gray-200" id="order-created-at">—</strong></span>
               <span aria-hidden="true">•</span>
-              <span>Provider ID: <strong class="text-gray-200 font-mono" id="provider-order-id">—</strong></span>
+              <span class="inline-flex items-center space-x-1">
+                <span>Provider ID: <strong class="text-gray-200 font-mono" id="provider-order-id">—</strong></span>
+                <button id="copy-provider-id-btn" type="button" class="p-1 text-gray-400 hover:text-white transition focus:outline-none focus-visible:ring-1 focus-visible:ring-pink-400 rounded hidden" title="Copy Provider Order ID" aria-label="Copy Provider Order ID">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </span>
             </div>
           </div>
 
@@ -309,30 +324,30 @@
               <div id="progress-bar-fill" style="width: 0%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-pink-500 to-green-500 transition-all duration-700"></div>
             </div>
 
-            <!-- Step Labels -->
-            <div class="grid grid-cols-4 text-center text-xs font-semibold" aria-hidden="true">
+            <!-- Step Labels (Accessible to Screen Readers) -->
+            <div class="grid grid-cols-4 text-center text-xs font-semibold" aria-label="Order fulfillment steps" id="stepper-labels-container">
               <div class="space-y-1 px-1" id="step-placed">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-1">1</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400">Placed</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-1">1</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300">Placed</div>
               </div>
               <div class="space-y-1 px-1" id="step-processing">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-2">2</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400" id="step-label-2">Processing</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-2">2</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300" id="step-label-2">Processing</div>
               </div>
               <div class="space-y-1 px-1" id="step-inprogress">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-3">3</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400" id="step-label-3">In Progress</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-3">3</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300" id="step-label-3">In Progress</div>
               </div>
               <div class="space-y-1 px-1" id="step-completed">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400" id="step-dot-4">4</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-400" id="step-label-4">Delivered</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-4">4</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300" id="step-label-4">Completed</div>
               </div>
             </div>
           </div>
         </section>
 
         <!-- Metric Stat Cards Grid -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" aria-label="Order statistics">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4" aria-label="Order statistics">
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Quantity Ordered</span>
@@ -347,6 +362,12 @@
           </div>
 
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Delivered Count</span>
+            <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400" id="stat-delivered">—</div>
+            <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Fulfilling Units</span>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Remainder</span>
             <div class="text-2xl font-black text-amber-600 dark:text-amber-400" id="stat-remains">—</div>
             <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Remaining Units</span>
@@ -358,7 +379,7 @@
             <span class="text-[11px] text-gray-500 dark:text-gray-400 block" id="stat-rate">Rate per 1k</span>
           </div>
 
-          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1 sm:col-span-2 lg:col-span-1">
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-1">
             <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Refill Eligibility</span>
             <div class="text-lg font-bold text-pink-600 dark:text-pink-400 pt-1" id="stat-refill-status">—</div>
             <span class="text-[11px] text-gray-500 dark:text-gray-400 block">Non-Drop Guarantee</span>

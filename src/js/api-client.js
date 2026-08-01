@@ -3991,6 +3991,7 @@ async function initOrderDetailPage() {
 
     let activeStep = 1; // Placed
     let pctNum = 25;
+    let isCanceled = false;
 
     if (st === 'pending') {
       activeStep = 1;
@@ -4013,7 +4014,8 @@ async function initOrderDetailPage() {
       }
     } else if (st === 'canceled' || st === 'refunded') {
       activeStep = 0;
-      pctNum = 0;
+      pctNum = 100;
+      isCanceled = true;
     }
 
     const pctStr = `${pctNum}%`;
@@ -4021,12 +4023,27 @@ async function initOrderDetailPage() {
     const progressContainer = document.getElementById('progress-bar-container');
     const fillPercentage = document.getElementById('progress-percentage');
 
-    if (fillBar) fillBar.style.width = pctStr;
-    if (progressContainer) {
-      progressContainer.setAttribute('aria-valuenow', pctNum);
-      progressContainer.setAttribute('aria-valuetext', `${pctStr} — ${status}`);
+    if (fillBar) {
+      fillBar.style.width = pctStr;
+      if (isCanceled) {
+        fillBar.className = 'shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500 transition-all duration-700';
+      } else {
+        fillBar.className = 'shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-pink-500 to-green-500 transition-all duration-700';
+      }
     }
-    if (fillPercentage) fillPercentage.textContent = `${pctStr} — ${escapeHtml(status)}`;
+    if (progressContainer) {
+      progressContainer.setAttribute('aria-valuenow', isCanceled ? 0 : pctNum);
+      progressContainer.setAttribute('aria-valuetext', `${isCanceled ? 'Order Canceled / Refunded' : pctStr + ' — ' + status}`);
+    }
+    if (fillPercentage) {
+      if (isCanceled) {
+        fillPercentage.textContent = `Status: ${escapeHtml(status)}`;
+        fillPercentage.className = 'text-xs font-bold text-red-600 dark:text-red-400';
+      } else {
+        fillPercentage.textContent = `${pctStr} — ${escapeHtml(status)}`;
+        fillPercentage.className = 'text-xs font-semibold text-pink-600 dark:text-pink-400';
+      }
+    }
 
     // Update Step Dots
     for (let i = 1; i <= 4; i++) {
@@ -4035,7 +4052,10 @@ async function initOrderDetailPage() {
 
       dot.className = 'w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] transition-colors duration-300';
 
-      if (activeStep === 0) {
+      if (isCanceled) {
+        dot.classList.add('bg-red-100', 'dark:bg-red-900/40', 'border-red-500', 'text-red-700', 'dark:text-red-300');
+        dot.removeAttribute('aria-current');
+      } else if (activeStep === 0) {
         dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-gray-400');
         dot.removeAttribute('aria-current');
       } else if (i < activeStep) {
@@ -4060,7 +4080,9 @@ async function initOrderDetailPage() {
       if (!textEl) return;
 
       textEl.className = 'text-[11px] sm:text-xs truncate transition-colors duration-300';
-      if (activeStep === 0) {
+      if (isCanceled) {
+        textEl.classList.add('text-red-600', 'dark:text-red-400');
+      } else if (activeStep === 0) {
         textEl.classList.add('text-gray-400', 'dark:text-gray-500');
       } else if (stepNum < activeStep) {
         textEl.classList.add('text-green-600', 'dark:text-green-400', 'font-semibold');
@@ -4125,6 +4147,13 @@ async function initOrderDetailPage() {
     const twDescEl = document.getElementById('twitter-desc');
     if (twDescEl) twDescEl.setAttribute('content', dynamicDesc);
 
+    // Schema.org Status Mapping
+    let schemaStatus = 'https://schema.org/OrderInTransit';
+    const stLower = String(order.status || '').toLowerCase();
+    if (stLower === 'completed') schemaStatus = 'https://schema.org/OrderDelivered';
+    else if (stLower === 'canceled' || stLower === 'refunded') schemaStatus = 'https://schema.org/OrderCancelled';
+    else if (stLower === 'pending' || stLower === 'partial') schemaStatus = 'https://schema.org/OrderProcessing';
+
     // Update JSON-LD Structured Data
     const schemaEl = document.getElementById('schema-jsonld');
     if (schemaEl) {
@@ -4143,9 +4172,15 @@ async function initOrderDetailPage() {
           {
             "@type": "Order",
             "orderNumber": order.id,
-            "orderStatus": `https://schema.org/Order${order.status === 'Completed' ? 'Delivered' : order.status === 'Processing' || order.status === 'In Progress' ? 'InTransit' : 'Processing'}`,
+            "orderDate": order.created_at || new Date().toISOString(),
+            "orderStatus": schemaStatus,
             "price": String(order.charge || 0),
             "priceCurrency": "GHS",
+            "seller": {
+              "@type": "Organization",
+              "name": "GhBooster",
+              "url": "https://ghbooster.com/"
+            },
             "orderedItem": {
               "@type": "Product",
               "name": svcName,
@@ -4166,10 +4201,14 @@ async function initOrderDetailPage() {
     if (createdAt) createdAt.textContent = order.created_at || '—';
 
     const providerId = document.getElementById('provider-order-id');
+    const copyProviderBtn = document.getElementById('copy-provider-id-btn');
     if (providerId) {
       providerId.textContent = order.provider_order_id || '—';
       if (!order.provider_order_id) {
         providerId.title = 'Provider tracking ID not yet available';
+        if (copyProviderBtn) copyProviderBtn.classList.add('hidden');
+      } else if (copyProviderBtn) {
+        copyProviderBtn.classList.remove('hidden');
       }
     }
 
@@ -4187,6 +4226,16 @@ async function initOrderDetailPage() {
 
     updateStepper(order);
 
+    // Refill Window Verification Logic
+    const isRefillPeriodActive = () => {
+      if (!order.created_at || !order.refill_period_days) return true;
+      const createdTime = new Date(order.created_at).getTime();
+      if (isNaN(createdTime)) return true;
+      const daysInMillis = (order.refill_period_days || 30) * 24 * 60 * 60 * 1000;
+      return (Date.now() - createdTime) <= daysInMillis;
+    };
+    const periodActive = isRefillPeriodActive();
+
     const refillBadge = document.getElementById('refill-guarantee-badge');
     const refillLabel = document.getElementById('refill-guarantee-label');
     if (refillBadge && refillLabel) {
@@ -4199,14 +4248,22 @@ async function initOrderDetailPage() {
       }
     }
 
+    const qVal = parseInt(order.quantity || 0, 10);
+    const remVal = parseInt(order.remains || 0, 10);
+    let delVal = Math.max(0, qVal - remVal);
+    if (stLower === 'completed') delVal = qVal;
+
     const qEl = document.getElementById('stat-quantity');
-    if (qEl) qEl.textContent = (order.quantity || 0).toLocaleString();
+    if (qEl) qEl.textContent = qVal.toLocaleString();
 
     const scEl = document.getElementById('stat-start-count');
     if (scEl) scEl.textContent = (order.start_count || 0).toLocaleString();
 
+    const delEl = document.getElementById('stat-delivered');
+    if (delEl) delEl.textContent = delVal.toLocaleString();
+
     const remEl = document.getElementById('stat-remains');
-    if (remEl) remEl.textContent = (order.remains || 0).toLocaleString();
+    if (remEl) remEl.textContent = remVal.toLocaleString();
 
     const chgEl = document.getElementById('stat-charge');
     if (chgEl) chgEl.textContent = `GH₵${parseFloat(order.charge || 0).toFixed(2)}`;
@@ -4217,9 +4274,16 @@ async function initOrderDetailPage() {
     const refillStatus = document.getElementById('stat-refill-status');
     if (refillStatus) {
       if (order.refill_guarantee) {
-        refillStatus.textContent = `Active (${order.refill_period_days || 30} Days)`;
+        if (periodActive) {
+          refillStatus.textContent = `Active (${order.refill_period_days || 30} Days)`;
+          refillStatus.className = 'text-lg font-bold text-pink-600 dark:text-pink-400 pt-1';
+        } else {
+          refillStatus.textContent = `Expired (${order.refill_period_days || 30} Days)`;
+          refillStatus.className = 'text-lg font-bold text-gray-500 dark:text-gray-400 pt-1';
+        }
       } else {
         refillStatus.textContent = 'Not Eligible';
+        refillStatus.className = 'text-lg font-bold text-gray-500 dark:text-gray-400 pt-1';
       }
     }
 
@@ -4273,10 +4337,10 @@ async function initOrderDetailPage() {
     const ticketLink = document.getElementById('open-ticket-link');
     if (ticketLink) ticketLink.href = `/tickets?order_id=${encodeURIComponent(order.id)}`;
 
-    // Refill Button Availability
+    // Refill Button Availability (With Window Expiration Enforcement)
     const refillBtn = document.getElementById('trigger-refill-btn');
     if (refillBtn) {
-      const isRefillEligible = order.status === 'Completed' && Boolean(order.refill_guarantee) && Boolean(order.provider_order_id);
+      const isRefillEligible = order.status === 'Completed' && Boolean(order.refill_guarantee) && Boolean(order.provider_order_id) && periodActive;
       if (isRefillEligible) {
         refillBtn.disabled = false;
         refillBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -4290,6 +4354,8 @@ async function initOrderDetailPage() {
           refillBtn.title = 'Refill is available after order status becomes Completed.';
         } else if (!order.refill_guarantee) {
           refillBtn.title = 'This service does not include a refill guarantee.';
+        } else if (!periodActive) {
+          refillBtn.title = `The refill guarantee period of ${order.refill_period_days || 30} days has expired.`;
         } else {
           refillBtn.title = 'Provider refill is not available for this order.';
         }
@@ -4309,6 +4375,19 @@ async function initOrderDetailPage() {
         showToast('Order ID copied to clipboard!');
       } else {
         showToast('Could not copy automatically. Please copy manually: ' + currentOrder.id, true);
+      }
+    };
+  }
+
+  const copyProviderIdBtn = document.getElementById('copy-provider-id-btn');
+  if (copyProviderIdBtn) {
+    copyProviderIdBtn.onclick = async () => {
+      if (!currentOrder || !currentOrder.provider_order_id) return;
+      const success = await copyToClipboard(currentOrder.provider_order_id);
+      if (success) {
+        showToast(`Provider Order ID (#${currentOrder.provider_order_id}) copied to clipboard!`);
+      } else {
+        showToast('Could not copy Provider Order ID automatically.', true);
       }
     };
   }
