@@ -180,18 +180,16 @@
     <!-- Top Header -->
     <header class="sticky top-0 z-30 h-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
       <div class="flex items-center space-x-3">
-        <!-- Logo -->
-        <a href="/" class="flex items-center">
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/dashboard" class="flex items-center md:hidden">
           <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
 
         <!-- Header Title -->
-        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Services & Rates Catalog</h1>
+        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Services & Rates</h1>
       </div>
-      <!-- Right Side Actions & Mobile Toggle -->
-      <div class="flex items-center space-x-3">
-        <a href="/login" class="px-3.5 py-2 text-xs font-bold text-gray-700 dark:text-gray-200 hover:text-pink-600 border border-gray-300 dark:border-gray-600 rounded-xl transition">Login</a>
-        <a href="/register" class="hidden sm:inline-flex px-3.5 py-2 text-xs font-bold text-white bg-pink-600 hover:bg-pink-700 rounded-xl shadow transition">Create Account</a>
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
         <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
           <!-- Hamburger Icon (shown when closed) -->
           <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
