@@ -369,8 +369,27 @@ class MoolreService {
     // Ensure it belongs to the requesting user
     if (txn.user_id !== userId) throw new Error('Transaction does not belong to this user.');
 
-    // Already credited — just return updated balance
+    // Already credited — ensure status is completed and return updated balance
     if (txn.status === 'completed') {
+      const { data: wallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+      return { success: true, already_completed: true, balance: wallet?.balance ?? 0, amount: txn.amount };
+    }
+
+    // Check if audit log already records that this transaction was credited
+    const { data: auditLog } = await supabaseAdmin
+      .from('audit_logs')
+      .select('id')
+      .eq('user_id', userId)
+      .ilike('details', `%${reference}%`)
+      .maybeSingle();
+
+    if (auditLog) {
+      // Wallet was credited previously, but status was stuck in pending. Mark completed now!
+      await supabaseAdmin
+        .from('transactions')
+        .update({ status: 'completed', updated_at: new Date().toISOString() })
+        .eq('id', txn.id);
+
       const { data: wallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
       return { success: true, already_completed: true, balance: wallet?.balance ?? 0, amount: txn.amount };
     }
@@ -416,6 +435,7 @@ class MoolreService {
 
     if (isSuccess) {
       await MoolreService._creditUserWallet(txn.user_id, txn.amount, reference);
+      await supabaseAdmin.from('transactions').update({ status: 'completed', updated_at: new Date().toISOString() }).eq('id', txn.id);
       return { received: true, credited: true, amount: txn.amount, user_id: txn.user_id };
     }
 
@@ -474,13 +494,38 @@ class MoolreService {
       }
     }
 
-    // Mark transaction completed
+    // Mark transaction completed safely without SQL OR type mismatch
     if (reference) {
-      await supabaseAdmin.from('transactions').update({
-        status: 'completed',
-        updated_at: new Date().toISOString(),
-        metadata: { credited_at: new Date().toISOString() }
-      }).or(`reference.eq.${reference},payment_ref.eq.${reference},id.eq.${reference}`);
+      let { data: targetTxn } = await supabaseAdmin
+        .from('transactions')
+        .select('id, metadata')
+        .eq('reference', reference)
+        .maybeSingle();
+
+      if (!targetTxn) {
+        const fb = await supabaseAdmin.from('transactions').select('id, metadata').eq('payment_ref', reference).maybeSingle();
+        targetTxn = fb.data;
+      }
+
+      if (targetTxn && targetTxn.id) {
+        const existingMeta = targetTxn.metadata || {};
+        await supabaseAdmin
+          .from('transactions')
+          .update({
+            status: 'completed',
+            updated_at: new Date().toISOString(),
+            metadata: { ...existingMeta, credited_at: new Date().toISOString() }
+          })
+          .eq('id', targetTxn.id);
+      } else {
+        await supabaseAdmin
+          .from('transactions')
+          .update({
+            status: 'completed',
+            updated_at: new Date().toISOString()
+          })
+          .eq('reference', reference);
+      }
     }
 
     // Audit log
@@ -519,6 +564,54 @@ class MoolreService {
       message: `Transaction ${reference} approved. GH₵${result.depositAmount.toFixed(2)} credited to user.`,
       new_balance: result.newBalance
     };
+  }
+
+  /**
+   * Self-healing repair: Find all pending deposit transactions whose audit log confirms wallet credit,
+   * and update their status to 'completed'.
+   */
+  static async repairPendingCompletedTransactions(userId = null) {
+    try {
+      let query = supabaseAdmin
+        .from('transactions')
+        .select('*')
+        .eq('status', 'pending')
+        .eq('type', 'deposit');
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data: pendingTxns } = await query;
+
+      if (!pendingTxns || pendingTxns.length === 0) return 0;
+
+      let repairedCount = 0;
+      for (const txn of pendingTxns) {
+        const ref = txn.reference || txn.payment_ref;
+        if (!ref) continue;
+
+        // Check if audit log records that this deposit was credited
+        const { data: logs } = await supabaseAdmin
+          .from('audit_logs')
+          .select('id')
+          .eq('user_id', txn.user_id)
+          .ilike('details', `%${ref}%`);
+
+        if (logs && logs.length > 0) {
+          await supabaseAdmin
+            .from('transactions')
+            .update({ status: 'completed', updated_at: new Date().toISOString() })
+            .eq('id', txn.id);
+          repairedCount++;
+          console.log(`[AutoRepair] Marked pending deposit #${txn.id} (${ref}) as completed.`);
+        }
+      }
+      return repairedCount;
+    } catch (err) {
+      console.warn('[AutoRepair Error]', err.message);
+      return 0;
+    }
   }
 }
 

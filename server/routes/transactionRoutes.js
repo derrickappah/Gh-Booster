@@ -2,9 +2,17 @@ const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/authMiddleware');
 const { supabaseAdmin } = require('../config/supabase');
+const MoolreService = require('../services/moolreService');
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    // 0. Auto-repair any pending deposit transactions that were already credited
+    try {
+      await MoolreService.repairPendingCompletedTransactions(req.user.id);
+    } catch (e) {
+      console.warn('[Transaction Repair Warning]', e.message);
+    }
+
     // 1. Fetch transactions table entries (Deposits, Refunds, Manual Adjustments)
     const { data: txs, error: txErr } = await supabaseAdmin
       .from('transactions')
