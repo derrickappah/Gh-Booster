@@ -119,6 +119,7 @@ const pageRoutesMap = {
   '/referrals': 'referrals.html',
   '/child-panel': 'child-panel.html',
   '/api-docs': 'api.html',
+  '/api': 'api.html',
   '/faq': 'faq.html',
   '/terms': 'terms.html',
   '/reviews': 'reviews.html',
@@ -149,14 +150,11 @@ const pageRoutesMap = {
 };
 
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {
-  app.get(routePath, (req, res, next) => {
-    if (req.accepts('html')) {
-      if (routePath.startsWith('/dashboard') || routePath.startsWith('/admin-')) {
-        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-      }
-      return res.sendFile(path.join(__dirname, '..', htmlFileName));
+  app.get(routePath, (req, res) => {
+    if (routePath.startsWith('/dashboard') || routePath.startsWith('/admin-')) {
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow');
     }
-    next();
+    return res.sendFile(path.join(__dirname, '..', htmlFileName));
   });
 });
 

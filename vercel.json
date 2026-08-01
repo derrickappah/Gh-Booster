@@ -51,6 +51,10 @@
       "destination": "/api.html"
     },
     {
+      "source": "/api",
+      "destination": "/api.html"
+    },
+    {
       "source": "/dashboard/orders/:id",
       "destination": "/order-detail.html"
     }
