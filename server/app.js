@@ -69,8 +69,9 @@ const registerAppRoutes = (prefix) => {
   app.use(`${prefix}/settings`, settingsRoutes);
 };
 
-// 1. Mount API Routes for /api prefix FIRST so API requests return JSON immediately
+// 1. Mount API Routes for /api and /api/v1 prefixes FIRST so API requests return JSON immediately
 registerAppRoutes('/api');
+registerAppRoutes('/api/v1');
 
 // Health Check Endpoints
 app.get(['/api/health', '/health'], (req, res) => {

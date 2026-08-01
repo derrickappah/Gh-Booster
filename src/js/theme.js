@@ -1139,6 +1139,220 @@
     }
   };
 
+  // PUBLIC SERVICE CATALOG RENDERER (Landing Page & Public Catalog)
+  const initPublicServiceCatalog = function () {
+    const tableBody = document.getElementById('public-services-tbody');
+    if (!tableBody) return;
+
+    const searchInput = document.getElementById('public-service-search');
+    const pillsContainer = document.getElementById('public-cat-pills');
+    const countBadge = document.getElementById('public-catalog-count-badge');
+
+    const defaultServices = [
+      { id: 101, name: "Instagram Followers | Real Accounts [Max 100K] [Non-Drop]", category_name: "Instagram Services", category_id: "ig", rate_per_1k: 1.50, min_quantity: 100, max_quantity: 100000, description: "Instant start, high retention real followers with 30-day refill guarantee.", refill: true, refill_period_days: 30 },
+      { id: 102, name: "Instagram Likes | Instant Speed [Real Active]", category_name: "Instagram Services", category_id: "ig", rate_per_1k: 0.85, min_quantity: 50, max_quantity: 50000, description: "Super fast speed 10k/day, instant start after order placement.", refill: false },
+      { id: 103, name: "TikTok Views | For You Page Algorithm Boost", category_name: "TikTok Services", category_id: "tt", rate_per_1k: 0.12, min_quantity: 500, max_quantity: 1000000, description: "Boost video reach and engagement on TikTok algorithm.", refill: false },
+      { id: 104, name: "TikTok Followers | High Quality Real Profiles", category_name: "TikTok Services", category_id: "tt", rate_per_1k: 2.20, min_quantity: 100, max_quantity: 50000, description: "Non-drop high quality real TikTok followers.", refill: true, refill_period_days: 30 },
+      { id: 105, name: "YouTube Subscribers | Real Accounts [30 Days Refill]", category_name: "YouTube Services", category_id: "yt", rate_per_1k: 8.50, min_quantity: 100, max_quantity: 20000, description: "Real subscribers to help achieve YouTube monetization threshold.", refill: true, refill_period_days: 30 },
+      { id: 106, name: "YouTube Watch Hours | Monetization Speed Boost", category_name: "YouTube Services", category_id: "yt", rate_per_1k: 12.00, min_quantity: 500, max_quantity: 4000, description: "High watch time retention for 4,000 hours requirement.", refill: true, refill_period_days: 30 },
+      { id: 107, name: "Telegram Channel Members | Real Accounts Instant", category_name: "Telegram Services", category_id: "tg", rate_per_1k: 1.80, min_quantity: 100, max_quantity: 50000, description: "Instant start public/private channel and group members.", refill: true, refill_period_days: 30 },
+      { id: 108, name: "Telegram Post Views | Auto 10 Posts Boost", category_name: "Telegram Services", category_id: "tg", rate_per_1k: 0.25, min_quantity: 500, max_quantity: 500000, description: "Fast delivery post views for recent channel posts.", refill: false },
+      { id: 109, name: "Facebook Page Likes & Followers | High Retention", category_name: "Facebook Services", category_id: "fb", rate_per_1k: 3.10, min_quantity: 100, max_quantity: 50000, description: "Fan page likes and profile followers with zero drop rate.", refill: true, refill_period_days: 30 },
+      { id: 110, name: "X (Twitter) Followers | Real Active Accounts", category_name: "Twitter Services", category_id: "tw", rate_per_1k: 4.50, min_quantity: 100, max_quantity: 30000, description: "Real profile followers for X / Twitter boosting.", refill: true, refill_period_days: 30 },
+      { id: 111, name: "Spotify Monthly Listeners | Real Streams", category_name: "Spotify Services", category_id: "sp", rate_per_1k: 2.80, min_quantity: 1000, max_quantity: 100000, description: "Worldwide real streams and monthly artist listeners.", refill: false },
+      { id: 112, name: "WhatsApp Channel Members | Instant Boost", category_name: "WhatsApp Services", category_id: "wa", rate_per_1k: 3.50, min_quantity: 100, max_quantity: 25000, description: "Channel members and group joiners with instant start.", refill: true, refill_period_days: 30 }
+    ];
+
+    const defaultCategories = [
+      { id: 'ig', name: 'Instagram Services', icon: 'src/img/platforms/instagram.webp' },
+      { id: 'tt', name: 'TikTok Services', icon: 'src/img/platforms/tiktok.webp' },
+      { id: 'yt', name: 'YouTube Services', icon: 'src/img/platforms/youtube.webp' },
+      { id: 'tg', name: 'Telegram Services', icon: 'src/img/platforms/telegram.webp' },
+      { id: 'fb', name: 'Facebook Services', icon: 'src/img/platforms/facebook.webp' },
+      { id: 'tw', name: 'Twitter Services', icon: 'src/img/platforms/twitter.webp' },
+      { id: 'sp', name: 'Spotify Services', icon: 'src/img/platforms/spotify.webp' },
+      { id: 'wa', name: 'WhatsApp Services', icon: 'src/img/platforms/whatsapp.webp' }
+    ];
+
+    let services = defaultServices;
+    let categories = defaultCategories;
+    let activeCat = 'all';
+
+    function formatIcon(iconPath) {
+      if (!iconPath) return '';
+      if (iconPath.includes('/') || iconPath.includes('.png') || iconPath.includes('.webp')) {
+        return `<img src="${iconPath}" class="w-4 h-4 mr-1.5 object-contain inline-block flex-shrink-0" alt="icon">`;
+      }
+      return `<i class="${iconPath} w-4 h-4 mr-1.5 object-contain inline-block flex-shrink-0"></i>`;
+    }
+
+    function renderCategoryPills() {
+      if (!pillsContainer) return;
+      pillsContainer.innerHTML = `
+        <button class="public-cat-pill px-4 py-2 ${activeCat === 'all' ? 'bg-pink-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'} rounded-xl transition inline-flex items-center flex-shrink-0 text-xs font-semibold" data-cat="all">All Services</button>
+        ${categories.map(c => `
+          <button class="public-cat-pill px-4 py-2 ${String(activeCat) === String(c.id) || activeCat === c.name ? 'bg-pink-600 text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'} rounded-xl transition inline-flex items-center flex-shrink-0 text-xs font-semibold" data-cat="${c.id || c.name}">
+            ${formatIcon(c.icon)} ${c.name}
+          </button>
+        `).join('')}
+      `;
+
+      pillsContainer.querySelectorAll('.public-cat-pill').forEach(btn => {
+        btn.addEventListener('click', function () {
+          activeCat = this.getAttribute('data-cat');
+          renderCategoryPills();
+          applyFilters();
+        });
+      });
+    }
+
+    function renderTable(list) {
+      if (countBadge) {
+        countBadge.textContent = `${list.length.toLocaleString()} Active ${list.length === 1 ? 'Service' : 'Services'}`;
+      }
+
+      if (!list || list.length === 0) {
+        const query = searchInput ? searchInput.value.trim() : '';
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-12 text-center text-gray-400 font-medium space-y-3">
+              <p>No active services found${query ? ` matching "${query}"` : ''}.</p>
+              ${query || activeCat !== 'all' ? `
+                <button type="button" id="reset-public-search-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-xl shadow transition">Clear Search & Filters</button>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+        const resetBtn = document.getElementById('reset-public-search-btn');
+        if (resetBtn) {
+          resetBtn.onclick = function () {
+            if (searchInput) searchInput.value = '';
+            activeCat = 'all';
+            renderCategoryPills();
+            applyFilters();
+          };
+        }
+        return;
+      }
+
+      tableBody.innerHTML = list.map(s => {
+        const providerId = s.service_id || s.provider_service_id || s.id;
+        const catName = s.category_name || s.categories?.name || 'General Services';
+        const rate = parseFloat(s.rate_per_1k || s.rate_per_1000 || s.our_price_per_1000 || 0).toFixed(2);
+        const min = (s.min_quantity || 100).toLocaleString();
+        const max = (s.max_quantity || 100000).toLocaleString();
+        const desc = s.description || 'Fast execution with high retention guarantee.';
+        const hasRefill = s.refill || s.refill_guarantee || (s.refill_period_days && s.refill_period_days > 0);
+        const refillDays = s.refill_period_days || 30;
+
+        return `
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/40 transition border-b border-gray-100 dark:border-gray-800">
+            <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400 text-xs">
+              <div class="inline-flex items-center space-x-1">
+                <span>#${providerId}</span>
+                <button type="button" class="btn-copy-public-svc p-1 text-gray-400 hover:text-pink-600 transition rounded" data-copy="${providerId}" title="Copy Service ID" aria-label="Copy Service ID">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </button>
+              </div>
+            </td>
+            <td class="py-4 px-4">
+              <div class="space-y-1">
+                <div class="font-bold text-gray-900 dark:text-white text-sm leading-snug">${s.name}</div>
+                <div class="flex items-center space-x-2 text-xs">
+                  <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded font-medium">${catName}</span>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400 text-xs line-clamp-2">${desc}</p>
+              </div>
+            </td>
+            <td class="py-4 px-4 font-bold text-gray-900 dark:text-white text-sm whitespace-nowrap">
+              GH₵ ${rate} <span class="text-xs text-gray-400 font-normal">/ 1,000</span>
+            </td>
+            <td class="py-4 px-4 text-xs font-mono text-gray-600 dark:text-gray-300 whitespace-nowrap">
+              ${min} / ${max}
+            </td>
+            <td class="py-4 px-4 whitespace-nowrap">
+              ${hasRefill ? `
+                <span class="inline-flex items-center px-2.5 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-xs font-bold rounded-full">
+                  <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  ${refillDays} Days Refill
+                </span>
+              ` : `
+                <span class="inline-flex items-center px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs font-medium rounded-full">
+                  Standard
+                </span>
+              `}
+            </td>
+            <td class="py-4 px-4 text-center whitespace-nowrap">
+              <a href="/register?service=${providerId}" class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl shadow-sm transition">
+                Order Now
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      tableBody.querySelectorAll('.btn-copy-public-svc').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const val = this.getAttribute('data-copy');
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(val);
+            const orig = this.innerHTML;
+            this.innerHTML = '<span class="text-green-500 text-xs font-bold">Copied!</span>';
+            setTimeout(() => { this.innerHTML = orig; }, 1500);
+          }
+        });
+      });
+    }
+
+    function applyFilters() {
+      const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      let filtered = services;
+
+      if (activeCat !== 'all') {
+        filtered = filtered.filter(s => 
+          String(s.category_id) === String(activeCat) || 
+          s.category_name === activeCat ||
+          s.categories?.name === activeCat
+        );
+      }
+
+      if (query) {
+        filtered = filtered.filter(s =>
+          s.name.toLowerCase().includes(query) ||
+          (s.category_name && s.category_name.toLowerCase().includes(query)) ||
+          String(s.id).toLowerCase().includes(query) ||
+          (s.service_id && String(s.service_id).toLowerCase().includes(query)) ||
+          (s.description && s.description.toLowerCase().includes(query))
+        );
+      }
+
+      renderTable(filtered);
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', applyFilters);
+    }
+
+    renderCategoryPills();
+    renderTable(services);
+
+    fetch('/api/services')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.services && data.services.length > 0) {
+          services = data.services;
+          if (data.categories && data.categories.length > 0) {
+            categories = data.categories;
+          }
+          renderCategoryPills();
+          applyFilters();
+        }
+      })
+      .catch(err => {
+        console.warn('Live public services API fetch error:', err.message);
+      });
+  };
+
   /**
    * ------------------------------------------------------------------------
    * Launch Functions
@@ -1154,6 +1368,7 @@
   myCustom();
   registerServiceWorker();
   initWhatsAppSupport();
+  initPublicServiceCatalog();
 
   // Defer non-critical vendor initializations out of the main-thread critical window
   var deferLaunch = function () {

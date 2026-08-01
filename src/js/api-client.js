@@ -4537,14 +4537,13 @@ async function initOrderDetailPage() {
     const activeStatuses = ['Pending', 'Processing', 'In Progress'];
     const isActive = activeStatuses.includes(status);
 
-    if (isActive && !pollTimer) {
+    stopPolling();
+    if (isActive) {
       pollTimer = setInterval(() => {
         if (!document.hidden) {
           loadOrder(true);
         }
       }, 20000);
-    } else if (!isActive && pollTimer) {
-      stopPolling();
     }
   }
 
@@ -4561,8 +4560,8 @@ async function initOrderDetailPage() {
   function updateStepper(order) {
     const status = order.status || '';
     const st = String(status).toLowerCase();
-    const qty = parseInt(order.quantity || 0, 10);
-    const rem = parseInt(order.remains || 0, 10);
+    const qty = Math.max(0, parseInt(order.quantity || 0, 10));
+    const rem = Math.max(0, parseInt(order.remains || 0, 10));
 
     let activeStep = 1; // Placed
     let pctNum = 25;
@@ -4582,8 +4581,8 @@ async function initOrderDetailPage() {
       pctNum = 100;
     } else if (st === 'partial') {
       activeStep = 3;
-      if (qty > 0 && rem >= 0 && rem <= qty) {
-        pctNum = Math.min(90, Math.max(10, Math.round(((qty - rem) / qty) * 100)));
+      if (qty > 0 && rem <= qty) {
+        pctNum = Math.min(95, Math.max(5, Math.round(((qty - rem) / qty) * 100)));
       } else {
         pctNum = 60;
       }
@@ -4631,7 +4630,7 @@ async function initOrderDetailPage() {
         dot.classList.add('bg-red-100', 'dark:bg-red-900/40', 'border-red-500', 'text-red-700', 'dark:text-red-300');
         dot.removeAttribute('aria-current');
       } else if (activeStep === 0) {
-        dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-gray-400');
+        dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-300');
         dot.removeAttribute('aria-current');
       } else if (i < activeStep) {
         dot.classList.add('bg-green-100', 'dark:bg-green-900/40', 'border-green-500', 'text-green-700', 'dark:text-green-400');
@@ -4640,12 +4639,12 @@ async function initOrderDetailPage() {
         dot.classList.add('bg-blue-100', 'dark:bg-blue-900/40', 'border-blue-500', 'text-blue-700', 'dark:text-blue-400', 'ring-2', 'ring-blue-400/30');
         dot.setAttribute('aria-current', 'step');
       } else {
-        dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-gray-400');
+        dot.classList.add('bg-gray-100', 'dark:bg-gray-700', 'border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-300');
         dot.removeAttribute('aria-current');
       }
     }
 
-    // Style step labels
+    // Style step labels with high WCAG contrast
     const stepIds = ['step-placed', 'step-processing', 'step-inprogress', 'step-completed'];
     stepIds.forEach((id, idx) => {
       const stepEl = document.getElementById(id);
@@ -4658,13 +4657,13 @@ async function initOrderDetailPage() {
       if (isCanceled) {
         textEl.classList.add('text-red-600', 'dark:text-red-400');
       } else if (activeStep === 0) {
-        textEl.classList.add('text-gray-400', 'dark:text-gray-500');
+        textEl.classList.add('text-gray-500', 'dark:text-gray-400');
       } else if (stepNum < activeStep) {
         textEl.classList.add('text-green-600', 'dark:text-green-400', 'font-semibold');
       } else if (stepNum === activeStep) {
         textEl.classList.add('text-blue-600', 'dark:text-blue-400', 'font-bold');
       } else {
-        textEl.classList.add('text-gray-400', 'dark:text-gray-500');
+        textEl.classList.add('text-gray-500', 'dark:text-gray-400');
       }
     });
   }
@@ -4672,24 +4671,24 @@ async function initOrderDetailPage() {
   function getStatusBadgeStyle(status) {
     const st = String(status || '').toLowerCase();
     if (st === 'completed') {
-      return { wrapperClass: 'bg-green-500/20 text-green-400 border border-green-500/30', dotClass: 'bg-green-400', pulse: false };
+      return { wrapperClass: 'bg-green-500/20 text-green-300 border border-green-500/40', dotClass: 'bg-green-400', pulse: false };
     }
     if (st === 'in progress') {
-      return { wrapperClass: 'bg-purple-500/20 text-purple-400 border border-purple-500/30', dotClass: 'bg-purple-400', pulse: true };
+      return { wrapperClass: 'bg-purple-500/20 text-purple-300 border border-purple-500/40', dotClass: 'bg-purple-400', pulse: true };
     }
     if (st === 'processing') {
-      return { wrapperClass: 'bg-blue-500/20 text-blue-400 border border-blue-500/30', dotClass: 'bg-blue-400', pulse: true };
+      return { wrapperClass: 'bg-blue-500/20 text-blue-300 border border-blue-500/40', dotClass: 'bg-blue-400', pulse: true };
     }
     if (st === 'pending') {
-      return { wrapperClass: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30', dotClass: 'bg-yellow-400', pulse: true };
+      return { wrapperClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/40', dotClass: 'bg-amber-400', pulse: true };
     }
     if (st === 'canceled' || st === 'refunded') {
-      return { wrapperClass: 'bg-red-500/20 text-red-400 border border-red-500/30', dotClass: 'bg-red-400', pulse: false };
+      return { wrapperClass: 'bg-red-500/20 text-red-300 border border-red-500/40', dotClass: 'bg-red-400', pulse: false };
     }
     if (st === 'partial') {
-      return { wrapperClass: 'bg-orange-500/20 text-orange-400 border border-orange-500/30', dotClass: 'bg-orange-400', pulse: true };
+      return { wrapperClass: 'bg-orange-500/20 text-orange-300 border border-orange-500/40', dotClass: 'bg-orange-400', pulse: true };
     }
-    return { wrapperClass: 'bg-gray-500/20 text-gray-400 border border-gray-500/30', dotClass: 'bg-gray-400', pulse: false };
+    return { wrapperClass: 'bg-gray-500/20 text-gray-300 border border-gray-500/40', dotClass: 'bg-gray-400', pulse: false };
   }
 
   function renderOrderDetail(order) {
@@ -4729,7 +4728,7 @@ async function initOrderDetailPage() {
     else if (stLower === 'canceled' || stLower === 'refunded') schemaStatus = 'https://schema.org/OrderCancelled';
     else if (stLower === 'pending' || stLower === 'partial') schemaStatus = 'https://schema.org/OrderProcessing';
 
-    // Update JSON-LD Structured Data
+    // Update JSON-LD Structured Data with full offers & seller properties
     const schemaEl = document.getElementById('schema-jsonld');
     if (schemaEl) {
       schemaEl.textContent = JSON.stringify({
@@ -4759,7 +4758,13 @@ async function initOrderDetailPage() {
             "orderedItem": {
               "@type": "Product",
               "name": svcName,
-              "description": order.service_description || "Social media boosting service"
+              "description": order.service_description || "Social media boosting service",
+              "offers": {
+                "@type": "Offer",
+                "price": String(order.charge || 0),
+                "priceCurrency": "GHS",
+                "availability": "https://schema.org/InStock"
+              }
             }
           }
         ]
@@ -4823,8 +4828,8 @@ async function initOrderDetailPage() {
       }
     }
 
-    const qVal = parseInt(order.quantity || 0, 10);
-    const remVal = parseInt(order.remains || 0, 10);
+    const qVal = Math.max(0, parseInt(order.quantity || 0, 10));
+    const remVal = Math.max(0, parseInt(order.remains || 0, 10));
     let delVal = Math.max(0, qVal - remVal);
     if (stLower === 'completed') delVal = qVal;
 
@@ -4879,11 +4884,13 @@ async function initOrderDetailPage() {
         openLinkBtn.href = safeUrl;
         openLinkBtn.classList.remove('opacity-40', 'pointer-events-none');
         openLinkBtn.removeAttribute('aria-disabled');
+        openLinkBtn.removeAttribute('tabindex');
         openLinkBtn.title = 'Open Target Link in New Tab';
       } else {
         openLinkBtn.removeAttribute('href');
         openLinkBtn.classList.add('opacity-40', 'pointer-events-none');
         openLinkBtn.setAttribute('aria-disabled', 'true');
+        openLinkBtn.setAttribute('tabindex', '-1');
         openLinkBtn.title = 'No valid web link available';
       }
     }
@@ -4939,6 +4946,11 @@ async function initOrderDetailPage() {
   }
 
   // Bind Static Event Listeners Once
+  const retryBtn = document.getElementById('retry-load-order-btn');
+  if (retryBtn) {
+    retryBtn.onclick = () => loadOrder(false);
+  }
+
   const copyIdBtn = document.getElementById('copy-order-id-btn');
   if (copyIdBtn) {
     copyIdBtn.onclick = async () => {
@@ -5010,7 +5022,9 @@ async function initOrderDetailPage() {
       } catch (e) {
         showToast(e.message || 'Refill request failed. Please try again.', true);
       } finally {
-        actionRefillBtn.disabled = false;
+        if (currentOrder) {
+          renderOrderDetail(currentOrder);
+        }
         actionRefillBtn.querySelector('span').textContent = 'Request Automatic Refill';
       }
     };

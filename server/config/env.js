@@ -16,4 +16,9 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development'
 };
 
+if (env.NODE_ENV === 'production' && env.JWT_SECRET === DEFAULT_JWT_SECRET) {
+  console.warn('⚠️ WARNING: GhBooster is running in production mode with default JWT_SECRET! Please set JWT_SECRET in environment variables.');
+}
+
 module.exports = env;
+

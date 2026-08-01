@@ -1,6 +1,6 @@
 const ServiceService = require('../services/serviceService');
 const OrderService = require('../services/orderService');
-const { supabase } = require('../config/supabase');
+const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class ApiV2Controller {
   static async handleV2Request(req, res, next) {
@@ -11,8 +11,8 @@ class ApiV2Controller {
     }
 
     try {
-      // Authenticate via API key in Supabase profiles table
-      const { data: profile, error } = await supabase
+      // Authenticate via API key in Supabase profiles table using admin client (bypasses RLS)
+      const { data: profile, error } = await supabaseAdmin
         .from('profiles')
         .select('*')
         .eq('api_key', key)
@@ -50,15 +50,17 @@ class ApiV2Controller {
 
         case 'status': {
           const { order } = req.query.order ? req.query : req.body;
-          const { data: orderData } = await supabase.from('orders').select('*').eq('id', order).maybeSingle();
+          const { data: orderData } = await supabaseAdmin.from('orders').select('*').eq('id', order).maybeSingle();
           if (!orderData) return res.status(404).json({ error: 'Order not found' });
           
           if (orderData.user_id !== userId) {
             return res.status(403).json({ error: 'Access denied: You do not have permission to view this order' });
           }
 
+          const chargeVal = parseFloat(orderData.total_price || orderData.charge || 0).toFixed(4);
+
           return res.json({
-            charge: orderData.charge,
+            charge: chargeVal,
             start_count: orderData.start_count || 0,
             status: orderData.status,
             remains: orderData.remains || 0,

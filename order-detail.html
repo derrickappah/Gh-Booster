@@ -242,7 +242,6 @@
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
           <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
-          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl h-24"></div>
         </div>
       </div>
 
@@ -255,8 +254,14 @@
         </div>
         <h2 class="text-xl font-bold text-gray-900 dark:text-white" id="error-title">Order Not Found</h2>
         <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto" id="error-message">We could not retrieve details for this order ID. Please verify the ID or check your order history.</p>
-        <div class="pt-2">
-          <a href="/orders" class="inline-flex items-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold text-xs rounded-xl shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2">
+        <div class="pt-2 flex items-center justify-center space-x-3 flex-wrap gap-y-2">
+          <button id="retry-load-order-btn" type="button" class="inline-flex items-center px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold text-xs rounded-xl shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 focus-visible:ring-offset-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Retry Loading</span>
+          </button>
+          <a href="/orders" class="inline-flex items-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold text-xs rounded-xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2">
             Return to Order History
           </a>
         </div>
@@ -267,14 +272,14 @@
 
         <!-- Banner Header Card -->
         <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-pink-950 text-white p-6 rounded-2xl shadow-lg border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div class="space-y-1.5">
+          <div class="space-y-1.5 min-w-0">
             <div class="flex items-center space-x-3 flex-wrap gap-y-2">
-              <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white" id="order-id-display">Order #...</h1>
-              <span id="order-status-badge" class="px-3 py-1 text-xs font-extrabold rounded-full flex items-center" aria-label="Order status" aria-live="polite">
+              <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white break-all md:break-normal truncate max-w-full" id="order-id-display">Order #...</h1>
+              <span id="order-status-badge" class="px-3 py-1 text-xs font-extrabold rounded-full flex items-center flex-shrink-0" aria-label="Order status" aria-live="polite">
                 <span class="w-2 h-2 rounded-full mr-2" id="status-dot" aria-hidden="true"></span>
                 <span id="status-text">Loading...</span>
               </span>
-              <span id="refill-guarantee-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 inline-flex items-center">
+              <span id="refill-guarantee-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 inline-flex items-center flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -284,9 +289,9 @@
             <div class="flex items-center text-xs text-gray-400 space-x-4 pt-1 flex-wrap gap-y-1">
               <span>Placed: <strong class="text-gray-200" id="order-created-at">—</strong></span>
               <span aria-hidden="true">•</span>
-              <span class="inline-flex items-center space-x-1">
+              <span class="inline-flex items-center space-x-1 min-w-0">
                 <span>Provider ID: <strong class="text-gray-200 font-mono" id="provider-order-id">—</strong></span>
-                <button id="copy-provider-id-btn" type="button" class="p-1 text-gray-400 hover:text-white transition focus:outline-none focus-visible:ring-1 focus-visible:ring-pink-400 rounded hidden" title="Copy Provider Order ID" aria-label="Copy Provider Order ID">
+                <button id="copy-provider-id-btn" type="button" class="p-1 text-gray-400 hover:text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 rounded hidden flex-shrink-0" title="Copy Provider Order ID" aria-label="Copy Provider Order ID">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
@@ -327,20 +332,20 @@
             <!-- Step Labels (Accessible to Screen Readers) -->
             <div class="grid grid-cols-4 text-center text-xs font-semibold" aria-label="Order fulfillment steps" id="stepper-labels-container">
               <div class="space-y-1 px-1" id="step-placed">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-1">1</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300">Placed</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300" id="step-dot-1">1</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-600 dark:text-gray-300">Placed</div>
               </div>
               <div class="space-y-1 px-1" id="step-processing">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-2">2</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300" id="step-label-2">Processing</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300" id="step-dot-2">2</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-600 dark:text-gray-300" id="step-label-2">Processing</div>
               </div>
               <div class="space-y-1 px-1" id="step-inprogress">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-3">3</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300" id="step-label-3">In Progress</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300" id="step-dot-3">3</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-600 dark:text-gray-300" id="step-label-3">In Progress</div>
               </div>
               <div class="space-y-1 px-1" id="step-completed">
-                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300" id="step-dot-4">4</div>
-                <div class="text-[11px] sm:text-xs truncate text-gray-500 dark:text-gray-300" id="step-label-4">Completed</div>
+                <div class="w-6 h-6 rounded-full border-2 mx-auto flex items-center justify-center font-bold text-[10px] bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300" id="step-dot-4">4</div>
+                <div class="text-[11px] sm:text-xs truncate text-gray-600 dark:text-gray-300" id="step-label-4">Completed</div>
               </div>
             </div>
           </div>
@@ -405,7 +410,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
                 <!-- cursor-text gives users correct visual cue that the text is selectable -->
-                <input type="text" id="target-link-input" readonly value="" class="bg-transparent text-xs md:text-sm font-mono text-pink-600 dark:text-pink-400 font-semibold w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 rounded cursor-text" aria-label="Target URL for this order" tabindex="0">
+                <input type="text" id="target-link-input" readonly value="" class="bg-transparent text-xs md:text-sm font-mono text-pink-600 dark:text-pink-400 font-semibold w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 rounded cursor-text" aria-label="Target URL for this order">
                 
                 <button id="copy-link-btn" type="button" class="p-2 text-gray-500 hover:text-pink-600 dark:hover:text-pink-400 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded flex-shrink-0" title="Copy URL" aria-label="Copy target URL to clipboard">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
