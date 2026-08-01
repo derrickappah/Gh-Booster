@@ -35,8 +35,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api-docs",
+      "destination": "/api.html"
     },
     {
       "source": "/wallet",
@@ -47,16 +47,12 @@
       "destination": "/account.html"
     },
     {
-      "source": "/api-docs",
-      "destination": "/api.html"
-    },
-    {
-      "source": "/api",
-      "destination": "/api.html"
-    },
-    {
       "source": "/dashboard/orders/:id",
       "destination": "/order-detail.html"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     }
   ]
 }
