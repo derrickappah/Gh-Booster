@@ -4295,6 +4295,7 @@ async function initOrderDetailPage() {
         }
       }
     }
+  }
 
   // Bind Static Event Listeners Once
   const copyIdBtn = document.getElementById('copy-order-id-btn');
