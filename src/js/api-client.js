@@ -2354,9 +2354,10 @@ async function initBulkOrderPage() {
       activeServices = res.services || [];
       allCategories = res.categories || [];
       renderDropdownMenu();
-      if (activeServices.length > 0 && !selectedService) {
-        selectService(activeServices[0]);
-      }
+      // No default service auto-selected; user searches and selects explicitly
+      if (bulkServiceSearchInput) bulkServiceSearchInput.value = '';
+      if (bulkService) bulkService.value = '';
+      if (bulkSelectedServiceCard) bulkSelectedServiceCard.classList.add('hidden');
     }
   } catch (e) {
     console.error('Failed to load bulk services:', e);
@@ -2422,7 +2423,9 @@ async function initBulkOrderPage() {
   // Sample Input button listener
   if (btnSample) {
     btnSample.addEventListener('click', () => {
-      const defaultSvcId = selectedService ? selectedService.id : '101';
+      if (!selectedService && activeServices.length > 0) {
+        selectService(activeServices[0]);
+      }
       if (bulkTextarea) {
         bulkTextarea.value = `https://instagram.com/user1 1000\nhttps://tiktok.com/@user/video 2500\nhttps://youtube.com/watch?v=demo 5000`;
         parseBulkInput();
@@ -2568,6 +2571,13 @@ async function initBulkOrderPage() {
 
       if (!bulkText) {
         showToast('Please enter mass orders.', 'warning');
+        return;
+      }
+
+      const lines = bulkText.split('\n').filter(l => l.trim().length > 0);
+      const hasTwoPartLine = lines.some(l => l.trim().split(/\s+/).length === 2);
+      if (hasTwoPartLine && !selectedServiceId) {
+        showToast('Please search and select a service first for your bulk order.', 'warning');
         return;
       }
 

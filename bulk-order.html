@@ -207,7 +207,7 @@
             Mass Order Format Rules
           </h3>
           <p class="text-xs text-gray-700 dark:text-gray-300">Enter 1 order per line in one of two supported formats:</p>
-          <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 1 (Uses Default Service below): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">target_link quantity</span></p>
+          <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 1 (Uses Selected Service below): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">target_link quantity</span></p>
           <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 2 (Per-line Service ID): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">service_id | target_link | quantity</span></p>
         </div>
         <button type="button" id="btn-sample-bulk-input" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs shadow transition flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
@@ -231,9 +231,9 @@
           <form id="bulk-order-form" class="space-y-5">
             <!-- Unified Custom Searchable Service Combobox Component -->
             <div class="relative" id="bulk-service-combobox-wrapper">
-              <input type="hidden" id="bulk-service" name="service" required>
+              <input type="hidden" id="bulk-service" name="service">
               
-              <label for="bulk-service-search-input" class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">Default Service</label>
+              <label for="bulk-service-search-input" class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">Select Service</label>
               
               <!-- Search & Active Selection Input Box -->
               <div class="relative">
@@ -242,7 +242,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input type="text" id="bulk-service-search-input" autocomplete="off" aria-label="Search default service for bulk order" placeholder="Search service by name, platform, or ID (e.g. TikTok, Instagram)..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
+                <input type="text" id="bulk-service-search-input" autocomplete="off" aria-label="Search service for bulk order" placeholder="Search and select service by name, platform, or ID..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
                 
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" id="bulk-combobox-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
