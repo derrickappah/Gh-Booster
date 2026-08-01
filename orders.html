@@ -9,6 +9,40 @@
   <!-- Title & Description -->
   <title>Order History | GhBooster - #1 SMM Panel</title>
   <meta name="description" content="View and track all your SMM orders, status, start count, remainder, and refill guarantees on GhBooster SMM Panel.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" id="page-canonical" href="https://ghbooster.com/orders">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" content="Order History | GhBooster SMM Panel">
+  <meta property="og:description" content="Track live fulfillment status, start count, remainder, and refill guarantees on GhBooster.">
+  <meta property="og:url" content="https://ghbooster.com/orders">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" content="Order History | GhBooster SMM Panel">
+  <meta name="twitter:description" content="Track live fulfillment status, start count, remainder, and refill guarantees on GhBooster.">
+  <meta name="twitter:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json" id="schema-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://ghbooster.com/dashboard" },
+          { "@type": "ListItem", "position": 3, "name": "Orders", "item": "https://ghbooster.com/orders" }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -147,13 +181,20 @@
     <!-- Top Header -->
     <header class="sticky top-0 z-30 h-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
       <div class="flex items-center space-x-3">
-        <!-- Mobile Logo (visible on mobile only) -->
-        <a href="/dashboard" class="flex items-center md:hidden">
-          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
-        </a>
+        <!-- Mobile Logo & Back Button -->
+        <div class="flex items-center space-x-2 md:hidden">
+          <a href="/dashboard" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" title="Back to Dashboard" aria-label="Back to Dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </a>
+          <a href="/dashboard" class="flex items-center">
+            <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+          </a>
+        </div>
 
-        <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Order History</h1>
+        <!-- Header Title -->
+        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Order History</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-3 md:hidden">
@@ -179,19 +220,19 @@
         <!-- Search Bar with Search Button (Full Width) -->
         <form id="search-form" class="flex items-center space-x-2 w-full" onsubmit="event.preventDefault();">
           <div class="relative flex-grow">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3.5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3.5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" id="order-search" placeholder="Search Order ID or Link URL..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+            <input type="text" id="order-search" placeholder="Search Order ID or Link URL..." aria-label="Search Order ID or Link URL" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
           </div>
-          <button type="submit" id="search-btn" class="px-6 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold text-xs rounded-lg shadow transition flex items-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button type="submit" id="search-btn" class="px-6 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold text-xs rounded-lg shadow transition flex items-center flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             Search
           </button>
-          <button type="button" id="btn-sync-all-orders" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold text-xs rounded-lg shadow-sm transition flex items-center flex-shrink-0" title="Sync Status of Non-Finalized Orders">
-            <svg id="icon-sync-spin" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button type="button" id="btn-sync-all-orders" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold text-xs rounded-lg shadow-sm transition flex items-center flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" title="Sync Status of Non-Finalized Orders" aria-label="Sync status of active orders">
+            <svg id="icon-sync-spin" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             <span id="text-sync-btn">Sync</span>
@@ -199,13 +240,15 @@
         </form>
 
         <!-- Filter Status Tabs -->
-        <div class="flex items-center space-x-2 overflow-x-auto border-t border-gray-100 dark:border-gray-700 pt-4 text-xs font-semibold">
+        <div class="flex items-center space-x-2 overflow-x-auto border-t border-gray-100 dark:border-gray-700 pt-4 text-xs font-semibold" aria-label="Order status filter tabs" id="order-status-tabs">
           <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active" data-status="all">All</button>
           <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="in-progress">In Progress</button>
           <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="pending">Pending</button>
           <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="completed">Completed</button>
           <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="processing">Processing</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="partial">Partial</button>
           <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="canceled">Canceled</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="refunded">Refunded</button>
         </div>
 
       </div>
@@ -213,7 +256,7 @@
       <!-- Orders Data Table -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300">
+          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300" aria-label="Order History table">
             <thead class="bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-400 font-semibold border-b border-gray-200 dark:border-gray-700 uppercase">
               <tr>
                 <th class="py-3.5 px-4 whitespace-nowrap">Order ID</th>
@@ -237,14 +280,25 @@
 
         <!-- Pagination Controls -->
         <div id="orders-pagination-container" class="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div id="orders-pagination-info" class="text-gray-500 dark:text-gray-400 font-medium">
-            Showing <span id="orders-count-text" class="font-bold text-gray-900 dark:text-white">0</span> entries
+          <div class="flex items-center space-x-3">
+            <div id="orders-pagination-info" class="text-gray-500 dark:text-gray-400 font-medium">
+              Showing <span id="orders-count-text" class="font-bold text-gray-900 dark:text-white">0</span> entries
+            </div>
+            <div class="flex items-center space-x-1.5 text-gray-500 dark:text-gray-400">
+              <span>Per page:</span>
+              <select id="orders-page-size" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500" aria-label="Orders per page">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
           </div>
 
-          <div class="flex items-center space-x-1">
-            <button class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50" disabled>Previous</button>
-            <button class="px-3 py-1.5 bg-pink-600 text-white font-bold rounded shadow-sm">1</button>
-            <button class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50" disabled>Next</button>
+          <div class="flex items-center space-x-1" id="orders-pagination-controls" aria-label="Pagination controls">
+            <button id="orders-prev-btn" class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" disabled aria-label="Previous page">Previous</button>
+            <div id="orders-page-buttons" class="flex items-center space-x-1"></div>
+            <button id="orders-next-btn" class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" disabled aria-label="Next page">Next</button>
           </div>
         </div>
 
@@ -253,24 +307,19 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
-      Copyright © GhBooster SMM Panel | All rights reserved.
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      Copyright &copy; <span id="footer-year"></span> GhBooster SMM Panel | All rights reserved.
     </footer>
 
   </div>
 
-  <!-- Dynamic Script -->
-  
-  
-
-
-  
-
-
-  
-
+  <!-- Dynamic Scripts -->
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
+  <script>
+    const yr = document.getElementById('footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
 
 </body>
-</html>
+</html>>

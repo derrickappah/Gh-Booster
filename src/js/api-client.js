@@ -1023,6 +1023,7 @@ async function initDashboardPage() {
 }
 
 // ORDERS HISTORY DYNAMIC RENDERER
+// ORDERS HISTORY DYNAMIC RENDERER
 async function initOrdersPage() {
   const tableBody = document.getElementById('orders-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
@@ -1043,33 +1044,161 @@ async function initOrdersPage() {
     return 'src/img/platforms/instagram.png';
   }
 
+  function sanitizeUrl(input) {
+    if (!input) return '';
+    const trimmed = String(input).trim();
+    if (!trimmed) return '';
+    try {
+      const url = new URL(trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`);
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        return url.href;
+      }
+    } catch (e) {}
+    return '';
+  }
+
   try {
     const res = await API.request('/orders');
     if (res.success && res.orders) {
       let ordersList = res.orders;
       let currentStatusFilter = 'all';
+      let currentPage = 1;
+      let pageSize = 10;
+      let currentFilteredList = ordersList;
+
+      const pageSizeSelect = document.getElementById('orders-page-size');
+      if (pageSizeSelect) {
+        pageSize = parseInt(pageSizeSelect.value, 10) || 10;
+        pageSizeSelect.addEventListener('change', () => {
+          pageSize = parseInt(pageSizeSelect.value, 10) || 10;
+          currentPage = 1;
+          renderOrders(currentFilteredList);
+        });
+      }
+
+      const renderPagination = (totalCount) => {
+        const countText = document.getElementById('orders-count-text');
+        const paginationInfo = document.getElementById('orders-pagination-info');
+        const prevBtn = document.getElementById('orders-prev-btn');
+        const nextBtn = document.getElementById('orders-next-btn');
+        const pageButtonsContainer = document.getElementById('orders-page-buttons');
+
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const startIdx = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+        const endIdx = Math.min(totalCount, currentPage * pageSize);
+
+        if (countText) countText.textContent = totalCount.toLocaleString();
+        if (paginationInfo) {
+          paginationInfo.innerHTML = `Showing <span class="font-bold text-gray-900 dark:text-white">${startIdx}–${endIdx}</span> of <span class="font-bold text-gray-900 dark:text-white">${totalCount.toLocaleString()}</span> entries`;
+        }
+
+        if (prevBtn) {
+          prevBtn.disabled = currentPage <= 1;
+          prevBtn.onclick = () => {
+            if (currentPage > 1) {
+              currentPage--;
+              renderOrders(currentFilteredList);
+            }
+          };
+        }
+
+        if (nextBtn) {
+          nextBtn.disabled = currentPage >= totalPages;
+          nextBtn.onclick = () => {
+            if (currentPage < totalPages) {
+              currentPage++;
+              renderOrders(currentFilteredList);
+            }
+          };
+        }
+
+        if (pageButtonsContainer) {
+          pageButtonsContainer.innerHTML = '';
+          const maxButtons = 5;
+          let startPage = Math.max(1, currentPage - 2);
+          let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+          if (endPage - startPage < maxButtons - 1) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+          }
+
+          for (let p = startPage; p <= endPage; p++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = p === currentPage
+              ? 'px-3 py-1.5 bg-pink-600 text-white font-bold rounded shadow-sm text-xs transition'
+              : 'px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs';
+            btn.textContent = p;
+            btn.onclick = () => {
+              currentPage = p;
+              renderOrders(currentFilteredList);
+            };
+            pageButtonsContainer.appendChild(btn);
+          }
+        }
+      };
 
       const renderOrders = (list) => {
-        const countText = document.getElementById('orders-count-text');
-        if (countText) countText.textContent = list.length.toLocaleString();
+        currentFilteredList = list;
+        const totalCount = list.length;
+        renderPagination(totalCount);
 
-        if (list.length === 0) {
-          tableBody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-gray-400 font-medium">No orders found yet. Place your first order on the Dashboard!</td></tr>`;
+        const searchInput = document.getElementById('order-search');
+        const searchQ = searchInput ? searchInput.value.trim() : '';
+
+        if (totalCount === 0) {
+          if (searchQ || currentStatusFilter !== 'all') {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="9" class="px-6 py-12 text-center space-y-3">
+                  <p class="text-gray-500 dark:text-gray-400 font-medium text-xs">No orders found matching your search criteria.</p>
+                  <button type="button" id="clear-filters-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg shadow transition">Clear Search & Filters</button>
+                </td>
+              </tr>`;
+            const clearBtn = document.getElementById('clear-filters-btn');
+            if (clearBtn) {
+              clearBtn.onclick = () => {
+                if (searchInput) searchInput.value = '';
+                currentStatusFilter = 'all';
+                const statusTabs = document.querySelectorAll('.status-tab');
+                statusTabs.forEach(t => {
+                  if (t.getAttribute('data-status') === 'all') {
+                    t.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active text-xs font-semibold';
+                  } else {
+                    t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition text-xs font-semibold';
+                  }
+                });
+                applyOrderFilters();
+              };
+            }
+          } else {
+            tableBody.innerHTML = `<tr><td colspan="9" class="px-6 py-12 text-center text-gray-400 font-medium">No orders found yet. Place your first order on the Dashboard!</td></tr>`;
+          }
           return;
         }
 
-        tableBody.innerHTML = list.map(o => {
+        const startIndex = (currentPage - 1) * pageSize;
+        const paginatedList = list.slice(startIndex, startIndex + pageSize);
+
+        tableBody.innerHTML = paginatedList.map(o => {
           const shortId = typeof o.id === 'string' && o.id.length > 8 ? o.id.substring(0, 8) : o.id;
           const icon = getPlatformIconByService(o.service_name);
           const chargeVal = parseFloat(o.charge || 0).toFixed(2);
           const startCount = (o.start_count || 0).toLocaleString();
           const remains = (o.remains || 0).toLocaleString();
           const isNonFinalized = nonFinalizedStatuses.includes((o.status || '').toLowerCase());
+          const safeLink = sanitizeUrl(o.link);
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50">
               <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400">
-                <a href="/dashboard/orders/${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(shortId))}">#${escapeHtml(String(shortId))}</a>
+                <div class="inline-flex items-center space-x-1">
+                  <a href="/dashboard/orders/${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(shortId))}">#${escapeHtml(String(shortId))}</a>
+                  <button type="button" class="btn-copy-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-text="${escapeHtml(String(o.id))}" title="Copy Order ID" aria-label="Copy order ID">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  </button>
+                </div>
               </td>
               <td class="py-4 px-4">
                 <span class="font-medium text-gray-900 dark:text-white flex items-center">
@@ -1079,14 +1208,21 @@ async function initOrdersPage() {
                 ${o.provider_order_id ? `<span class="text-[10px] text-gray-400 block mt-0.5 font-mono">Ref: #${escapeHtml(String(o.provider_order_id))}</span>` : ''}
               </td>
               <td class="py-4 px-4">
-                <a href="${escapeHtml(o.link || '')}" target="_blank" rel="noopener noreferrer" class="text-pink-600 dark:text-pink-400 hover:underline font-mono truncate block max-w-[180px]">${escapeHtml(o.link || '')}</a>
+                <div class="flex items-center space-x-1">
+                  ${safeLink ? `<a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 dark:text-pink-400 hover:underline font-mono truncate block max-w-[160px]">${escapeHtml(o.link || '')}</a>` : `<span class="text-gray-400 font-mono truncate block max-w-[160px]">${escapeHtml(o.link || '—')}</span>`}
+                  ${o.link ? `
+                    <button type="button" class="btn-copy-link p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-link="${escapeHtml(o.link)}" title="Copy Link URL" aria-label="Copy Target Link">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </button>
+                  ` : ''}
+                </div>
               </td>
               <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">${(o.quantity || 0).toLocaleString()}</td>
               <td class="py-4 px-4 font-mono text-xs text-gray-500 dark:text-gray-400">${startCount} / ${remains}</td>
               <td class="py-4 px-4 font-extrabold text-green-600 dark:text-green-400">GH₵${chargeVal}</td>
               <td class="py-4 px-4 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(o.created_at || '')}</td>
               <td class="py-4 px-4 whitespace-nowrap">
-                <span class="px-2.5 py-1 rounded-full font-bold text-[11px] inline-flex items-center whitespace-nowrap ${getStatusBadgeClass(o.status)}">
+                <span class="px-2.5 py-1 rounded-full font-bold text-[11px] inline-flex items-center whitespace-nowrap ${getStatusBadgeClass(o.status)}" aria-label="Status: ${escapeHtml(o.status || '')}">
                   ${escapeHtml(o.status || '')}
                 </span>
               </td>
@@ -1109,6 +1245,28 @@ async function initOrdersPage() {
             </tr>
           `;
         }).join('');
+
+        // Attach Copy ID handlers
+        tableBody.querySelectorAll('.btn-copy-id').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const text = btn.getAttribute('data-copy-text');
+            if (text) {
+              const ok = await copyToClipboard(text);
+              if (ok) showToast('Order ID copied to clipboard!');
+            }
+          });
+        });
+
+        // Attach Copy Link handlers
+        tableBody.querySelectorAll('.btn-copy-link').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const link = btn.getAttribute('data-copy-link');
+            if (link) {
+              const ok = await copyToClipboard(link);
+              if (ok) showToast('Target URL copied to clipboard!');
+            }
+          });
+        });
 
         // Attach Sync action handlers
         tableBody.querySelectorAll('.btn-sync-order').forEach(btn => {
@@ -1159,16 +1317,43 @@ async function initOrdersPage() {
 
       renderOrders(ordersList);
 
+      // Top Sync All Button Handler
+      const syncAllBtn = document.getElementById('btn-sync-all-orders');
+      if (syncAllBtn) {
+        syncAllBtn.addEventListener('click', async () => {
+          const spinIcon = document.getElementById('icon-sync-spin');
+          const syncText = document.getElementById('text-sync-btn');
+          try {
+            syncAllBtn.disabled = true;
+            if (spinIcon) spinIcon.classList.add('animate-spin');
+            if (syncText) syncText.textContent = 'Syncing...';
+            showToast('Syncing status for all active orders...');
+            await pollOrdersStatus();
+          } catch (e) {
+            showToast('Sync failed: ' + (e.message || 'Server error'), true);
+          } finally {
+            syncAllBtn.disabled = false;
+            if (spinIcon) spinIcon.classList.remove('animate-spin');
+            if (syncText) syncText.textContent = 'Sync';
+          }
+        });
+      }
+
       // Search & Filter listeners
       const searchInput = document.getElementById('order-search') || document.querySelector('input[type="search"], input[placeholder*="Search"]');
       const statusTabs = document.querySelectorAll('.status-tab');
 
       function applyOrderFilters() {
+        currentPage = 1;
         const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
         let filtered = ordersList;
 
         if (currentStatusFilter !== 'all') {
-          filtered = filtered.filter(o => (o.status || '').toLowerCase().replace(/\s+/g, '-') === currentStatusFilter || (o.status || '').toLowerCase() === currentStatusFilter);
+          filtered = filtered.filter(o => {
+            const st = (o.status || '').toLowerCase();
+            const normalizedSt = st.replace(/\s+/g, '-');
+            return normalizedSt === currentStatusFilter || st === currentStatusFilter;
+          });
         }
 
         if (q) {
@@ -1264,27 +1449,6 @@ async function initOrdersPage() {
       });
 
       startPolling();
-
-      const syncAllBtn = document.getElementById('btn-sync-all-orders');
-      if (syncAllBtn) {
-        syncAllBtn.addEventListener('click', async () => {
-          const spinIcon = document.getElementById('icon-sync-spin');
-          const syncText = document.getElementById('text-sync-btn');
-          try {
-            syncAllBtn.disabled = true;
-            if (spinIcon) spinIcon.classList.add('animate-spin');
-            if (syncText) syncText.textContent = 'Syncing...';
-            await pollOrdersStatus();
-            showToast('Orders status synced successfully!', 'success');
-          } catch (err) {
-            showToast(err.message || 'Sync failed', 'error');
-          } finally {
-            syncAllBtn.disabled = false;
-            if (spinIcon) spinIcon.classList.remove('animate-spin');
-            if (syncText) syncText.textContent = 'Sync';
-          }
-        });
-      }
     }
   } catch (e) {
     console.error('Failed to load orders:', e);
