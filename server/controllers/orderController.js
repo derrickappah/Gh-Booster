@@ -89,11 +89,15 @@ class OrderController {
   static async cancelOrder(req, res, next) {
     try {
       const orderId = req.params.id;
-      const userId = req.user.id;
+      const userId = req.user ? req.user.id : null;
+      const isAdmin = req.user ? (req.user.role === 'admin' || req.user.role === 'super_admin' || req.user.is_admin === true) : false;
       if (!userId) {
         return res.status(401).json({ success: false, error: 'Authentication required.' });
       }
-      const result = await OrderService.cancelOrder(orderId, userId);
+      if (!isAdmin) {
+        return res.status(403).json({ success: false, error: 'Users are not permitted to cancel their own orders. Please open a support ticket if assistance is needed.' });
+      }
+      const result = await OrderService.cancelOrder(orderId, userId, isAdmin);
       res.json({ success: true, ...result });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });

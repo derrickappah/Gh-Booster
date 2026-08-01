@@ -14,9 +14,9 @@ function comparePassword(password, hash) {
 
 function generateToken(user) {
   return jwt.sign(
-    { id: user.id, username: user.username, role: user.role },
+    { id: user.id, username: user.username, role: user.role, email: user.email },
     env.JWT_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: '36500d' }
   );
 }
 

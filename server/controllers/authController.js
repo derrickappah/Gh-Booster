@@ -28,8 +28,11 @@ class AuthController {
   }
 
   static async me(req, res) {
+    const { generateToken } = require('../auth');
+    const freshToken = generateToken(req.user);
     res.json({
       success: true,
+      token: freshToken,
       user: req.user
     });
   }

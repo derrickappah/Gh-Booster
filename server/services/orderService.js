@@ -512,9 +512,12 @@ class OrderService {
     return { success: true, message: 'Refill requested successfully', refill_id: res ? res.refill : null, order: updatedOrder };
   }
 
-  static async cancelOrder(orderId, userId) {
+  static async cancelOrder(orderId, userId, isAdmin = false) {
+    if (!isAdmin) {
+      throw new Error('Users are not permitted to cancel their own orders. Please contact support via tickets.');
+    }
     // Fetch the order first to validate ownership and status
-    const order = await OrderService.getOrderById(orderId, userId);
+    const order = await OrderService.getOrderById(orderId, userId, isAdmin);
 
     const nonCancellableStatuses = ['Completed', 'Canceled', 'Refunded', 'Partial'];
     if (nonCancellableStatuses.includes(order.status)) {

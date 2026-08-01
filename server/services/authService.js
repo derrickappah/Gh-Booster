@@ -97,7 +97,7 @@ class AuthService {
       console.error('[AuthService] Wallet creation error:', walletErr.message);
     }
 
-    const token = authData?.session?.access_token || generateToken({ id: userId, username: targetUsername, role: 'user', email: cleanEmail });
+    const token = generateToken({ id: userId, username: targetUsername, role: 'user', email: cleanEmail });
 
     return {
       token,
@@ -151,7 +151,6 @@ class AuthService {
       throw new Error(authErr ? authErr.message : 'Invalid credentials. Please check your username/email and password.');
     }
 
-    const token = authData.session.access_token;
     const userId = authData.user.id;
 
     // Fetch Profile & Wallet directly from Supabase PostgreSQL tables
@@ -164,19 +163,23 @@ class AuthService {
       || authData.user?.app_metadata?.role
       || (emailToUse.toLowerCase().includes('admin') || (profile?.username && profile.username.toLowerCase() === 'admin') ? 'admin' : 'user');
 
+    const user = {
+      id: userId,
+      username: profile?.username || profile?.full_name || emailToUse.split('@')[0],
+      email: emailToUse,
+      phone: profile?.phone || null,
+      balance: wallet ? parseFloat(wallet.balance) : 0.0,
+      currency: wallet?.currency || 'GHS',
+      role: userRole,
+      is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
+      api_key: profile?.api_key || null
+    };
+
+    const token = generateToken(user);
+
     return {
       token,
-      user: {
-        id: userId,
-        username: profile?.username || profile?.full_name || emailToUse.split('@')[0],
-        email: emailToUse,
-        phone: profile?.phone || null,
-        balance: wallet ? parseFloat(wallet.balance) : 0.0,
-        currency: wallet?.currency || 'GHS',
-        role: userRole,
-        is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
-        api_key: profile?.api_key || null
-      }
+      user
     };
   }
 

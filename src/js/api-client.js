@@ -161,14 +161,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const meRes = await API.request('/auth/me');
       if (meRes.success && meRes.user) {
+        if (meRes.token) {
+          API.setToken(meRes.token);
+        }
         API.setUser(meRes.user);
         updateUserUI(meRes.user);
       }
     } catch (e) {
-      // Only log out if explicitly unauthorized (401 or 403 status code)
-      if (isProtectedPage && (e.status === 401 || e.status === 403)) {
-        API.logout();
-      }
+      // Do not auto-logout on transient network or auth errors.
+      // Retain cached session in localStorage so user is never logged out unless pressing signout.
+      console.warn('[Auth] Error refreshing profile, retaining cached user session:', e.message);
     }
 
     // Dynamic Admin Probe: If logged in user isn't marked as admin locally, verify against backend admin endpoint
@@ -4294,24 +4296,6 @@ async function initOrderDetailPage() {
       }
     }
 
-    // Cancel & Refund Button Availability
-    const cancelBtn = document.getElementById('trigger-cancel-btn');
-    if (cancelBtn) {
-      const isCancellable = order.status === 'Pending' || order.status === 'Processing';
-      if (!isCancellable) {
-        cancelBtn.disabled = true;
-        cancelBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        cancelBtn.setAttribute('aria-disabled', 'true');
-        cancelBtn.title = `Orders with status "${order.status}" cannot be canceled.`;
-      } else {
-        cancelBtn.disabled = false;
-        cancelBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        cancelBtn.removeAttribute('aria-disabled');
-        cancelBtn.title = 'Cancel order and request a refund to your wallet';
-      }
-    }
-  }
-
   // Bind Static Event Listeners Once
   const copyIdBtn = document.getElementById('copy-order-id-btn');
   if (copyIdBtn) {
@@ -4353,13 +4337,13 @@ async function initOrderDetailPage() {
     };
   }
 
-  const refillBtn = document.getElementById('trigger-refill-btn');
-  if (refillBtn) {
-    refillBtn.onclick = async () => {
-      if (!currentOrder || refillBtn.disabled) return;
+  const actionRefillBtn = document.getElementById('trigger-refill-btn');
+  if (actionRefillBtn) {
+    actionRefillBtn.onclick = async () => {
+      if (!currentOrder || actionRefillBtn.disabled) return;
       try {
-        refillBtn.disabled = true;
-        refillBtn.querySelector('span').textContent = 'Submitting…';
+        actionRefillBtn.disabled = true;
+        actionRefillBtn.querySelector('span').textContent = 'Submitting…';
         const rRes = await API.request(`/orders/${currentOrder.id}/refill`, 'POST');
         showToast(rRes.message || 'Refill request submitted successfully!');
         if (rRes.order) {
@@ -4371,40 +4355,8 @@ async function initOrderDetailPage() {
       } catch (e) {
         showToast(e.message || 'Refill request failed. Please try again.', true);
       } finally {
-        refillBtn.disabled = false;
-        refillBtn.querySelector('span').textContent = 'Request Automatic Refill';
-      }
-    };
-  }
-
-  const cancelBtn = document.getElementById('trigger-cancel-btn');
-  if (cancelBtn) {
-    cancelBtn.onclick = async () => {
-      if (!currentOrder || cancelBtn.disabled) return;
-      const shortId = currentOrder.id.substring(0, 8);
-      const chargeFormatted = `GH₵${parseFloat(currentOrder.charge || 0).toFixed(2)}`;
-      if (!confirm(`Are you sure you want to cancel Order #${shortId} and refund ${chargeFormatted} to your wallet balance?`)) return;
-      try {
-        cancelBtn.disabled = true;
-        cancelBtn.querySelector('span').textContent = 'Canceling…';
-        const cRes = await API.request(`/orders/${currentOrder.id}/cancel`, 'POST');
-        showToast(cRes.message || 'Order canceled and wallet refunded successfully!');
-        const user = API.getUser();
-        if (user && cRes.new_balance !== undefined && cRes.new_balance !== null) {
-          user.balance = cRes.new_balance;
-          API.setUser(user);
-          updateUserUI(user);
-        }
-        if (cRes.order) {
-          currentOrder = cRes.order;
-          renderOrderDetail(cRes.order);
-        } else {
-          loadOrder(false);
-        }
-      } catch (e) {
-        showToast(e.message || 'Failed to cancel order. Please contact support.', true);
-        cancelBtn.disabled = false;
-        cancelBtn.querySelector('span').textContent = 'Cancel & Refund Order';
+        actionRefillBtn.disabled = false;
+        actionRefillBtn.querySelector('span').textContent = 'Request Automatic Refill';
       }
     };
   }
