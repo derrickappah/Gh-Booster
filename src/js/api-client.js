@@ -1711,23 +1711,80 @@ async function initServicesPage() {
 
 // ADD FUNDS & TRANSACTIONS HISTORY HANDLER
 async function initAddFundsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('add-funds-tbody') || document.querySelector('tbody');
+
+  // Copy Pending Ref handler
+  const btnCopyPendingRef = document.getElementById('btn-copy-deposit-ref');
+  if (btnCopyPendingRef) {
+    btnCopyPendingRef.addEventListener('click', async () => {
+      const refEl = document.getElementById('deposit-ref-display');
+      if (refEl && refEl.textContent) {
+        const cleanRef = refEl.textContent.replace(/^(Reference:|Sandbox Reference:)\s*/i, '').trim();
+        if (cleanRef) {
+          const ok = await copyToClipboard(cleanRef);
+          if (ok) showToast('Payment reference copied to clipboard!');
+        }
+      }
+    });
+  }
 
   if (tableBody) {
     try {
       const res = await API.request('/transactions');
       if (res.success && res.transactions) {
-        tableBody.innerHTML = res.transactions.map(t => `
-          <tr class="hover:bg-gray-50 border-b border-gray-100">
-            <td class="px-6 py-3.5 font-bold text-gray-900 font-mono text-xs">${escapeHtml(t.reference || '—')}</td>
-            <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(t.gateway || '—')}</td>
-            <td class="px-6 py-3.5 font-bold ${t.amount >= 0 ? 'text-green-600' : 'text-red-600'}">GH₵${Math.abs(t.amount).toFixed(2)}</td>
-            <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-green-100 text-green-700">${escapeHtml(t.status || '')}</span></td>
-            <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(new Date(t.created_at).toLocaleString())}</td>
-          </tr>
-        `).join('');
+        const deposits = res.transactions.filter(t => (t.type || '').toLowerCase() === 'deposit' || parseFloat(t.amount || 0) >= 0);
+
+        if (deposits.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="py-8 text-center text-gray-400 dark:text-gray-500 font-medium">No recent deposit transactions found. Top up your balance above!</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = deposits.slice(0, 10).map(t => {
+          const ref = t.reference || t.id || t.payment_ref || '—';
+          const gateway = t.gateway || t.method || t.payment_method || 'Mobile Money';
+          const amtVal = parseFloat(t.amount || 0).toFixed(2);
+          const st = (t.status || 'Completed').toLowerCase();
+
+          let badgeClass = 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300';
+          if (st === 'pending') badgeClass = 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
+          if (st === 'failed' || st === 'canceled') badgeClass = 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300';
+
+          return `
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50 text-xs">
+              <td class="px-4 py-3.5 font-bold font-mono text-pink-600 dark:text-pink-400">
+                <div class="inline-flex items-center space-x-1">
+                  <span>#${escapeHtml(String(ref))}</span>
+                  <button type="button" class="btn-copy-tx-ref p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-ref="${escapeHtml(String(ref))}" title="Copy Reference" aria-label="Copy Reference">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  </button>
+                </div>
+              </td>
+              <td class="px-4 py-3.5 text-xs text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(gateway)}</td>
+              <td class="px-4 py-3.5 font-extrabold text-green-600 dark:text-green-400">GH₵${amtVal}</td>
+              <td class="px-4 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full ${badgeClass}">${escapeHtml(t.status || 'Completed')}</span></td>
+              <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(t.created_at || '')}</td>
+            </tr>
+          `;
+        }).join('');
+
+        // Attach Copy Tx Ref handlers
+        tableBody.querySelectorAll('.btn-copy-tx-ref').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const text = btn.getAttribute('data-copy-ref');
+            if (text) {
+              const ok = await copyToClipboard(text);
+              if (ok) showToast('Transaction reference copied to clipboard!');
+            }
+          });
+        });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Failed to load deposit history:', e);
+    }
   }
 }
 

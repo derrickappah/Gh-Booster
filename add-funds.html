@@ -9,6 +9,39 @@
   <!-- Title & Description -->
   <title>Add Funds & Payment Gateways | GhBooster - #1 SMM Panel</title>
   <meta name="description" content="Top up your GhBooster account balance instantly using MTN Mobile Money, Telecel Cash, Credit Cards, PayPal, and Cryptocurrency.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" id="page-canonical" href="https://ghbooster.com/add-funds">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" content="Add Funds & Deposit | GhBooster - #1 SMM Panel">
+  <meta property="og:description" content="Top up your GhBooster account balance instantly using Mobile Money and Automated Payment Gateways.">
+  <meta property="og:url" content="https://ghbooster.com/add-funds">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" content="Add Funds & Deposit | GhBooster - #1 SMM Panel">
+  <meta name="twitter:description" content="Top up your GhBooster account balance instantly using Mobile Money and Automated Payment Gateways.">
+  <meta name="twitter:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json" id="schema-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Add Funds", "item": "https://ghbooster.com/add-funds" }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -151,8 +184,8 @@
           <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
 
-        <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Add Funds & Deposit</h1>
+        <!-- Header Title -->
+        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Add Funds & Deposit</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-3 md:hidden">
@@ -178,41 +211,64 @@
         <!-- Left 2 Cols: Payment Method Selection & Form -->
         <div class="lg:col-span-2 space-y-6">
 
-
           <!-- Deposit Form Card -->
           <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
-            <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-                <span class="w-3 h-3 rounded-full bg-green-500 mr-2.5 flex-shrink-0"></span>
-                Deposit Funds
-              </h2>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Top up your wallet balance instantly via Mobile Money.</p>
+            <div class="border-b border-gray-100 dark:border-gray-700 pb-4 flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                  <span class="w-3 h-3 rounded-full bg-green-500 mr-2.5 flex-shrink-0"></span>
+                  Deposit Funds
+                </h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Top up your wallet balance instantly via Mobile Money & Gateways.</p>
+              </div>
+            </div>
+
+            <!-- Network Selection Pills -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Select Payment Network</label>
+              <div class="grid grid-cols-3 gap-2" id="network-selector-pills">
+                <button type="button" data-network="MTN" class="network-pill py-3 px-3 rounded-xl border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 font-bold text-xs flex items-center justify-center space-x-1.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                  <span>MTN MoMo</span>
+                </button>
+                <button type="button" data-network="Telecel" class="network-pill py-3 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-bold text-xs flex items-center justify-center space-x-1.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                  <span>Telecel Cash</span>
+                </button>
+                <button type="button" data-network="AT" class="network-pill py-3 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-bold text-xs flex items-center justify-center space-x-1.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  <span>AT Money</span>
+                </button>
+              </div>
             </div>
 
             <form id="deposit-form" class="space-y-4">
               <input type="hidden" id="moolre-network-hidden" value="MTN">
 
               <!-- Amount Input -->
-              <div class="flex items-center rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/20 focus-within:bg-white dark:focus-within:bg-gray-900 transition">
-                <span class="pl-4 pr-1 text-gray-500 dark:text-gray-400 font-bold text-sm select-none flex-shrink-0">
-                  GH₵
-                </span>
-                <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="0.00" value="15"
-                  class="w-full py-3 px-2 bg-transparent text-gray-900 dark:text-white text-base font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+              <div class="space-y-1">
+                <div class="flex items-center rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-500/20 focus-within:bg-white dark:focus-within:bg-gray-900 transition">
+                  <span class="pl-4 pr-1 text-gray-500 dark:text-gray-400 font-bold text-sm select-none flex-shrink-0">
+                    GH₵
+                  </span>
+                  <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="0.00" value="15" aria-label="Deposit Amount in GHS"
+                    class="w-full py-3 px-2 bg-transparent text-gray-900 dark:text-white text-base font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                </div>
+                <span id="deposit-amount-error" class="text-[11px] font-bold text-red-500 block hidden">Minimum deposit amount is GH₵1.00</span>
               </div>
 
               <!-- Quick-pick amounts -->
               <div class="flex flex-row gap-2" id="quick-amounts">
-                <button type="button" data-amount="15"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 transition">₵15</button>
-                <button type="button" data-amount="50"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵50</button>
-                <button type="button" data-amount="100" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵100</button>
-                <button type="button" data-amount="200" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵200</button>
-                <button type="button" data-amount="500" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition">₵500</button>
+                <button type="button" data-amount="15"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-green-500 text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵15</button>
+                <button type="button" data-amount="50"  class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵50</button>
+                <button type="button" data-amount="100" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵100</button>
+                <button type="button" data-amount="200" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵200</button>
+                <button type="button" data-amount="500" class="quick-amt flex-1 py-2.5 text-xs font-bold rounded-2xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 hover:border-green-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">₵500</button>
               </div>
 
               <!-- Submit Button -->
               <button type="submit" id="deposit-submit-btn"
-                class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white font-bold text-sm rounded-2xl shadow-lg shadow-green-600/20 hover:shadow-green-600/40 transition-all duration-200 flex items-center justify-center gap-2">
+                class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 active:scale-[0.98] text-white font-bold text-sm rounded-2xl shadow-lg shadow-green-600/20 hover:shadow-green-600/40 transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -220,15 +276,20 @@
               </button>
 
               <!-- Pending / Redirect State -->
-              <div id="deposit-pending-box" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 flex items-start gap-3">
-                <svg class="animate-spin h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
-                <div>
-                  <p class="text-xs font-bold text-amber-800 dark:text-amber-300">Payment Pending Confirmation</p>
-                  <p id="deposit-ref-display" class="text-[11px] text-amber-600 dark:text-amber-400 font-mono mt-0.5"></p>
+              <div id="deposit-pending-box" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 flex items-start justify-between gap-3">
+                <div class="flex items-start space-x-3">
+                  <svg class="animate-spin h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-xs font-bold text-amber-800 dark:text-amber-300">Payment Pending Confirmation</p>
+                    <p id="deposit-ref-display" class="text-[11px] text-amber-600 dark:text-amber-400 font-mono mt-0.5"></p>
+                  </div>
                 </div>
+                <button type="button" id="btn-copy-deposit-ref" class="text-xs font-bold text-amber-700 dark:text-amber-300 hover:underline inline-flex items-center flex-shrink-0" title="Copy Reference">
+                  <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Copy Ref
+                </button>
               </div>
             </form>
           </div>
@@ -256,7 +317,13 @@
 
           <!-- Account Balance Info Card -->
           <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
-            <h3 class="text-sm font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Your Wallet Summary</h3>
+            <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+              <h3 class="text-sm font-bold text-gray-900 dark:text-white">Your Wallet Summary</h3>
+              <button type="button" id="btn-refresh-balance" class="text-xs font-semibold text-pink-600 dark:text-pink-400 hover:underline inline-flex items-center" title="Refresh Wallet Balance">
+                <svg id="icon-refresh-bal" class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Sync
+              </button>
+            </div>
             
             <div class="space-y-3 text-xs">
               <div class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-gray-900 rounded-xl">
@@ -275,11 +342,41 @@
 
       </div>
 
+      <!-- Recent Deposit Transactions History Table -->
+      <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Recent Deposits &amp; Top-ups</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Real-time log of your recent wallet payment requests.</p>
+          </div>
+          <a href="/transactions" class="text-xs font-bold text-pink-600 dark:text-pink-400 hover:underline">View All Transactions →</a>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse" aria-label="Recent Deposit Transactions Table">
+            <thead>
+              <tr class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 uppercase font-semibold border-b border-gray-200 dark:border-gray-700">
+                <th class="py-3 px-4">Reference</th>
+                <th class="py-3 px-4">Gateway / Network</th>
+                <th class="py-3 px-4">Amount</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4">Date</th>
+              </tr>
+            </thead>
+            <tbody id="add-funds-tbody" class="divide-y divide-gray-100 dark:divide-gray-700/50 text-gray-700 dark:text-gray-300">
+              <tr>
+                <td colspan="5" class="py-8 text-center text-gray-400 font-medium">Loading deposit transactions...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400">
-      Copyright © GhBooster SMM Panel | All rights reserved.
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      Copyright &copy; <span id="footer-year"></span> GhBooster SMM Panel | All rights reserved.
     </footer>
 
   </div>
@@ -287,5 +384,44 @@
   <!-- Scripts -->
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
+  <script>
+    const yr = document.getElementById('footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+
+    // Mobile Money Network Selector Pills Handler
+    const pills = document.querySelectorAll('.network-pill');
+    const hiddenNet = document.getElementById('moolre-network-hidden');
+    pills.forEach(p => {
+      p.addEventListener('click', () => {
+        pills.forEach(b => {
+          b.className = 'network-pill py-3 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 font-bold text-xs flex items-center justify-center space-x-1.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500';
+        });
+        const net = p.getAttribute('data-network');
+        if (hiddenNet) hiddenNet.value = net;
+        p.className = 'network-pill py-3 px-3 rounded-xl border border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 font-bold text-xs flex items-center justify-center space-x-1.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500';
+      });
+    });
+
+    // Refresh Balance Button Handler
+    const btnRefBal = document.getElementById('btn-refresh-balance');
+    if (btnRefBal) {
+      btnRefBal.addEventListener('click', async () => {
+        const icon = document.getElementById('icon-refresh-bal');
+        if (icon) icon.classList.add('animate-spin');
+        try {
+          const meRes = await API.request('/auth/me');
+          if (meRes.success && meRes.user) {
+            API.setUser(meRes.user);
+            updateUserUI(meRes.user);
+            showToast(`Wallet synced! Current balance: GH₵${parseFloat(meRes.user.balance || 0).toFixed(2)}`, 'success');
+          }
+        } catch (e) {
+          showToast('Failed to sync wallet balance', 'error');
+        } finally {
+          if (icon) icon.classList.remove('animate-spin');
+        }
+      });
+    }
+  </script>
 </body>
 </html>
