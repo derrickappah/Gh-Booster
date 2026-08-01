@@ -2769,7 +2769,7 @@ async function initAdminOrdersPage() {
         if (!orderList || orderList.length === 0) {
           tableBody.innerHTML = `
             <tr class="hover:bg-gray-50/50 transition">
-              <td colspan="9" class="py-8 text-center text-gray-400 font-medium">No orders found matching your criteria.</td>
+              <td colspan="10" class="py-8 text-center text-gray-400 font-medium">No orders found matching your criteria.</td>
             </tr>
           `;
           return;
@@ -2787,7 +2787,7 @@ async function initAdminOrdersPage() {
           const qty = (o.quantity || 0).toLocaleString();
           const startCount = o.start_count ?? 0;
           const remains = o.remains ?? 0;
-          const charge = parseFloat(o.charge || 0).toFixed(2);
+          const charge = parseFloat(o.charge ?? o.total_price ?? 0).toFixed(2);
           const createdAt = o.created_at ? o.created_at.substring(0, 16).replace('T', ' ') : '';
           const status = o.status || 'Pending';
           const statusLower = status.toLowerCase();
@@ -2802,9 +2802,22 @@ async function initAdminOrdersPage() {
           else if (svcLower.includes('spotify')) platformIcon = 'src/img/platforms/spotify.png';
 
           let selectStyle = 'bg-yellow-50 border-yellow-200 text-yellow-800';
-          if (statusLower === 'completed') selectStyle = 'bg-green-50 border-green-200 text-green-800';
-          else if (statusLower === 'in progress' || statusLower === 'in-progress' || statusLower === 'processing') selectStyle = 'bg-blue-50 border-blue-200 text-blue-800';
-          else if (statusLower === 'canceled' || statusLower === 'refunded') selectStyle = 'bg-red-50 border-red-200 text-red-800';
+          let badgeStyle = 'bg-yellow-100 text-yellow-800';
+          let dotStyle = 'bg-yellow-500';
+
+          if (statusLower === 'completed') {
+            selectStyle = 'bg-green-50 border-green-200 text-green-800';
+            badgeStyle = 'bg-green-100 text-green-800';
+            dotStyle = 'bg-green-500';
+          } else if (statusLower === 'in progress' || statusLower === 'in-progress' || statusLower === 'processing') {
+            selectStyle = 'bg-blue-50 border-blue-200 text-blue-800';
+            badgeStyle = 'bg-blue-100 text-blue-800';
+            dotStyle = 'bg-blue-500';
+          } else if (statusLower === 'canceled' || statusLower === 'refunded') {
+            selectStyle = 'bg-red-50 border-red-200 text-red-800';
+            badgeStyle = 'bg-red-100 text-red-800';
+            dotStyle = 'bg-red-500';
+          }
 
           return `
             <tr class="admin-order-row hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
@@ -2826,6 +2839,12 @@ async function initAdminOrdersPage() {
               </td>
               <td class="py-4 px-4 font-extrabold text-gray-900">GH₵${charge}</td>
               <td class="py-4 px-4 text-gray-500 text-xs">${escapeHtml(createdAt)}</td>
+              <td class="py-4 px-4">
+                <span class="px-2.5 py-1 ${badgeStyle} rounded-full font-bold text-[11px] inline-flex items-center">
+                  <span class="w-1.5 h-1.5 rounded-full ${dotStyle} mr-1.5 animate-pulse" aria-hidden="true"></span>
+                  ${escapeHtml(status)}
+                </span>
+              </td>
               <td class="py-4 px-4">
                 <select class="status-select py-1 px-2 border font-bold rounded text-xs focus:outline-none ${selectStyle}">
                   <option value="Completed" ${statusLower === 'completed' ? 'selected' : ''}>Completed</option>
@@ -2947,7 +2966,7 @@ async function initAdminOrdersPage() {
     console.error('Failed to load admin orders:', e.message);
     tableBody.innerHTML = `
       <tr class="hover:bg-gray-50/50 transition">
-        <td colspan="9" class="py-8 text-center text-red-500 font-medium">Failed to load orders. ${escapeHtml(e.message || '')}</td>
+        <td colspan="10" class="py-8 text-center text-red-500 font-medium">Failed to load orders. ${escapeHtml(e.message || '')}</td>
       </tr>
     `;
   }
