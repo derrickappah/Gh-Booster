@@ -9,6 +9,39 @@
   <!-- Title & Description -->
   <title>Transactions History | GhBooster - #1 SMM Panel</title>
   <meta name="description" content="View your complete transaction history, deposit logs, order payments, and refunds on GhBooster SMM Panel.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" id="page-canonical" href="https://ghbooster.com/transactions">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" content="Transactions History | GhBooster - #1 SMM Panel">
+  <meta property="og:description" content="Track your deposit top-ups, order payments, and refund credits in real-time.">
+  <meta property="og:url" content="https://ghbooster.com/transactions">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" content="Transactions History | GhBooster - #1 SMM Panel">
+  <meta name="twitter:description" content="Track your deposit top-ups, order payments, and refund credits in real-time.">
+  <meta name="twitter:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json" id="schema-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Transactions History", "item": "https://ghbooster.com/transactions" }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -150,7 +183,7 @@
           <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
         <!-- Header Title -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Transactions History</h1>
+        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Transactions History</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button -->
       <div class="flex items-center space-x-3 md:hidden">
@@ -171,39 +204,47 @@
       <!-- Controls Card: Search & Filters -->
       <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
         
-        <!-- Search Input -->
-        <div class="flex items-center space-x-2 w-full">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <!-- Search Input -->
           <div class="relative flex-grow">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3.5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" id="transaction-search" placeholder="Search transactions by reference, method, or type..." 
+            <input type="text" id="transaction-search" placeholder="Search transactions by reference, method, or type..." aria-label="Search transactions by reference, method, or type"
               class="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 transition">
+          </div>
+
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <span id="transactions-count-badge" class="px-3 py-1.5 bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 font-bold rounded-2xl text-xs">Loading...</span>
+            <button type="button" id="btn-sync-transactions" class="px-3.5 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-2xl text-xs transition inline-flex items-center space-x-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+              <svg id="icon-sync-tx" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Sync Log</span>
+            </button>
           </div>
         </div>
 
         <!-- Status Filter Tabs -->
-        <div class="flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-t border-gray-100 dark:border-gray-700 pt-4 pb-1 text-xs font-semibold [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" id="status-filter-tabs">
-          <button class="status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold" data-status="all">All</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold" data-status="completed">Completed</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold" data-status="pending">Pending</button>
-          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold" data-status="failed">Failed</button>
+        <div class="flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-t border-gray-100 dark:border-gray-700 pt-4 pb-1 text-xs font-semibold [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" id="status-filter-tabs" aria-label="Filter transactions by status">
+          <button class="status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" data-status="all">All Transactions</button>
+          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" data-status="completed">Completed</button>
+          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" data-status="pending">Pending</button>
+          <button class="status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" data-status="failed">Failed</button>
         </div>
 
       </div>
 
       <!-- Transactions Table -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden space-y-4 p-4 md:p-6">
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300">
+          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300" aria-label="Transactions History Table">
             <thead class="bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold uppercase border-b border-gray-200 dark:border-gray-700">
               <tr>
-                <th class="py-3.5 px-6">Reference / ID</th>
-                <th class="py-3.5 px-6">Type</th>
-                <th class="py-3.5 px-6">Amount</th>
-                <th class="py-3.5 px-6">Method</th>
-                <th class="py-3.5 px-6">Date &amp; Time</th>
-                <th class="py-3.5 px-6">Status</th>
+                <th class="py-3.5 px-4">Reference / ID</th>
+                <th class="py-3.5 px-4">Type</th>
+                <th class="py-3.5 px-4">Amount</th>
+                <th class="py-3.5 px-4">Method / Gateway</th>
+                <th class="py-3.5 px-4">Date &amp; Time</th>
+                <th class="py-3.5 px-4">Status</th>
               </tr>
             </thead>
             <tbody id="transactions-tbody" class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -221,18 +262,44 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Dynamic Pagination Controls -->
+        <div id="transactions-pagination" class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs">
+          <div class="flex items-center space-x-3 text-gray-500 dark:text-gray-400">
+            <span id="transactions-page-info">Showing 0 to 0 of 0 transactions</span>
+            <div class="flex items-center space-x-1.5">
+              <label for="transactions-page-size" class="text-gray-500 dark:text-gray-400 font-medium">Per page:</label>
+              <select id="transactions-page-size" class="px-2.5 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button id="transactions-prev-btn" type="button" class="px-3.5 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 font-semibold rounded-xl transition text-xs">Previous</button>
+            <div id="transactions-page-buttons" class="flex items-center space-x-1"></div>
+            <button id="transactions-next-btn" type="button" class="px-3.5 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-700 dark:text-gray-200 font-semibold rounded-xl transition text-xs">Next</button>
+          </div>
+        </div>
       </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400">
-      Copyright © GhBooster SMM Panel | All rights reserved.
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      Copyright &copy; <span id="footer-year"></span> GhBooster SMM Panel | All rights reserved.
     </footer>
 
   </div>
 
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
+  <script>
+    const yr = document.getElementById('footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
