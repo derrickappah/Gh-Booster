@@ -2213,6 +2213,10 @@ async function initBulkOrderPage() {
   const bulkTotalChargeDisp = document.getElementById('bulk-total-charge');
   const bulkForm = document.getElementById('bulk-order-form');
   const tableBody = document.getElementById('bulk-batches-tbody');
+  const btnSample = document.getElementById('btn-sample-bulk-input');
+  const btnClear = document.getElementById('btn-clear-bulk-textarea');
+  const syntaxWarning = document.getElementById('bulk-syntax-warning');
+  const syncBatchesBtn = document.getElementById('btn-sync-bulk-batches');
 
   const bulkServiceSearchInput = document.getElementById('bulk-service-search-input');
   const bulkServiceDropdownMenu = document.getElementById('bulk-service-dropdown-menu');
@@ -2293,7 +2297,6 @@ async function initBulkOrderPage() {
       return;
     }
 
-    // Group by category_name
     const grouped = {};
     list.forEach(s => {
       const cName = s.category_name || s.categories?.name || 'General Services';
@@ -2332,7 +2335,6 @@ async function initBulkOrderPage() {
 
     bulkServiceDropdownMenu.innerHTML = html;
 
-    // Attach click events
     bulkServiceDropdownMenu.querySelectorAll('.bulk-svc-option-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.getAttribute('data-svc-id');
@@ -2359,6 +2361,9 @@ async function initBulkOrderPage() {
       activeServices = res.services || [];
       allCategories = res.categories || [];
       renderDropdownMenu();
+      if (activeServices.length > 0 && !selectedService) {
+        selectService(activeServices[0]);
+      }
     }
   } catch (e) {
     console.error('Failed to load bulk services:', e);
@@ -2369,7 +2374,7 @@ async function initBulkOrderPage() {
   function parseBulkInput() {
     if (!bulkTextarea) return;
     const text = bulkTextarea.value.trim();
-    const lines = text ? text.split('\n') : [];
+    const lines = text ? text.split('\n').filter(l => l.trim().length > 0) : [];
     const lineCount = lines.length;
     
     const ratePerThousand = selectedService 
@@ -2378,24 +2383,31 @@ async function initBulkOrderPage() {
 
     let validCount = 0;
     let totalCost = 0;
+    let invalidLines = 0;
 
     lines.forEach(function (line) {
       const parts = line.trim().split(/\s+/);
       if (parts.length >= 3) {
         const svcId = parts[0];
-        const qty = parseInt(parts[2]);
+        const qty = parseInt(parts[2], 10);
         if (!isNaN(qty) && qty > 0) {
           validCount++;
-          const svc = activeServices.find(s => String(s.id) === String(svcId));
+          const svc = activeServices.find(s => String(s.id) === String(svcId) || String(s.service_id) === String(svcId));
           const svcRate = svc ? parseFloat(svc.rate_per_1k || svc.rate_per_1000 || svc.our_price_per_1000 || 0) : ratePerThousand;
           totalCost += (qty / 1000) * svcRate;
+        } else {
+          invalidLines++;
         }
       } else if (parts.length === 2) {
-        const qty = parseInt(parts[1]);
+        const qty = parseInt(parts[1], 10);
         if (!isNaN(qty) && qty > 0) {
           validCount++;
           totalCost += (qty / 1000) * ratePerThousand;
+        } else {
+          invalidLines++;
         }
+      } else {
+        invalidLines++;
       }
     });
 
@@ -2403,6 +2415,38 @@ async function initBulkOrderPage() {
     if (totalLinesDisp) totalLinesDisp.textContent = lineCount;
     if (validOrdersDisp) validOrdersDisp.textContent = validCount;
     if (bulkTotalChargeDisp) bulkTotalChargeDisp.textContent = "GH₵" + totalCost.toFixed(2);
+
+    if (syntaxWarning) {
+      if (invalidLines > 0) {
+        syntaxWarning.textContent = `⚠️ ${invalidLines} ${invalidLines === 1 ? 'line' : 'lines'} could not be parsed. Make sure each line follows "link quantity" or "service_id link quantity".`;
+        syntaxWarning.classList.remove('hidden');
+      } else {
+        syntaxWarning.classList.add('hidden');
+      }
+    }
+  }
+
+  // Sample Input button listener
+  if (btnSample) {
+    btnSample.addEventListener('click', () => {
+      const defaultSvcId = selectedService ? selectedService.id : '101';
+      if (bulkTextarea) {
+        bulkTextarea.value = `https://instagram.com/user1 1000\nhttps://tiktok.com/@user/video 2500\nhttps://youtube.com/watch?v=demo 5000`;
+        parseBulkInput();
+        showToast('Sample mass order input inserted!');
+      }
+    });
+  }
+
+  // Clear Textarea listener
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      if (bulkTextarea) {
+        bulkTextarea.value = '';
+        parseBulkInput();
+        showToast('Textarea cleared.');
+      }
+    });
   }
 
   if (bulkTextarea) {
@@ -2442,7 +2486,7 @@ async function initBulkOrderPage() {
         if (batchesRes.batches.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="7" class="py-8 text-center text-gray-400 font-medium">No bulk batches placed yet.</td>
+              <td colspan="7" class="py-8 text-center text-gray-400 dark:text-gray-500 font-medium">No bulk batches placed yet. Submit your first batch above!</td>
             </tr>
           `;
           return;
@@ -2458,26 +2502,70 @@ async function initBulkOrderPage() {
             'Canceled': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
             'Refunded': 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
           };
-          const badgeClass = statusColors[b.status] || 'bg-gray-100 text-gray-700';
-          const seed = new Date(b.created_at).getTime();
-          const batchIdNumber = (seed % 90000) + 10000;
+          const badgeClass = statusColors[b.status] || 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+          const seed = new Date(b.created_at || Date.now()).getTime();
+          const batchIdNumber = b.batch_id || `BATCH-${(seed % 90000) + 10000}`;
 
           return `
-            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition border-b border-gray-100 dark:border-gray-800/40">
-              <td class="py-3.5 px-4 font-bold text-pink-600 font-mono">#BATCH-${batchIdNumber}</td>
-              <td class="py-3.5 px-4 max-w-[200px] truncate" title="${escapeHtml(b.service_name)}">${escapeHtml(b.service_name)}</td>
-              <td class="py-3.5 px-4 font-semibold">${b.total_orders} Link${b.total_orders !== 1 ? 's' : ''}</td>
-              <td class="py-3.5 px-4 font-mono">${b.total_quantity.toLocaleString()}</td>
-              <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">GH₵${b.charge.toFixed(2)}</td>
-              <td class="py-3.5 px-4 text-gray-500 dark:text-gray-400">${b.created_at.substring(0, 10)}</td>
-              <td class="py-3.5 px-4"><span class="px-2.5 py-1 ${badgeClass} rounded-full font-semibold text-[11px]">${b.status}</span></td>
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition border-b border-gray-100 dark:border-gray-800/40 text-xs">
+              <td class="py-3.5 px-4 font-bold text-pink-600 dark:text-pink-400 font-mono">
+                <div class="inline-flex items-center space-x-1">
+                  <span>#${escapeHtml(String(batchIdNumber))}</span>
+                  <button type="button" class="btn-copy-batch-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-batch="${escapeHtml(String(batchIdNumber))}" title="Copy Batch ID" aria-label="Copy Batch ID">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  </button>
+                </div>
+              </td>
+              <td class="py-3.5 px-4 max-w-[200px] truncate font-medium text-gray-900 dark:text-white" title="${escapeHtml(b.service_name || '')}">${escapeHtml(b.service_name || 'Multiple Services')}</td>
+              <td class="py-3.5 px-4 font-semibold text-gray-800 dark:text-gray-200">${(b.total_orders || 0).toLocaleString()} Link${b.total_orders !== 1 ? 's' : ''}</td>
+              <td class="py-3.5 px-4 font-mono text-gray-600 dark:text-gray-300">${(b.total_quantity || 0).toLocaleString()}</td>
+              <td class="py-3.5 px-4 font-extrabold text-green-600 dark:text-green-400">GH₵${parseFloat(b.charge || 0).toFixed(2)}</td>
+              <td class="py-3.5 px-4 text-gray-500 dark:text-gray-400 font-mono">${escapeHtml((b.created_at || '').substring(0, 10))}</td>
+              <td class="py-3.5 px-4"><span class="px-2.5 py-1 ${badgeClass} rounded-full font-bold text-[11px]">${escapeHtml(b.status || 'Processing')}</span></td>
             </tr>
           `;
         }).join('');
+
+        // Copy Batch ID handlers
+        tableBody.querySelectorAll('.btn-copy-batch-id').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const text = btn.getAttribute('data-copy-batch');
+            if (text) {
+              const ok = await copyToClipboard(text);
+              if (ok) showToast('Batch ID copied to clipboard!');
+            }
+          });
+        });
       } else {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="7" class="py-8 text-center text-red-500 font-medium">Failed to load batches.</td>
+            <td colspan="7" class="py-8 text-center text-gray-400 dark:text-gray-500 font-medium">No bulk batches placed yet.</td>
+          </tr>
+        `;
+      }
+    } catch (e) {
+      console.error(e);
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="py-8 text-center text-gray-400 dark:text-gray-500 font-medium">No bulk batches recorded yet.</td>
+        </tr>
+      `;
+    }
+  }
+
+  // Sync Batches button handler
+  if (syncBatchesBtn) {
+    syncBatchesBtn.addEventListener('click', async () => {
+      const icon = document.getElementById('icon-sync-batch');
+      if (icon) icon.classList.add('animate-spin');
+      await loadBulkBatches();
+      showToast('Bulk batches updated!', 'success');
+      if (icon) icon.classList.remove('animate-spin');
+    });
+  }
+
+  await loadBulkBatches();
+}n="7" class="py-8 text-center text-red-500 font-medium">Failed to load batches.</td>
           </tr>
         `;
       }

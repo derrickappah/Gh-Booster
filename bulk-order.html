@@ -9,6 +9,39 @@
   <!-- Title & Description -->
   <title>Place Bulk Order | GhBooster - #1 SMM Panel</title>
   <meta name="description" content="Submit mass orders instantly on GhBooster SMM Panel. Fast multi-link processing and automated reseller fulfillment.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" id="page-canonical" href="https://ghbooster.com/bulk-order">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" content="Place Bulk Order | GhBooster - #1 SMM Panel">
+  <meta property="og:description" content="Submit mass orders instantly on GhBooster SMM Panel. Fast multi-link processing and automated reseller fulfillment.">
+  <meta property="og:url" content="https://ghbooster.com/bulk-order">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" content="Place Bulk Order | GhBooster - #1 SMM Panel">
+  <meta name="twitter:description" content="Submit mass orders instantly on GhBooster SMM Panel. Fast multi-link processing and automated reseller fulfillment.">
+  <meta name="twitter:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json" id="schema-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ghbooster.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Bulk Order", "item": "https://ghbooster.com/bulk-order" }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -145,8 +178,8 @@
           <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
 
-        <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Bulk Order</h1>
+        <!-- Header Title -->
+        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Bulk Order</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-3 md:hidden">
@@ -166,11 +199,27 @@
     <!-- Main View Content -->
     <main class="p-4 md:p-6 space-y-6 flex-grow">
 
+      <!-- Format Guide Card -->
+      <div class="bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-blue-500/10 dark:from-pink-900/20 dark:to-purple-900/20 p-5 rounded-2xl border border-pink-200/60 dark:border-pink-800/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <h3 class="text-xs font-bold text-pink-700 dark:text-pink-300 uppercase tracking-wider flex items-center">
+            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Mass Order Format Rules
+          </h3>
+          <p class="text-xs text-gray-700 dark:text-gray-300">Enter 1 order per line in one of two supported formats:</p>
+          <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 1 (Uses Default Service below): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">target_link quantity</span></p>
+          <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 2 (Per-line Service ID): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">service_id | target_link | quantity</span></p>
+        </div>
+        <button type="button" id="btn-sample-bulk-input" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs shadow transition flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
+          Insert Sample Input
+        </button>
+      </div>
+
       <!-- Bulk Order Form Container -->
       <div class="grid grid-cols-1 gap-6">
         
         <!-- Mass Order Form Card -->
-        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
+        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
           <div class="border-b border-gray-100 dark:border-gray-700 pb-4">
             <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
               <span class="w-3 h-3 rounded-full bg-pink-600 mr-2.5"></span>
@@ -193,7 +242,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input type="text" id="bulk-service-search-input" autocomplete="off" placeholder="Search service by name, platform, or ID (e.g. TikTok, Instagram)..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
+                <input type="text" id="bulk-service-search-input" autocomplete="off" aria-label="Search default service for bulk order" placeholder="Search service by name, platform, or ID (e.g. TikTok, Instagram)..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
                 
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" id="bulk-combobox-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -244,21 +293,23 @@
               </div>
             </div>
 
-
-
             <!-- Bulk Orders Textarea -->
             <div>
               <div class="flex justify-between items-center mb-2">
                 <label for="bulk-textarea" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Mass Order Input</label>
-                <span id="line-counter" class="text-xs text-gray-400 dark:text-gray-500 font-medium">0 lines</span>
+                <div class="flex items-center space-x-3">
+                  <span id="line-counter" class="text-xs text-gray-400 dark:text-gray-500 font-medium">0 lines</span>
+                  <button type="button" id="btn-clear-bulk-textarea" class="text-xs text-pink-600 dark:text-pink-400 hover:underline font-semibold">Clear Textarea</button>
+                </div>
               </div>
-              <textarea id="bulk-textarea" rows="7" required placeholder="https://instagram.com/user1 1000
+              <textarea id="bulk-textarea" rows="7" required aria-label="Mass Order Links and Quantities Input" placeholder="https://instagram.com/user1 1000
 https://instagram.com/user2 2500
-https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm font-mono focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition"></textarea>
+https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-mono focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition"></textarea>
+              <div id="bulk-syntax-warning" class="hidden mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 text-xs font-semibold"></div>
             </div>
 
             <!-- Live Calculation & Summary -->
-            <div class="p-4 bg-pink-50 dark:bg-pink-950/40 border border-pink-100 dark:border-pink-900/50 rounded-lg grid grid-cols-3 gap-4 text-center">
+            <div class="p-4 bg-pink-50 dark:bg-pink-950/40 border border-pink-100 dark:border-pink-900/50 rounded-2xl grid grid-cols-3 gap-4 text-center">
               <div>
                 <span class="text-xs text-pink-700 dark:text-pink-400 font-medium block">Total Lines</span>
                 <span id="total-lines" class="text-xl font-extrabold text-pink-600 dark:text-pink-400">0</span>
@@ -274,23 +325,27 @@ https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-9
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full py-4 px-6 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm rounded-lg shadow-lg hover:shadow-pink-600/30 transform transition duration-200 active:scale-95 flex items-center justify-center space-x-2">
+            <button type="submit" class="w-full py-4 px-6 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm rounded-2xl shadow-lg hover:shadow-pink-600/30 transform transition duration-200 active:scale-95 flex items-center justify-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
               <span>Submit Bulk Orders</span>
             </button>
           </form>
         </div>
 
-
-
       </div>
 
       <!-- Recent Mass Orders History -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 class="text-base font-bold text-gray-900">Recent Bulk Batches</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-4">
+          <h3 class="text-base font-bold text-gray-900 dark:text-white">Recent Bulk Batches</h3>
+          <button type="button" id="btn-sync-bulk-batches" class="px-3.5 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-2xl text-xs transition inline-flex items-center space-x-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500">
+            <svg id="icon-sync-batch" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Sync Batches</span>
+          </button>
+        </div>
         
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600">
-            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">
+          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300" aria-label="Recent Bulk Order Batches Table">
+            <thead class="bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold border-b border-gray-200 dark:border-gray-700 uppercase">
               <tr>
                 <th class="py-3 px-4">Batch ID</th>
                 <th class="py-3 px-4">Service</th>
@@ -301,7 +356,7 @@ https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-9
                 <th class="py-3 px-4">Status</th>
               </tr>
             </thead>
-            <tbody id="bulk-batches-tbody" class="divide-y divide-gray-100 dark:divide-gray-700 text-gray-700 dark:text-gray-300">
+            <tbody id="bulk-batches-tbody" class="divide-y divide-gray-100 dark:divide-gray-700/50 text-gray-700 dark:text-gray-300">
               <tr>
                 <td colspan="7" class="py-8 text-center text-gray-400 font-medium">Loading recent batches...</td>
               </tr>
@@ -313,35 +368,17 @@ https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-9
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
-      Copyright © GhBooster SMM Panel | All rights reserved.
+    <footer class="py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      Copyright &copy; <span id="footer-year"></span> GhBooster SMM Panel | All rights reserved.
     </footer>
 
   </div>
 
-  <!-- Dynamic Script -->
-  
-  
-
-
-  
-
-
-  
-
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
-
-  
-
-
-  
-
-
-  
-
-
-  <!-- Inline script removed. Logic is implemented inside src/js/api-client.js -->
-
+  <script>
+    const yr = document.getElementById('footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
