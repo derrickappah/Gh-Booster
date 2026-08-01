@@ -181,20 +181,13 @@
     <!-- Top Header -->
     <header class="sticky top-0 z-30 h-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
       <div class="flex items-center space-x-3">
-        <!-- Mobile Logo & Back Button -->
-        <div class="flex items-center space-x-2 md:hidden">
-          <a href="/dashboard" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" title="Back to Dashboard" aria-label="Back to Dashboard">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </a>
-          <a href="/dashboard" class="flex items-center">
-            <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
-          </a>
-        </div>
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/dashboard" class="flex items-center md:hidden">
+          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+        </a>
 
-        <!-- Header Title -->
-        <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Order History</h1>
+        <!-- Header Title (Desktop only) -->
+        <h1 class="hidden md:block text-lg md:text-xl font-bold text-gray-900 dark:text-white">Order History</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-3 md:hidden">
