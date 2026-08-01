@@ -35,10 +35,6 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/index.js"
-    },
-    {
       "source": "/wallet",
       "destination": "/add-funds.html"
     },
