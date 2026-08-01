@@ -118,7 +118,7 @@ const pageRoutesMap = {
   '/tickets': 'tickets.html',
   '/referrals': 'referrals.html',
   '/child-panel': 'child-panel.html',
-  '/api-docs': 'api.html',
+  '/api-docs': 'api-docs.html',
   '/api': 'api.html',
   '/faq': 'faq.html',
   '/terms': 'terms.html',

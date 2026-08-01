@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title & Description -->
+  <title>API Integration & Developer Docs | GhBooster - #1 SMM Panel</title>
+  <meta name="description" content="Automate social media orders with GhBooster REST API. Access developer API keys, endpoints, parameters, code samples in PHP, Python, cURL, and JS.">
+  <link rel="canonical" href="https://ghbooster.com/api-docs">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GhBooster">
+  <meta property="og:title" content="API Integration & Developer Docs | GhBooster - #1 SMM Panel">
+  <meta property="og:description" content="Automate social media orders with GhBooster REST API. Access developer API keys, endpoints, parameters, code samples in PHP, Python, cURL, and JS.">
+  <meta property="og:url" content="https://ghbooster.com/api-docs">
+  <meta property="og:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ghbooster">
+  <meta name="twitter:title" content="API Integration & Developer Docs | GhBooster - #1 SMM Panel">
+  <meta name="twitter:description" content="Automate social media orders with GhBooster REST API. Access developer API keys, endpoints, parameters, code samples in PHP, Python, cURL, and JS.">
+  <meta name="twitter:image" content="https://ghbooster.com/src/img/logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="src/css/style.css">
+  <link rel="icon" href="src/img/favicon.png">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden">
+    <!-- Brand Header (Fixed at top of sidebar) -->
+    <div id="brand-header" class="bg-gray-900 z-10 h-20 flex items-center justify-between px-6 border-b border-gray-800 transition-all duration-300 flex-shrink-0">
+        <a href="/dashboard" id="brand-full" class="h-full flex items-center text-2xl md:text-3xl font-extrabold text-white tracking-wide flex-shrink-0 select-none">
+          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-9 w-auto object-contain max-h-12">
+        </a>
+        <button id="toggle-sidebar" class="hidden md:flex p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition focus:outline-none flex-shrink-0" title="Toggle Sidebar">
+          <!-- Collapse Left Icon -->
+          <svg id="icon-collapse" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+          <!-- Expand Right Icon -->
+          <svg id="icon-expand" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+    <!-- Scrollable Navigation Area -->
+    <div class="flex-1 min-h-0 overflow-y-auto sidebar-scrollbar">
+      <!-- Navigation Links -->
+      <nav id="sidebar-nav" class="py-6 px-4 space-y-1 transition-all duration-300">
+        <a id="admin-sidebar-link" href="/admin-dashboard" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 rounded-lg shadow-md shadow-pink-600/30 transition group mt-1 mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-white group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span class="sidebar-text truncate">Admin Control Panel</span>
+        </a>
+        <a href="/dashboard" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span class="sidebar-text truncate">Dashboard</span>
+        </a>
+        <a href="/bulk-order" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          <span class="sidebar-text truncate">Bulk Order</span>
+        </a>
+        <a href="/orders" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span class="sidebar-text truncate">Orders History</span>
+        </a>
+        <a href="/add-funds" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="sidebar-text truncate">Add Funds</span>
+        </a>
+        <a href="/services" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span class="sidebar-text truncate">Services List</span>
+        </a>
+        <a href="/api-docs" class="sidebar-link flex items-center px-4 py-3 text-sm font-semibold text-white bg-pink-600 rounded-lg shadow-lg shadow-pink-600/30 transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-white group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+          <span class="sidebar-text truncate">API Docs</span>
+        </a>
+        <a href="/tickets" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span class="sidebar-text truncate">Support Tickets</span>
+        </a>
+        <a href="/referrals" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span class="sidebar-text truncate">Affiliates</span>
+        </a>
+        <a href="/child-panel" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+          </svg>
+          <span class="sidebar-text truncate">Child Panel</span>
+        </a>
+        <a href="/account" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span class="sidebar-text truncate">Account Settings</span>
+        </a>
+        <a href="/faq" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="sidebar-text truncate">FAQ & Help</span>
+        </a>
+        <a href="/terms" class="hidden sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="sidebar-text truncate">Terms & Privacy</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- User & Logout Footer -->
+    <div id="sidebar-footer" class="p-4 border-t border-gray-800 transition-all duration-300 flex-shrink-0">
+      <a href="/login" data-action="logout" class="logout-btn sidebar-link flex items-center px-4 py-3 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-gray-800 rounded-lg transition group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span class="sidebar-text truncate">Sign Out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content Body -->
+  <div class="flex-grow flex flex-col min-w-0">
+
+    <!-- Top Header -->
+    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/dashboard" class="flex items-center md:hidden">
+          <img src="src/img/logo.png" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+        </a>
+
+        <!-- Desktop Header Title (hidden on mobile) -->
+        <h1 class="hidden md:block text-xl font-bold text-gray-900">API Documentation v2</h1>
+      </div>
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
+          <!-- Hamburger Icon (shown when closed) -->
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <!-- Close Icon (shown when expanded) -->
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main View Content -->
+    <main class="p-4 md:p-6 space-y-6 flex-grow">
+
+      <!-- API Credentials Box -->
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+              Developer API Key & Endpoint
+            </h2>
+            <p class="text-xs text-gray-500 mt-1">Keep your secret API key confidential. Do not expose it in client-side code.</p>
+          </div>
+          <button id="regen-key-btn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg transition flex items-center self-start md:self-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Generate New Key
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <!-- Secret API Key -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">HTTP POST API Key</label>
+            <div class="flex items-center space-x-2">
+              <input type="password" id="api-key-input" readonly value="ghb_live_key" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono text-gray-900 focus:outline-none">
+              <button id="toggle-key-btn" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition">Show</button>
+              <button id="copy-key-btn" class="px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-bold shadow transition">Copy</button>
+            </div>
+          </div>
+
+          <!-- API URL -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">API Endpoint URL</label>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="api-url-input" readonly value="https://ghbooster.com/api/v2" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono text-gray-900 focus:outline-none">
+              <button id="copy-url-btn" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-bold transition">Copy URL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Endpoint Code Examples Card -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 space-y-5">
+        
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-4 gap-4">
+          <h3 class="text-base font-bold text-gray-900 dark:text-white">API Methods & Code Snippets</h3>
+          
+          <!-- Language Tabs -->
+          <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg text-xs font-semibold self-start lg:self-auto">
+            <button class="lang-tab px-3 py-1 bg-pink-600 text-white rounded shadow-sm transition active" data-lang="curl">cURL</button>
+            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-lang="php">PHP</button>
+            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-lang="python">Python</button>
+            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-lang="js">Node / JS</button>
+          </div>
+        </div>
+
+        <!-- Action Selection Tabs -->
+        <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg text-xs font-semibold overflow-x-auto">
+          <button class="action-tab px-3 py-1.5 bg-pink-600 text-white rounded shadow-sm transition active" data-action="add">Add Order</button>
+          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-action="status">Order Status</button>
+          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-action="balance">User Balance</button>
+          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-action="services">Services List</button>
+        </div>
+
+        <!-- Code Snippet Area -->
+        <div class="space-y-4">
+          <div class="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-xs overflow-x-auto relative min-h-[140px]">
+            <button id="copy-snippet-btn" class="absolute top-2 right-2 bg-gray-800 hover:bg-gray-700 text-[10px] text-gray-400 hover:text-white px-2.5 py-1 rounded font-sans transition select-none">Copy Code</button>
+            <pre><code id="code-snippet-display">Loading...</code></pre>
+          </div>
+
+          <!-- Sample Response -->
+          <div class="space-y-1.5">
+            <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 block">Sample Success Response (JSON):</span>
+            <div class="bg-gray-800 text-green-400 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+              <pre><code id="response-snippet-display">Loading...</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Parameters Reference Table -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-4 border-b border-gray-100">
+          <h3 class="text-base font-bold text-gray-900">API Parameters Reference</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-gray-600">
+            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">
+              <tr>
+                <th class="py-3.5 px-4">Parameter</th>
+                <th class="py-3.5 px-4">Type</th>
+                <th class="py-3.5 px-4">Required</th>
+                <th class="py-3.5 px-4">Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600">key</td>
+                <td class="py-3.5 px-4 font-mono">String</td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Yes</span></td>
+                <td class="py-3.5 px-4">Your secret API key from account settings.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600">action</td>
+                <td class="py-3.5 px-4 font-mono">String</td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Yes</span></td>
+                <td class="py-3.5 px-4">Action type: <code>services</code>, <code>add</code>, <code>status</code>, <code>balance</code>.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600">service</td>
+                <td class="py-3.5 px-4 font-mono">Integer</td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px]">For 'add'</span></td>
+                <td class="py-3.5 px-4">ID of the requested service (e.g. 101, 104).</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600">link</td>
+                <td class="py-3.5 px-4 font-mono">String</td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px]">For 'add'</span></td>
+                <td class="py-3.5 px-4">Target profile or video URL.</td>
+              </tr>
+              <tr>
+                <td class="py-3.5 px-4 font-mono font-bold text-pink-600">quantity</td>
+                <td class="py-3.5 px-4 font-mono">Integer</td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px]">For 'add'</span></td>
+                <td class="py-3.5 px-4">Requested order quantity.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
+      Copyright © GhBooster SMM Panel | All rights reserved.
+    </footer>
+
+  </div>
+
+  <!-- Dynamic Script -->
+  
+  
+
+
+  
+
+
+  
+
+  <script src="src/js/theme.js"></script>
+  <script src="src/js/api-client.js"></script>
+
+</body>
+</html>
