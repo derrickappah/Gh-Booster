@@ -15,6 +15,8 @@ router.put('/users/:userId/phone', AdminController.updateUserPhone);
 // Orders
 router.get('/orders', AdminController.getOrders);
 router.post('/orders/status', AdminController.updateOrderStatus);
+router.put('/orders/:orderId/status', AdminController.updateOrderStatus);
+router.post('/orders/batch-refill', AdminController.batchRefillOrders);
 
 // Services & Categories
 router.get('/services', AdminController.getServices);

@@ -57,8 +57,18 @@ class AdminController {
 
   static async updateOrderStatus(req, res, next) {
     try {
-      const { orderId, status } = req.body;
+      const orderId = req.params.orderId || req.body.orderId;
+      const status = req.body.status;
       const result = await AdminService.updateOrderStatus({ orderId, status });
+      res.json({ success: true, ...result });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  static async batchRefillOrders(req, res, next) {
+    try {
+      const result = await AdminService.batchRefillOrders();
       res.json({ success: true, ...result });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });

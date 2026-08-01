@@ -2735,24 +2735,222 @@ async function initAdminUsersPage() {
 
 // ADMIN ORDERS HANDLER
 async function initAdminOrdersPage() {
-  const tableBody = document.querySelector('tbody');
+  const totalElem = document.getElementById('admin-orders-total');
+  const completedSubElem = document.getElementById('admin-orders-completed-sub');
+  const inProgressElem = document.getElementById('admin-orders-in-progress');
+  const pendingElem = document.getElementById('admin-orders-pending');
+  const canceledElem = document.getElementById('admin-orders-canceled');
+  const tableBody = document.getElementById('admin-orders-tbody') || document.querySelector('tbody');
+  const searchInput = document.getElementById('admin-order-search');
+  const orderTabs = document.querySelectorAll('.order-tab');
+  const batchRefillBtn = document.getElementById('btn-batch-refill');
+
   if (!tableBody) return;
 
   try {
     const res = await API.request('/admin/orders');
     if (res.success && res.orders) {
-      tableBody.innerHTML = res.orders.map(o => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">#${o.id}</td>
-          <td class="px-6 py-3.5 font-medium text-gray-900">${o.profiles?.username || 'User'}</td>
-          <td class="px-6 py-3.5 font-medium text-gray-900">${o.services?.name || 'Service'}</td>
-          <td class="px-6 py-3.5 font-mono text-xs text-pink-600 truncate max-w-xs">${o.link}</td>
-          <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${parseFloat(o.charge || 0).toFixed(2)}</td>
-          <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full ${getStatusBadgeClass(o.status)}">${o.status}</span></td>
-        </tr>
-      `).join('');
+      const orders = res.orders;
+
+      // KPI Counts
+      const totalCount = orders.length;
+      const completedCount = orders.filter(o => (o.status || '').toLowerCase() === 'completed').length;
+      const inProgressCount = orders.filter(o => ['in progress', 'in-progress', 'processing'].includes((o.status || '').toLowerCase())).length;
+      const pendingCount = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
+      const canceledCount = orders.filter(o => ['canceled', 'refunded', 'canceled & refund'].includes((o.status || '').toLowerCase())).length;
+
+      if (totalElem) totalElem.textContent = totalCount.toLocaleString();
+      if (completedSubElem) completedSubElem.textContent = `${completedCount.toLocaleString()} completed`;
+      if (inProgressElem) inProgressElem.textContent = `${inProgressCount.toLocaleString()} Orders`;
+      if (pendingElem) pendingElem.textContent = `${pendingCount.toLocaleString()} Orders`;
+      if (canceledElem) canceledElem.textContent = `${canceledCount.toLocaleString()} Orders`;
+
+      function renderTable(orderList) {
+        if (!orderList || orderList.length === 0) {
+          tableBody.innerHTML = `
+            <tr class="hover:bg-gray-50/50 transition">
+              <td colspan="9" class="py-8 text-center text-gray-400 font-medium">No orders found matching your criteria.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = orderList.map(o => {
+          const rawId = String(o.id || '');
+          const shortId = rawId.length > 8 ? rawId.substring(0, 8) : rawId;
+          const userObj = o.profiles || {};
+          const username = userObj.username || userObj.email || o.user_id || 'User';
+          const serviceObj = o.services || {};
+          const serviceName = serviceObj.name || 'Service Order';
+          const serviceId = o.service_id || serviceObj.id || '';
+          const targetLink = o.link || '#';
+          const qty = (o.quantity || 0).toLocaleString();
+          const startCount = o.start_count ?? 0;
+          const remains = o.remains ?? 0;
+          const charge = parseFloat(o.charge || 0).toFixed(2);
+          const createdAt = o.created_at ? o.created_at.substring(0, 16).replace('T', ' ') : '';
+          const status = o.status || 'Pending';
+          const statusLower = status.toLowerCase();
+
+          let platformIcon = 'src/img/platforms/instagram.png';
+          const svcLower = serviceName.toLowerCase();
+          if (svcLower.includes('tiktok')) platformIcon = 'src/img/platforms/tiktok.png';
+          else if (svcLower.includes('youtube')) platformIcon = 'src/img/platforms/youtube.png';
+          else if (svcLower.includes('facebook')) platformIcon = 'src/img/platforms/facebook.png';
+          else if (svcLower.includes('twitter') || svcLower.includes('x ')) platformIcon = 'src/img/platforms/twitter.png';
+          else if (svcLower.includes('telegram')) platformIcon = 'src/img/platforms/telegram.png';
+          else if (svcLower.includes('spotify')) platformIcon = 'src/img/platforms/spotify.png';
+
+          let selectStyle = 'bg-yellow-50 border-yellow-200 text-yellow-800';
+          if (statusLower === 'completed') selectStyle = 'bg-green-50 border-green-200 text-green-800';
+          else if (statusLower === 'in progress' || statusLower === 'in-progress' || statusLower === 'processing') selectStyle = 'bg-blue-50 border-blue-200 text-blue-800';
+          else if (statusLower === 'canceled' || statusLower === 'refunded') selectStyle = 'bg-red-50 border-red-200 text-red-800';
+
+          return `
+            <tr class="admin-order-row hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
+              <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
+              <td class="py-4 px-4 font-bold text-gray-900">${escapeHtml(username)}</td>
+              <td class="py-4 px-4">
+                <span class="font-semibold text-gray-900 flex items-center">
+                  <img src="${platformIcon}" alt="Platform" class="w-4 h-4 mr-1.5 object-contain flex-shrink-0" onerror="this.style.display='none'">
+                  ${escapeHtml(serviceName)}
+                </span>
+                ${serviceId ? `<span class="text-[10px] text-gray-400">ID: ${escapeHtml(String(serviceId))}</span>` : ''}
+              </td>
+              <td class="py-4 px-4">
+                <a href="${escapeHtml(targetLink)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 hover:underline font-mono truncate block max-w-[140px]">${escapeHtml(targetLink)}</a>
+              </td>
+              <td class="py-4 px-4 font-mono">
+                <span class="font-bold text-gray-900 block">${qty}</span>
+                <span class="text-[10px] text-gray-400">${startCount} / ${remains}</span>
+              </td>
+              <td class="py-4 px-4 font-extrabold text-gray-900">GH₵${charge}</td>
+              <td class="py-4 px-4 text-gray-500 text-xs">${escapeHtml(createdAt)}</td>
+              <td class="py-4 px-4">
+                <select class="status-select py-1 px-2 border font-bold rounded text-xs focus:outline-none ${selectStyle}">
+                  <option value="Completed" ${statusLower === 'completed' ? 'selected' : ''}>Completed</option>
+                  <option value="In Progress" ${['in progress', 'in-progress', 'processing'].includes(statusLower) ? 'selected' : ''}>In Progress</option>
+                  <option value="Pending" ${statusLower === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="Canceled" ${['canceled', 'refunded'].includes(statusLower) ? 'selected' : ''}>Canceled & Refund</option>
+                </select>
+              </td>
+              <td class="py-4 px-4 text-center space-x-1">
+                <button type="button" class="save-status-btn px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded text-[11px] transition">Save</button>
+                <button type="button" class="refund-btn px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded text-[11px] transition">Refund</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        // Event listener for Save Status buttons
+        tableBody.querySelectorAll('.save-status-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const tr = e.target.closest('tr');
+            const orderId = decodeURIComponent(tr.getAttribute('data-order-id') || '');
+            const select = tr.querySelector('.status-select');
+            const newStatus = select ? select.value : 'Completed';
+            try {
+              await API.request('/admin/orders/status', 'POST', { orderId, status: newStatus });
+              if (typeof showToast === 'function') showToast(`Order status updated to ${newStatus}`, 'success');
+              else alert(`Order status updated to ${newStatus}`);
+              initAdminOrdersPage();
+            } catch (err) {
+              alert(err.message || 'Failed to update status');
+            }
+          });
+        });
+
+        // Event listener for Refund buttons
+        tableBody.querySelectorAll('.refund-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const tr = e.target.closest('tr');
+            const orderId = decodeURIComponent(tr.getAttribute('data-order-id') || '');
+            if (!confirm(`Are you sure you want to cancel and refund Order #${orderId.substring(0, 8)}?`)) return;
+            try {
+              const refRes = await API.request('/admin/orders/status', 'POST', { orderId, status: 'Canceled' });
+              if (typeof showToast === 'function') showToast(refRes.message || 'Order refunded successfully', 'success');
+              else alert(refRes.message || 'Order refunded successfully');
+              initAdminOrdersPage();
+            } catch (err) {
+              alert(err.message || 'Failed to refund order');
+            }
+          });
+        });
+      }
+
+      renderTable(orders);
+
+      // Search & Status Tabs Handling
+      let currentStatusFilter = 'all';
+
+      if (searchInput) {
+        searchInput.addEventListener('input', () => applyFilters());
+      }
+
+      orderTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          orderTabs.forEach(t => {
+            t.classList.remove('bg-pink-600', 'text-white', 'shadow-sm', 'active');
+            t.classList.add('bg-gray-100', 'text-gray-600');
+          });
+          e.currentTarget.classList.remove('bg-gray-100', 'text-gray-600');
+          e.currentTarget.classList.add('bg-pink-600', 'text-white', 'shadow-sm', 'active');
+
+          currentStatusFilter = e.currentTarget.getAttribute('data-status') || 'all';
+          applyFilters();
+        });
+      });
+
+      function applyFilters() {
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        let filtered = orders;
+
+        if (currentStatusFilter !== 'all') {
+          filtered = filtered.filter(o => {
+            const st = (o.status || '').toLowerCase();
+            if (currentStatusFilter === 'in-progress') return ['in progress', 'in-progress', 'processing'].includes(st);
+            if (currentStatusFilter === 'pending') return st === 'pending';
+            if (currentStatusFilter === 'completed') return st === 'completed';
+            if (currentStatusFilter === 'canceled') return ['canceled', 'refunded'].includes(st);
+            return true;
+          });
+        }
+
+        if (query) {
+          filtered = filtered.filter(o => {
+            const id = String(o.id || '').toLowerCase();
+            const user = (o.profiles?.username || o.profiles?.email || o.user_id || '').toLowerCase();
+            const link = (o.link || '').toLowerCase();
+            const svc = (o.services?.name || '').toLowerCase();
+            return id.includes(query) || user.includes(query) || link.includes(query) || svc.includes(query);
+          });
+        }
+
+        renderTable(filtered);
+      }
+
+      // Batch Refill All handler
+      if (batchRefillBtn) {
+        batchRefillBtn.onclick = async () => {
+          try {
+            const batchRes = await API.request('/admin/orders/batch-refill', 'POST');
+            if (typeof showToast === 'function') showToast(batchRes.message || 'Batch refill executed', 'success');
+            else alert(batchRes.message || 'Batch refill executed');
+            initAdminOrdersPage();
+          } catch (err) {
+            alert(err.message || 'Batch refill failed');
+          }
+        };
+      }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Failed to load admin orders:', e.message);
+    tableBody.innerHTML = `
+      <tr class="hover:bg-gray-50/50 transition">
+        <td colspan="9" class="py-8 text-center text-red-500 font-medium">Failed to load orders. ${escapeHtml(e.message || '')}</td>
+      </tr>
+    `;
+  }
 }
 
 // ADMIN SERVICES HANDLER

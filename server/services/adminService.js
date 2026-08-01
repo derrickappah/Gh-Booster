@@ -148,6 +148,14 @@ class AdminService {
   }
 
   static async updateOrderStatus({ orderId, status }) {
+    const { data: currentOrder } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .maybeSingle();
+
+    const oldStatus = currentOrder ? currentOrder.status : null;
+
     const { data, error } = await supabaseAdmin
       .from('orders')
       .update({ status, updated_at: new Date().toISOString() })
@@ -155,7 +163,56 @@ class AdminService {
       .select();
 
     if (error) throw new Error(error.message);
-    return { success: true, message: `Order #${orderId} status updated to ${status}`, order: data[0] };
+
+    // If updating status to Canceled / Refunded and it was not previously canceled/refunded, refund wallet
+    const isNewCancel = ['Canceled', 'Refunded', 'canceled', 'refunded'].includes(status);
+    const wasCancel = ['Canceled', 'Refunded', 'canceled', 'refunded'].includes(oldStatus);
+
+    if (isNewCancel && !wasCancel && currentOrder) {
+      const chargeAmount = parseFloat(currentOrder.charge || 0);
+      const userId = currentOrder.user_id;
+      if (chargeAmount > 0 && userId) {
+        const { data: wallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+        const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
+        const newBalance = currentBalance + chargeAmount;
+        await supabaseAdmin.from('wallets').update({ balance: newBalance, updated_at: new Date().toISOString() }).eq('user_id', userId);
+        await supabaseAdmin.from('transactions').insert({
+          user_id: userId,
+          amount: chargeAmount,
+          currency: 'GHS',
+          gateway: 'Wallet Balance',
+          reference: 'admin_refund_' + orderId,
+          type: 'refund',
+          status: 'completed'
+        });
+      }
+    }
+
+    return { success: true, message: `Order status updated to ${status}`, order: data ? data[0] : null };
+  }
+
+  static async batchRefillOrders() {
+    const SmmgenService = require('./smmgenService');
+    const { data: orders } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('status', 'Completed')
+      .not('provider_order_id', 'is', null);
+
+    let count = 0;
+    if (orders && orders.length > 0) {
+      for (const order of orders) {
+        try {
+          if (order.provider_order_id) {
+            await SmmgenService.refillOrder(order.provider_order_id);
+            count++;
+          }
+        } catch (e) {
+          console.error(`[AdminService] Batch refill skipped order ${order.id}:`, e.message);
+        }
+      }
+    }
+    return { success: true, refilled_count: count, message: count > 0 ? `Batch refill requested for ${count} active orders.` : 'No active orders requiring refill.' };
   }
 
   static async getAllServices() {
