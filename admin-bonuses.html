@@ -139,19 +139,22 @@
   <div class="flex-grow flex flex-col min-w-0">
     <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
       <div class="flex items-center space-x-3">
+        <!-- Mobile Logo (visible on mobile only) -->
         <a href="/admin-dashboard" class="flex items-center md:hidden">
           <img src="/src/img/logo.png?v=2" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">Bonus Manager</h1>
+        <h1 class="text-xl font-bold text-gray-900">Bonus Manager</h1>
       </div>
-      <div class="flex items-center space-x-3">
-        <button onclick="document.getElementById('add-bonus-modal').classList.remove('hidden')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          + Create Bonus
-        </button>
-        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition focus:outline-none" aria-label="Toggle Sidebar Menu">
-          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </header>
@@ -181,6 +184,15 @@
           </div>
           <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
         </div>
+      </div>
+
+      <!-- Toolbar Controls (Moved below stats cards) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+        <h3 class="font-bold text-gray-900 text-sm">Active Bonus Rules &amp; Promotions</h3>
+        <button onclick="document.getElementById('add-bonus-modal').classList.remove('hidden')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center shrink-0 cursor-pointer" style="white-space: nowrap !important; width: auto !important;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Create Bonus
+        </button>
       </div>
 
       <!-- Bonus Rules Cards -->

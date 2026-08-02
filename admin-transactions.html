@@ -142,13 +142,25 @@
 
     <!-- Header -->
     <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
-      <h1 class="text-xl font-bold text-gray-900">Transaction Ledger</h1>
-      <button onclick="alert('Exporting transaction CSV...')" class="bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-        Export CSV
-      </button>
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/admin-dashboard" class="flex items-center md:hidden">
+          <img src="/src/img/logo.png?v=2" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+        </a>
+        <h1 class="text-xl font-bold text-gray-900">Transaction Ledger</h1>
+      </div>
+
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </header>
 
     <main class="p-4 md:p-6 space-y-6 flex-grow">
@@ -170,9 +182,9 @@
 
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-red-600 leading-tight truncate">GH₵199,920.00</h3>
+            <h3 class="text-base font-bold text-red-600 leading-tight truncate">GH₵203,760.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Debits</span>
-            <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Orders + Deductions</span>
+            <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Order purchases</span>
           </div>
           <div class="p-2.5 bg-red-50 text-red-600 rounded-lg flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -183,9 +195,9 @@
 
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-yellow-600 leading-tight truncate">GH₵3,840.00</h3>
+            <h3 class="text-base font-bold text-yellow-600 leading-tight truncate">GH₵3,450.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Refunds</span>
-            <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Auto + admin refunds</span>
+            <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Canceled orders</span>
           </div>
           <div class="p-2.5 bg-yellow-50 text-yellow-600 rounded-lg flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,24 +221,30 @@
       </div>
 
       <!-- Search & Filter Bar -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
-        <div class="flex flex-col md:flex-row gap-3">
-          <div class="relative flex-grow">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+        <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div class="relative flex-grow w-full md:w-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" id="txn-search" placeholder="Search by Txn ID, username, description..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition">
+            <input type="text" id="txn-search" placeholder="Search by Txn ID, username, description..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition">
           </div>
-          <select id="txn-type-filter" class="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-600 transition">
-            <option value="all">All Types</option>
-            <option value="credit">Credit</option>
-            <option value="debit">Debit</option>
-            <option value="refund">Refund</option>
-            <option value="admin">Admin Adjustment</option>
-          </select>
+          <div class="flex items-center space-x-2.5 w-full md:w-auto justify-between md:justify-end">
+            <select id="txn-type-filter" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-600 transition">
+              <option value="all">All Types</option>
+              <option value="credit">Credits (Deposits &amp; Top-ups)</option>
+              <option value="debit">Debits (Order Purchases)</option>
+              <option value="refund">Refunds</option>
+            </select>
+            <button onclick="alert('Exporting transaction CSV...')" class="bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center shrink-0 cursor-pointer" style="white-space: nowrap !important; width: auto !important;">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
         </div>
-
-        <div class="flex items-center space-x-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden border-t border-gray-100 pt-4 text-xs font-semibold">
+      </div>
           <button class="txn-tab px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition flex-shrink-0" data-tab="all">All</button>
           <button class="txn-tab px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-tab="credit">Credits</button>
           <button class="txn-tab px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-tab="debit">Debits</button>

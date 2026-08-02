@@ -4609,16 +4609,53 @@ async function initAdminDepositsPage() {
           let actionButtons = '';
           if (status === 'pending') {
             actionButtons = `
-              <button data-action="approve" data-id="${d.id}" class="dep-action-btn px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white font-bold rounded text-[11px] transition shadow-sm">Approve</button>
-              <button data-action="reject" data-id="${d.id}" class="dep-action-btn px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded text-[11px] transition">Reject</button>
+              <div class="inline-block text-left relative">
+                <button type="button" class="dep-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for deposit" title="Deposit Actions">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+                <div class="dep-actions-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
+                  <div class="py-1">
+                    <button type="button" data-action="approve" data-id="${d.id}" class="approve-dep-btn w-full text-left px-3.5 py-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-gray-700 transition flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Approve Deposit
+                    </button>
+                  </div>
+                  <div class="py-1">
+                    <button type="button" data-action="reject" data-id="${d.id}" class="reject-dep-btn w-full text-left px-3.5 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 transition flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Reject Deposit
+                    </button>
+                  </div>
+                </div>
+              </div>
             `;
           } else if (status === 'completed' || status === 'approved') {
-            actionButtons = `
-              <span class="text-[11px] text-green-600 font-bold">✓ Credited</span>
-            `;
+            actionButtons = `<span class="text-[11px] text-green-600 font-bold">✓ Credited</span>`;
           } else {
             actionButtons = `
-              <button data-action="approve" data-id="${d.id}" class="dep-action-btn px-2.5 py-1 bg-gray-100 hover:bg-green-50 text-gray-700 hover:text-green-700 font-bold rounded text-[11px] transition">Override</button>
+              <div class="inline-block text-left relative">
+                <button type="button" class="dep-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for deposit" title="Deposit Actions">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                  </svg>
+                </button>
+                <div class="dep-actions-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 text-left text-xs font-semibold">
+                  <div class="py-1">
+                    <button type="button" data-action="approve" data-id="${d.id}" class="approve-dep-btn w-full text-left px-3.5 py-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-gray-700 transition flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Override Approve
+                    </button>
+                  </div>
+                </div>
+              </div>
             `;
           }
 
@@ -4631,23 +4668,43 @@ async function initAdminDepositsPage() {
               <td class="py-3.5 px-4 font-extrabold ${amtClass}">GH₵${amt}</td>
               <td class="py-3.5 px-4 text-gray-500 text-xs">${dateFormatted}</td>
               <td class="py-3.5 px-4"><span class="px-2.5 py-1 ${badgeClass} font-bold rounded-full text-[11px] capitalize">${statusText}</span></td>
-              <td class="py-3.5 px-4 text-center space-x-1">${actionButtons}</td>
+              <td class="py-3.5 px-4 text-center relative">${actionButtons}</td>
             </tr>
           `;
         }).join('');
 
-        // Attach action handlers
-        tableBody.querySelectorAll('.dep-action-btn').forEach(btn => {
+        // Toggle 3-dots action menu dropdown
+        tableBody.querySelectorAll('.dep-actions-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMenu = btn.nextElementSibling;
+            const isHidden = currentMenu.classList.contains('hidden');
+            document.querySelectorAll('.dep-actions-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) {
+              currentMenu.classList.remove('hidden');
+            }
+          });
+        });
+
+        if (!window.__depDropdownOutsideClickBound) {
+          window.__depDropdownOutsideClickBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.dep-actions-menu').forEach(m => m.classList.add('hidden'));
+          });
+        }
+
+        // Action Handlers for Deposit Approval / Rejection
+        tableBody.querySelectorAll('.approve-dep-btn, .reject-dep-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {
-            const action = e.target.getAttribute('data-action');
-            const depId = e.target.getAttribute('data-id');
+            const action = btn.getAttribute('data-action');
+            const depId = btn.getAttribute('data-id');
             const targetStatus = action === 'approve' ? 'completed' : 'rejected';
+            const menu = btn.closest('.dep-actions-menu');
+            if (menu) menu.classList.add('hidden');
 
             if (!confirm(`Are you sure you want to ${action} this deposit request?`)) return;
 
             try {
-              e.target.disabled = true;
-              e.target.textContent = '...';
               const updateRes = await API.request('/admin/deposits/status', 'POST', { id: depId, status: targetStatus });
               if (updateRes.success) {
                 initAdminDepositsPage();

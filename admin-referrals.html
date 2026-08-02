@@ -138,11 +138,23 @@
 
   <div class="flex-grow flex flex-col min-w-0">
     <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
-      <h1 class="text-xl font-bold text-gray-900">Referral Program</h1>
-      <div class="flex items-center space-x-2">
-        <button onclick="alert('Referral settings saved!')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          Export CSV
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/admin-dashboard" class="flex items-center md:hidden">
+          <img src="/src/img/logo.png?v=2" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+        </a>
+        <h1 class="text-xl font-bold text-gray-900">Referral Program</h1>
+      </div>
+
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </header>
