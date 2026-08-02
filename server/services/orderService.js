@@ -96,7 +96,7 @@ class OrderService {
 
     const { data: rawOrders, error } = await supabaseAdmin
       .from('orders')
-      .select('id, provider_order_id, status, start_count, remains')
+      .select('*')
       .not('provider_order_id', 'is', null);
 
     if (error || !rawOrders) {
@@ -135,6 +135,7 @@ class OrderService {
           : order.remains;
 
         const hasChanged = newStatus !== order.status || newStartCount !== order.start_count || newRemains !== order.remains;
+        const isRefundableStatus = ['Canceled', 'Refunded', 'Partial'].includes(newStatus);
 
         if (hasChanged) {
           await supabaseAdmin
@@ -147,6 +148,15 @@ class OrderService {
             })
             .eq('id', order.id);
           updatedCount++;
+
+          if (isRefundableStatus) {
+            await OrderService.processOrderRefund({
+              order: { ...order, status: newStatus, start_count: newStartCount, remains: newRemains },
+              newStatus,
+              remains: newRemains,
+              startCount: newStartCount
+            });
+          }
         }
       } catch (err) {
         console.error(`[OrderCron] Error syncing provider order #${order.provider_order_id}:`, err.message);
@@ -587,6 +597,108 @@ class OrderService {
       message: chargeAmount > 0 ? `Order canceled and GH₵${chargeAmount.toFixed(2)} has been refunded to your wallet.` : 'Order has been canceled successfully.',
       new_balance: newBalance,
       order: updatedOrder
+    };
+  }
+
+  /**
+   * Automatically process wallet refunds when an order status is updated to Canceled, Refunded, or Partial.
+   */
+  static async processOrderRefund({ order, newStatus, remains }) {
+    if (!order || !order.id || !order.user_id) return null;
+
+    const st = (newStatus || order.status || '').toLowerCase();
+    const isCancelOrRefund = st === 'canceled' || st === 'cancelled' || st === 'refunded';
+    const isPartial = st === 'partial';
+
+    if (!isCancelOrRefund && !isPartial) return null;
+
+    const totalCharge = parseFloat(order.total_price || order.charge || order.price || 0);
+    const totalQty = parseInt(order.quantity || 0, 10);
+    const userId = order.user_id;
+
+    if (totalCharge <= 0 || !userId) return null;
+
+    // Check existing refunds for this order in transactions table to guarantee idempotency
+    const { data: existingRefundTxs } = await supabaseAdmin
+      .from('transactions')
+      .select('amount')
+      .eq('user_id', userId)
+      .eq('type', 'refund')
+      .ilike('reference', `%${order.id}%`);
+
+    const alreadyRefundedFromTxs = (existingRefundTxs || []).reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
+    const existingRefundedOnOrder = parseFloat(order.refunded_amount || 0);
+    const alreadyRefunded = Math.max(alreadyRefundedFromTxs, existingRefundedOnOrder);
+
+    let targetRefundTotal = 0;
+
+    if (isCancelOrRefund) {
+      targetRefundTotal = totalCharge;
+    } else if (isPartial) {
+      const rem = remains !== undefined && remains !== null ? parseInt(remains, 10) : parseInt(order.remains || 0, 10);
+      const unfulfilledQty = Math.max(0, Math.min(rem, totalQty));
+      if (totalQty > 0) {
+        targetRefundTotal = (unfulfilledQty / totalQty) * totalCharge;
+      }
+    }
+
+    const refundableAmount = Math.max(0, targetRefundTotal - alreadyRefunded);
+
+    // If no additional refund is owed, return existing status
+    if (refundableAmount < 0.0001) {
+      return { refunded: false, refundAmount: 0 };
+    }
+
+    // Atomically credit user's wallet balance
+    const { data: wallet } = await supabaseAdmin
+      .from('wallets')
+      .select('balance')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
+    const newBalance = currentBalance + refundableAmount;
+
+    await supabaseAdmin
+      .from('wallets')
+      .update({ balance: newBalance, updated_at: new Date().toISOString() })
+      .eq('user_id', userId);
+
+    const refPrefix = isPartial ? 'partial_refund_' : 'refund_';
+    const txRef = `${refPrefix}${order.id}_${Date.now().toString(36)}`;
+
+    await supabaseAdmin.from('transactions').insert({
+      user_id: userId,
+      amount: refundableAmount,
+      currency: 'GHS',
+      gateway: 'Wallet Balance',
+      reference: txRef,
+      type: 'refund',
+      status: 'completed',
+      description: isPartial
+        ? `Partial order refund for Order #${String(order.id).substring(0, 8)}`
+        : `Order ${newStatus} refund for Order #${String(order.id).substring(0, 8)}`
+    });
+
+    const newTotalRefunded = alreadyRefunded + refundableAmount;
+
+    try {
+      await supabaseAdmin
+        .from('orders')
+        .update({
+          refunded_amount: newTotalRefunded,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', order.id);
+    } catch (_) {}
+
+    console.log(`[OrderRefund] Successfully refunded GH₵${refundableAmount.toFixed(2)} to user ${userId} for Order #${order.id} (${newStatus})`);
+
+    return {
+      refunded: true,
+      refundAmount: refundableAmount,
+      newTotalRefunded,
+      newBalance
     };
   }
 }

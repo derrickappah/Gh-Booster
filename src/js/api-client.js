@@ -4886,7 +4886,15 @@ async function initOrderDetailPage() {
     if (remEl) remEl.textContent = remVal.toLocaleString();
 
     const chgEl = document.getElementById('stat-charge');
-    if (chgEl) chgEl.textContent = `GH₵${parseFloat(order.charge || 0).toFixed(2)}`;
+    if (chgEl) {
+      const chargeVal = parseFloat(order.charge || order.total_price || 0);
+      const refundVal = parseFloat(order.refunded_amount || 0);
+      if (refundVal > 0) {
+        chgEl.textContent = `GH₵${chargeVal.toFixed(2)} (GH₵${refundVal.toFixed(2)} Refunded)`;
+      } else {
+        chgEl.textContent = `GH₵${chargeVal.toFixed(2)}`;
+      }
+    }
 
     const rateEl = document.getElementById('stat-rate');
     if (rateEl) rateEl.textContent = `GH₵${parseFloat(order.rate_per_1k || 0).toFixed(2)} per 1k`;

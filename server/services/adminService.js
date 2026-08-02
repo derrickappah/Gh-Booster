@@ -164,28 +164,15 @@ class AdminService {
 
     if (error) throw new Error(error.message);
 
-    // If updating status to Canceled / Refunded and it was not previously canceled/refunded, refund wallet
-    const isNewCancel = ['Canceled', 'Refunded', 'canceled', 'refunded'].includes(status);
-    const wasCancel = ['Canceled', 'Refunded', 'canceled', 'refunded'].includes(oldStatus);
-
-    if (isNewCancel && !wasCancel && currentOrder) {
-      const chargeAmount = parseFloat(currentOrder.charge || 0);
-      const userId = currentOrder.user_id;
-      if (chargeAmount > 0 && userId) {
-        const { data: wallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
-        const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-        const newBalance = currentBalance + chargeAmount;
-        await supabaseAdmin.from('wallets').update({ balance: newBalance, updated_at: new Date().toISOString() }).eq('user_id', userId);
-        await supabaseAdmin.from('transactions').insert({
-          user_id: userId,
-          amount: chargeAmount,
-          currency: 'GHS',
-          gateway: 'Wallet Balance',
-          reference: 'admin_refund_' + orderId,
-          type: 'refund',
-          status: 'completed'
-        });
-      }
+    // Automatically process wallet refund for Partial, Canceled, or Refunded status
+    const isRefundable = ['Canceled', 'Refunded', 'Partial', 'canceled', 'refunded', 'partial'].includes(status);
+    if (isRefundable && currentOrder) {
+      const OrderService = require('./orderService');
+      await OrderService.processOrderRefund({
+        order: { ...currentOrder, status },
+        newStatus: status,
+        remains: currentOrder.remains
+      });
     }
 
     return { success: true, message: `Order status updated to ${status}`, order: data ? data[0] : null };
