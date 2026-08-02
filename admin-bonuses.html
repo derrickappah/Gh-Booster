@@ -165,21 +165,21 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-green-600 leading-tight truncate">3</h3>
+            <h3 id="admin-bonus-active" class="text-base font-bold text-green-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Active Bonuses</span>
           </div>
           <div class="p-2.5 bg-green-50 text-green-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 13C10.832 21 4 20 4 20V9a2 2 0 012-2h12a2 2 0 012 2v11s-6.832 1-8 1z"/></svg></div>
         </div>
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-pink-600 leading-tight truncate">GH₵2,460</h3>
+            <h3 id="admin-bonus-claimed" class="text-base font-bold text-pink-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Claimed</span>
           </div>
           <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
         </div>
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-blue-600 leading-tight truncate">388</h3>
+            <h3 id="admin-bonus-users" class="text-base font-bold text-blue-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Users Benefited</span>
           </div>
           <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
@@ -196,59 +196,9 @@
       </div>
 
       <!-- Bonus Rules Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <!-- Bonus 1 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold text-pink-600 uppercase tracking-wider">Welcome Bonus</span>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
-            </label>
-          </div>
-          <p class="text-xs text-gray-600 leading-relaxed">New users receive a <strong>GH₵1.00 credit</strong> upon verifying their email address. Applied automatically.</p>
-          <div class="text-xs space-y-1.5 border-t border-gray-100 pt-3">
-            <div class="flex justify-between"><span class="text-gray-500">Bonus Amount</span><span class="font-bold text-gray-900">GH₵1.00</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Trigger</span><span class="font-bold text-gray-900">Email Verification</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Claimed This Month</span><span class="font-bold text-green-600">124 users</span></div>
-          </div>
-          <button onclick="alert('Edit Welcome Bonus')" class="w-full py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Edit Bonus</button>
-        </div>
-
-        <!-- Bonus 2 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold text-pink-600 uppercase tracking-wider">First Deposit Bonus</span>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
-            </label>
-          </div>
-          <p class="text-xs text-gray-600 leading-relaxed">Users get a <strong>10% bonus</strong> on their very first deposit. One-time reward per account.</p>
-          <div class="text-xs space-y-1.5 border-t border-gray-100 pt-3">
-            <div class="flex justify-between"><span class="text-gray-500">Bonus %</span><span class="font-bold text-gray-900">10%</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Trigger</span><span class="font-bold text-gray-900">First Deposit</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Max Bonus Cap</span><span class="font-bold text-gray-900">GH₵20.00</span></div>
-          </div>
-          <button onclick="alert('Edit First Deposit Bonus')" class="w-full py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Edit Bonus</button>
-        </div>
-
-        <!-- Bonus 3 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold text-pink-600 uppercase tracking-wider">Weekend Top-Up</span>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" class="sr-only peer">
-              <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
-            </label>
-          </div>
-          <p class="text-xs text-gray-600 leading-relaxed">Weekend exclusive: <strong>5% extra</strong> on all Saturday &amp; Sunday deposits of GH₵10+.</p>
-          <div class="text-xs space-y-1.5 border-t border-gray-100 pt-3">
-            <div class="flex justify-between"><span class="text-gray-500">Bonus %</span><span class="font-bold text-gray-900">5%</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Trigger</span><span class="font-bold text-gray-900">Sat–Sun Deposits</span></div>
-            <div class="flex justify-between"><span class="text-gray-500">Min Deposit</span><span class="font-bold text-gray-900">GH₵10.00</span></div>
-          </div>
-          <button onclick="alert('Edit Weekend Top-Up Bonus')" class="w-full py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Edit Bonus</button>
+      <div id="bonuses-container" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="col-span-full py-12 text-center text-gray-400 font-medium bg-white rounded-xl shadow-sm border border-gray-100">
+          Loading active bonus rules...
         </div>
       </div>
 
@@ -261,29 +211,38 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="font-extrabold text-gray-900">Create New Bonus</h3>
-        <button onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+        <button type="button" onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <div class="space-y-3">
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">Bonus Name</label><input type="text" placeholder="e.g. Flash Sale Bonus" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600"></div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">Bonus Type</label>
-          <select class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 focus:outline-none">
-            <option>Percentage (%)</option><option>Fixed Amount (GHS)</option>
-          </select>
+      <form id="add-bonus-form" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Bonus Name / Title</label>
+          <input type="text" id="bonus-name" placeholder="e.g. Flash Deposit Bonus" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
         </div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">Bonus Value</label><input type="number" placeholder="e.g. 10" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600"></div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">Trigger</label>
-          <select class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 focus:outline-none">
-            <option>Email Verification</option><option>First Deposit</option><option>All Deposits</option><option>Weekend Deposits</option>
-          </select>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Bonus %</label>
+            <input type="number" id="bonus-percentage" step="0.1" placeholder="e.g. 10" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Min Deposit (GH₵)</label>
+            <input type="number" id="bonus-min-amount" step="0.01" placeholder="e.g. 50" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+          </div>
         </div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">Description</label><textarea rows="2" placeholder="Describe this bonus..." class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 resize-none"></textarea></div>
-      </div>
-      <div class="flex space-x-2 pt-2">
-        <button onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">Cancel</button>
-        <button onclick="alert('Bonus created!'); document.getElementById('add-bonus-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg shadow transition">Create Bonus</button>
-      </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Gateway / Trigger</label>
+          <input type="text" id="bonus-gateway" placeholder="e.g. All Gateways / Mobile Money" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Description</label>
+          <textarea id="bonus-description" rows="2" placeholder="Describe this bonus..." class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 resize-none"></textarea>
+        </div>
+        <div class="flex space-x-2 pt-2">
+          <button type="button" onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">Cancel</button>
+          <button type="submit" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg shadow transition">Create Bonus</button>
+        </div>
+      </form>
     </div>
   </div>
 

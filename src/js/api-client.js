@@ -5084,22 +5084,110 @@ async function initAdminChildPanelsPage() {
 
 // ADMIN BONUSES HANDLER
 async function initAdminBonusesPage() {
-  const tableBody = document.querySelector('tbody');
-  if (!tableBody) return;
+  const container = document.getElementById('bonuses-container') || document.querySelector('.grid.grid-cols-1.md\\:grid-cols-3');
+  if (!container) return;
 
-  try {
-    const res = await API.request('/admin/bonuses');
-    if (res.success && res.bonuses) {
-      tableBody.innerHTML = res.bonuses.map(b => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${parseFloat(b.min_amount).toFixed(2)}</td>
-          <td class="px-6 py-3.5 font-bold text-pink-600">${b.bonus_percentage}%</td>
-          <td class="px-6 py-3.5 text-xs text-gray-500">${b.gateway}</td>
-          <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-green-100 text-green-700">${b.status}</span></td>
-        </tr>
-      `).join('');
+  async function loadBonuses() {
+    try {
+      const res = await API.request('/admin/bonuses');
+      if (res.success && Array.isArray(res.bonuses)) {
+        const list = res.bonuses;
+
+        // Dynamically compute KPI metrics
+        const activeElem = document.getElementById('admin-bonus-active');
+        const claimedElem = document.getElementById('admin-bonus-claimed');
+        const usersElem = document.getElementById('admin-bonus-users');
+
+        const activeCount = list.filter(b => (b.status || 'active').toLowerCase() === 'active').length;
+        const totalClaimed = list.reduce((sum, b) => sum + parseFloat(b.total_claimed || b.claimed_amount || 0), 0);
+        const usersCount = list.reduce((sum, b) => sum + parseInt(b.claimed_count || b.users_count || 0, 10), 0);
+
+        if (activeElem) activeElem.textContent = activeCount.toLocaleString();
+        if (claimedElem) claimedElem.textContent = `GH₵${totalClaimed.toFixed(2)}`;
+        if (usersElem) usersElem.textContent = usersCount.toLocaleString();
+
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full py-12 text-center text-gray-400 font-medium bg-white rounded-xl shadow-sm border border-gray-100">
+              No active bonus rules configured yet.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = list.map(b => {
+          const name = b.name || b.title || 'Deposit Bonus';
+          const pct = b.bonus_percentage || 0;
+          const minAmt = parseFloat(b.min_amount || 0).toFixed(2);
+          const gateway = b.gateway || 'All Gateways';
+          const desc = b.description || `Get ${pct}% bonus on deposits of GH₵${minAmt} or more.`;
+          const status = (b.status || 'active').toLowerCase();
+          const isChecked = status === 'active' ? 'checked' : '';
+
+          return `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-pink-600 uppercase tracking-wider">${escapeHtml(name)}</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" ${isChecked} class="sr-only peer" disabled>
+                  <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
+                </label>
+              </div>
+              <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(desc)}</p>
+              <div class="text-xs space-y-1.5 border-t border-gray-100 pt-3">
+                <div class="flex justify-between"><span class="text-gray-500">Bonus Rate</span><span class="font-bold text-pink-600">${pct}%</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Min Deposit</span><span class="font-bold text-gray-900">GH₵${minAmt}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Gateway</span><span class="font-bold text-gray-900">${escapeHtml(gateway)}</span></div>
+              </div>
+              <button onclick="alert('Managing ${escapeHtml(name)}')" class="w-full py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Manage Bonus</button>
+            </div>
+          `;
+        }).join('');
+      }
+    } catch (e) {
+      console.error('Bonuses load error:', e);
     }
-  } catch (e) {}
+  }
+
+  await loadBonuses();
+
+  const addBonusForm = document.getElementById('add-bonus-form');
+  if (addBonusForm) {
+    addBonusForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('bonus-name')?.value || '').trim();
+      const bonus_percentage = parseFloat(document.getElementById('bonus-percentage')?.value || 0);
+      const min_amount = parseFloat(document.getElementById('bonus-min-amount')?.value || 0);
+      const gateway = (document.getElementById('bonus-gateway')?.value || 'All').trim();
+      const description = (document.getElementById('bonus-description')?.value || '').trim();
+
+      if (!name || !bonus_percentage) {
+        alert('Please fill out bonus name and percentage.');
+        return;
+      }
+
+      try {
+        const res = await API.request('/admin/bonuses', 'POST', {
+          name,
+          bonus_percentage,
+          min_amount,
+          gateway,
+          description,
+          status: 'active'
+        });
+        if (res.success) {
+          alert('Bonus rule created successfully!');
+          addBonusForm.reset();
+          document.getElementById('add-bonus-modal')?.classList.add('hidden');
+          await loadBonuses();
+        } else {
+          alert(res.message || 'Failed to create bonus.');
+        }
+      } catch (err) {
+        alert(err.message || 'Error creating bonus.');
+      }
+    });
+  }
 }
 
 // ADMIN PROMOTIONS HANDLER
