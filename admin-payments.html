@@ -166,26 +166,16 @@
 
         <div class="relative z-10">
           <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-4">
-              <!-- Moolre Logo Badge -->
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg moolre-pulse">
-                <span class="text-white font-black text-lg tracking-tight">M</span>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <h2 class="text-xl font-black text-white">Moolre</h2>
+                <span id="moolre-env-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-400/30">SANDBOX</span>
               </div>
-              <div>
-                <div class="flex items-center gap-2 mb-1">
-                  <h2 class="text-xl font-black text-white">Moolre</h2>
-                  <span id="moolre-env-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-400/30">SANDBOX</span>
-                </div>
-                <p class="text-gray-300 text-xs">Licensed Enhanced Payment Service Provider – Ghana</p>
-                <p class="text-gray-400 text-[11px] mt-0.5">Powered by moolre.com · Registration No. PS00104</p>
-              </div>
+              <p class="text-gray-300 text-xs">Licensed Enhanced Payment Service Provider – Ghana</p>
+              <p class="text-gray-400 text-[11px] mt-0.5">Powered by moolre.com · Registration No. PS00104</p>
             </div>
             <!-- Actions & Enable toggle -->
             <div class="flex items-center gap-3">
-              <button id="btn-open-moolre-modal" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Configure Credentials
-              </button>
               <label class="relative inline-flex items-center cursor-pointer mt-1">
                 <input type="checkbox" id="moolre-master-toggle" class="sr-only peer" checked>
                 <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
@@ -492,7 +482,7 @@
     const openModal = () => modal.classList.remove('hidden');
     const closeModal = () => modal.classList.add('hidden');
 
-    document.getElementById('btn-open-moolre-modal').addEventListener('click', openModal);
+    document.getElementById('btn-open-moolre-modal')?.addEventListener('click', openModal);
     document.getElementById('btn-open-moolre-modal-2').addEventListener('click', openModal);
     document.getElementById('btn-close-moolre-modal').addEventListener('click', closeModal);
     document.getElementById('btn-cancel-moolre').addEventListener('click', closeModal);
