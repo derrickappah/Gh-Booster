@@ -22,6 +22,14 @@
     #moolre-modal { transition: opacity 0.2s ease; }
     #moolre-modal.hidden { pointer-events: none; }
 
+    /* ── Break all text utility ── */
+    .break-all {
+      word-break: break-all !important;
+      overflow-wrap: anywhere !important;
+      word-wrap: break-word !important;
+      white-space: normal !important;
+    }
+
     /* ── Status badge ── */
     .badge-live   { background:#dcfce7; color:#15803d; }
     .badge-sandbox{ background:#fef9c3; color:#a16207; }
@@ -335,15 +343,15 @@
           Webhook Configuration
         </h3>
         <p class="text-xs text-gray-500 mb-3">Configure this URL in your Moolre dashboard under <strong>Settings → Webhooks</strong> to automatically receive payment notifications.</p>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <code id="webhook-url-display" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs font-mono text-gray-800 select-all break-all min-w-0">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full max-w-full overflow-hidden">
+          <code id="webhook-url-display" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs font-mono text-gray-800 select-all min-w-0 max-w-full block overflow-x-auto break-all" style="word-break: break-all; overflow-wrap: anywhere; word-wrap: break-word; white-space: normal; box-sizing: border-box;">
             http://localhost:5000/api/payments/moolre/webhook
           </code>
           <button id="btn-copy-webhook" class="px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 cursor-pointer">
             Copy URL
           </button>
         </div>
-        <p class="text-[11px] text-gray-400 mt-2 break-words">⚠️ Replace <code class="break-all">localhost:5000</code> with your production domain before going live.</p>
+        <p class="text-[11px] text-gray-400 mt-2 break-all" style="word-break: break-all; overflow-wrap: anywhere;">⚠️ Replace <code class="break-all" style="word-break: break-all;">localhost:5000</code> with your production domain before going live.</p>
       </div>
 
     </main>
