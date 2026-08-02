@@ -210,7 +210,7 @@
           <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 1 (Uses Selected Service below): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">target_link quantity</span></p>
           <p class="text-[11px] font-mono text-gray-600 dark:text-gray-400">Format 2 (Per-line Service ID): <span class="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">service_id | target_link | quantity</span></p>
         </div>
-        <button type="button" id="btn-sample-bulk-input" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs shadow transition flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
+        <button type="button" id="btn-sample-bulk-input" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl text-xs shadow transition flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400">
           Insert Sample Input
         </button>
       </div>
@@ -242,7 +242,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input type="text" id="bulk-service-search-input" autocomplete="off" aria-label="Search service for bulk order" placeholder="Search and select service by name, platform, or ID..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
+                 <input type="text" id="bulk-service-search-input" autocomplete="off" aria-label="Search service for bulk order" placeholder="Search and select service by name, platform, or ID..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
                 
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" id="bulk-combobox-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -252,12 +252,12 @@
               </div>
 
               <!-- Custom Floating Dropdown Menu -->
-              <div id="bulk-service-dropdown-menu" style="max-height: 220px; overflow-y: auto;" class="hidden absolute z-50 mt-1.5 w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700/50 backdrop-blur-md">
+              <div id="bulk-service-dropdown-menu" style="max-height: 220px; overflow-y: auto;" class="hidden absolute z-50 mt-1.5 w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700/50 backdrop-blur-md">
                 <div class="p-3 text-center text-xs text-gray-400 font-medium" id="bulk-dropdown-loading-state">Loading services...</div>
               </div>
 
               <!-- White Theme Selected Service Summary Card -->
-              <div id="bulk-selected-service-card" class="hidden mt-4 p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+              <div id="bulk-selected-service-card" class="hidden mt-4 p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
                 <div class="flex items-start justify-between gap-3">
                   <div class="flex items-center space-x-2.5 min-w-0">
                     <img id="bulk-selected-svc-icon" src="src/img/platforms/instagram.png" class="w-6 h-6 object-contain flex-shrink-0" alt="Platform Icon">
@@ -304,8 +304,8 @@
               </div>
               <textarea id="bulk-textarea" rows="7" required aria-label="Mass Order Links and Quantities Input" placeholder="https://instagram.com/user1 1000
 https://instagram.com/user2 2500
-https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-mono focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition"></textarea>
-              <div id="bulk-syntax-warning" class="hidden mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 text-xs font-semibold"></div>
+https://tiktok.com/@user/video 5000" class="w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white text-sm font-mono focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition"></textarea>
+              <div id="bulk-syntax-warning" class="hidden mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-2xl text-amber-800 dark:text-amber-300 text-xs font-semibold"></div>
             </div>
 
             <!-- Live Calculation & Summary -->

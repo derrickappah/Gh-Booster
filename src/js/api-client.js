@@ -1849,8 +1849,8 @@ async function initTransactionsPage() {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = i === currentPage
-          ? 'px-3 py-1 bg-pink-600 text-white font-bold rounded-xl text-xs transition shadow-sm'
-          : 'px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl transition text-xs';
+          ? 'px-3 py-1 bg-pink-600 text-white font-bold rounded-2xl text-xs transition shadow-sm'
+          : 'px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-2xl transition text-xs';
         btn.textContent = i;
         btn.addEventListener('click', () => {
           currentPage = i;

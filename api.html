@@ -196,7 +196,7 @@
             </h2>
             <p class="text-xs text-gray-500 mt-1">Keep your secret API key confidential. Do not expose it in client-side code.</p>
           </div>
-          <button id="regen-key-btn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg transition flex items-center self-start md:self-auto">
+          <button id="regen-key-btn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-2xl transition flex items-center self-start md:self-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -209,9 +209,9 @@
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">HTTP POST API Key</label>
             <div class="flex items-center space-x-2">
-              <input type="password" id="api-key-input" readonly value="ghb_live_key" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono text-gray-900 focus:outline-none">
-              <button id="toggle-key-btn" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition">Show</button>
-              <button id="copy-key-btn" class="px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-bold shadow transition">Copy</button>
+              <input type="password" id="api-key-input" readonly value="ghb_live_key" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-gray-900 focus:outline-none">
+              <button id="toggle-key-btn" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl text-xs font-semibold transition">Show</button>
+              <button id="copy-key-btn" class="px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl text-xs font-bold shadow transition">Copy</button>
             </div>
           </div>
 
@@ -219,8 +219,8 @@
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1.5">API Endpoint URL</label>
             <div class="flex items-center space-x-2">
-              <input type="text" id="api-url-input" readonly value="https://ghbooster.com/api/v2" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono text-gray-900 focus:outline-none">
-              <button id="copy-url-btn" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-bold transition">Copy URL</button>
+              <input type="text" id="api-url-input" readonly value="https://ghbooster.com/api/v2" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-gray-900 focus:outline-none">
+              <button id="copy-url-btn" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-2xl text-xs font-bold transition">Copy URL</button>
             </div>
           </div>
         </div>
@@ -233,26 +233,26 @@
           <h3 class="text-base font-bold text-gray-900 dark:text-white">API Methods & Code Snippets</h3>
           
           <!-- Language Tabs -->
-          <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg text-xs font-semibold self-start lg:self-auto">
-            <button class="lang-tab px-3 py-1 bg-pink-600 text-white rounded shadow-sm transition active" data-lang="curl">cURL</button>
-            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-lang="php">PHP</button>
-            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-lang="python">Python</button>
-            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-lang="js">Node / JS</button>
+          <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-2xl text-xs font-semibold self-start lg:self-auto">
+            <button class="lang-tab px-3 py-1 bg-pink-600 text-white rounded-2xl shadow-sm transition active" data-lang="curl">cURL</button>
+            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition" data-lang="php">PHP</button>
+            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition" data-lang="python">Python</button>
+            <button class="lang-tab px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition" data-lang="js">Node / JS</button>
           </div>
         </div>
 
         <!-- Action Selection Tabs -->
-        <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-lg text-xs font-semibold overflow-x-auto">
-          <button class="action-tab px-3 py-1.5 bg-pink-600 text-white rounded shadow-sm transition active" data-action="add">Add Order</button>
-          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-action="status">Order Status</button>
-          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-action="balance">User Balance</button>
-          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded transition" data-action="services">Services List</button>
+        <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-2xl text-xs font-semibold overflow-x-auto">
+          <button class="action-tab px-3 py-1.5 bg-pink-600 text-white rounded-2xl shadow-sm transition active" data-action="add">Add Order</button>
+          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition" data-action="status">Order Status</button>
+          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition" data-action="balance">User Balance</button>
+          <button class="action-tab px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition" data-action="services">Services List</button>
         </div>
 
         <!-- Code Snippet Area -->
         <div class="space-y-4">
-          <div class="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-xs overflow-x-auto relative min-h-[140px]">
-            <button id="copy-snippet-btn" class="absolute top-2 right-2 bg-gray-800 hover:bg-gray-700 text-[10px] text-gray-400 hover:text-white px-2.5 py-1 rounded font-sans transition select-none">Copy Code</button>
+          <div class="bg-gray-900 text-gray-100 p-4 rounded-2xl font-mono text-xs overflow-x-auto relative min-h-[140px]">
+            <button id="copy-snippet-btn" class="absolute top-2 right-2 bg-gray-800 hover:bg-gray-700 text-[10px] text-gray-400 hover:text-white px-2.5 py-1 rounded-2xl font-sans transition select-none">Copy Code</button>
             <pre><code id="code-snippet-display">Loading...</code></pre>
           </div>
 
