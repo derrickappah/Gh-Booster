@@ -169,7 +169,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-green-600 leading-tight truncate">GH₵284,120.00</h3>
+            <h3 id="admin-txn-credits" class="text-base font-bold text-green-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Credits</span>
             <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Deposits + top-ups</span>
           </div>
@@ -182,7 +182,7 @@
 
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-red-600 leading-tight truncate">GH₵203,760.00</h3>
+            <h3 id="admin-txn-debits" class="text-base font-bold text-red-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Debits</span>
             <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Order purchases</span>
           </div>
@@ -195,7 +195,7 @@
 
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-yellow-600 leading-tight truncate">GH₵3,450.00</h3>
+            <h3 id="admin-txn-refunds" class="text-base font-bold text-yellow-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Refunds</span>
             <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Canceled orders</span>
           </div>
@@ -208,7 +208,7 @@
 
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
           <div class="min-w-0 pr-2">
-            <h3 class="text-base font-bold text-purple-600 leading-tight truncate">GH₵80,360.00</h3>
+            <h3 id="admin-txn-float" class="text-base font-bold text-purple-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Net Balance Float</span>
             <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Held in user accounts</span>
           </div>
@@ -266,101 +266,18 @@
                 <th class="py-3.5 px-4">Description</th>
                 <th class="py-3.5 px-4">Amount</th>
                 <th class="py-3.5 px-4">Balance After</th>
-                <th class="py-3.5 px-4">Date & Time</th>
+                <th class="py-3.5 px-4">Date &amp; Time</th>
                 <th class="py-3.5 px-4">Status</th>
               </tr>
             </thead>
             <tbody id="txn-tbody" class="divide-y divide-gray-100">
-
-              <!-- Txn 1 – Deposit (Credit) -->
-              <tr class="txn-row hover:bg-gray-50/50 transition" data-type="credit">
-                <td class="py-4 px-4 font-bold text-pink-600">#TXN-8801</td>
-                <td class="py-4 px-4 font-bold text-gray-900">appiahattah</td>
-                <td class="py-4 px-4">
-                  <span class="px-2.5 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Credit</span>
-                </td>
-                <td class="py-4 px-4 text-gray-700">MTN Mobile Money Deposit</td>
-                <td class="py-4 px-4 font-extrabold text-green-600">+GH₵50.00</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵250.00</td>
-                <td class="py-4 px-4 text-gray-500">2026-07-27 22:01</td>
-                <td class="py-4 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Approved</span></td>
+              <tr class="hover:bg-gray-50/50 transition">
+                <td colspan="8" class="py-12 text-center text-gray-400 font-medium">Loading transaction records...</td>
               </tr>
-
-              <!-- Txn 2 – Order Charge (Debit) -->
-              <tr class="txn-row hover:bg-gray-50/50 transition" data-type="debit">
-                <td class="py-4 px-4 font-bold text-pink-600">#TXN-8800</td>
-                <td class="py-4 px-4 font-bold text-gray-900">appiahattah</td>
-                <td class="py-4 px-4">
-                  <span class="px-2.5 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Debit</span>
-                </td>
-                <td class="py-4 px-4 text-gray-700">Order #169913 – Instagram Followers ×1,000</td>
-                <td class="py-4 px-4 font-extrabold text-red-600">-GH₵0.85</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵200.00</td>
-                <td class="py-4 px-4 text-gray-500">2026-07-27 22:14</td>
-                <td class="py-4 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Completed</span></td>
-              </tr>
-
-              <!-- Txn 3 – Refund -->
-              <tr class="txn-row hover:bg-gray-50/50 transition" data-type="refund">
-                <td class="py-4 px-4 font-bold text-pink-600">#TXN-8799</td>
-                <td class="py-4 px-4 font-bold text-gray-900">kwame_pro</td>
-                <td class="py-4 px-4">
-                  <span class="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 font-bold rounded text-[10px]">Refund</span>
-                </td>
-                <td class="py-4 px-4 text-gray-700">Order #169905 canceled – TikTok Views refund</td>
-                <td class="py-4 px-4 font-extrabold text-yellow-600">+GH₵2.40</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵86.90</td>
-                <td class="py-4 px-4 text-gray-500">2026-07-27 18:32</td>
-                <td class="py-4 px-4"><span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 font-bold rounded text-[10px]">Refunded</span></td>
-              </tr>
-
-              <!-- Txn 4 – Admin Adjustment (Credit) -->
-              <tr class="txn-row hover:bg-gray-50/50 transition" data-type="admin">
-                <td class="py-4 px-4 font-bold text-pink-600">#TXN-8798</td>
-                <td class="py-4 px-4 font-bold text-gray-900">ama_social</td>
-                <td class="py-4 px-4">
-                  <span class="px-2.5 py-0.5 bg-purple-100 text-purple-700 font-bold rounded text-[10px]">Admin Adj.</span>
-                </td>
-                <td class="py-4 px-4 text-gray-700">Manual balance top-up by admin</td>
-                <td class="py-4 px-4 font-extrabold text-green-600">+GH₵100.00</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵145.00</td>
-                <td class="py-4 px-4 text-gray-500">2026-07-27 16:05</td>
-                <td class="py-4 px-4"><span class="px-2 py-0.5 bg-purple-100 text-purple-700 font-bold rounded text-[10px]">Applied</span></td>
-              </tr>
-
-              <!-- Txn 5 – Deposit (Credit) -->
-              <tr class="txn-row hover:bg-gray-50/50 transition" data-type="credit">
-                <td class="py-4 px-4 font-bold text-pink-600">#TXN-8797</td>
-                <td class="py-4 px-4 font-bold text-gray-900">kwame_pro</td>
-                <td class="py-4 px-4">
-                  <span class="px-2.5 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Credit</span>
-                </td>
-                <td class="py-4 px-4 text-gray-700">Telecel Cash Deposit</td>
-                <td class="py-4 px-4 font-extrabold text-green-600">+GH₵25.00</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵84.50</td>
-                <td class="py-4 px-4 text-gray-500">2026-07-27 12:18</td>
-                <td class="py-4 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Approved</span></td>
-              </tr>
-
-              <!-- Txn 6 – Order Charge (Debit) -->
-              <tr class="txn-row hover:bg-gray-50/50 transition" data-type="debit">
-                <td class="py-4 px-4 font-bold text-pink-600">#TXN-8796</td>
-                <td class="py-4 px-4 font-bold text-gray-900">ama_social</td>
-                <td class="py-4 px-4">
-                  <span class="px-2.5 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Debit</span>
-                </td>
-                <td class="py-4 px-4 text-gray-700">Order #169890 – YouTube Subscribers ×500</td>
-                <td class="py-4 px-4 font-extrabold text-red-600">-GH₵2.25</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵45.00</td>
-                <td class="py-4 px-4 text-gray-500">2026-07-27 10:44</td>
-                <td class="py-4 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Completed</span></td>
-              </tr>
-
             </tbody>
           </table>
         </div>
       </div>
-
     </main>
 
     <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">

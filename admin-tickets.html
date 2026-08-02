@@ -181,64 +181,10 @@
             <button class="px-3 py-1.5 bg-white text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">Closed</button>
           </div>
 
-          <!-- Ticket Cards -->
-          <div onclick="showTicket('TKT-1021')" class="bg-white border-2 border-pink-500 rounded-xl p-4 cursor-pointer shadow-sm space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-pink-600">#TKT-1021</span>
-              <span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Urgent</span>
-            </div>
-            <p class="text-xs font-bold text-gray-900 leading-snug">My order has been pending for 3 days – please help!</p>
-            <div class="flex items-center justify-between text-[11px] text-gray-400">
-              <span>appiahattah</span>
-              <span>2 hours ago</span>
-            </div>
-          </div>
-
-          <div onclick="showTicket('TKT-1020')" class="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-300 hover:shadow-sm transition space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-pink-600">#TKT-1020</span>
-              <span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Urgent</span>
-            </div>
-            <p class="text-xs font-bold text-gray-900 leading-snug">Deposited ₵200 via MoMo but balance not updated</p>
-            <div class="flex items-center justify-between text-[11px] text-gray-400">
-              <span>ama_social</span>
-              <span>5 hours ago</span>
-            </div>
-          </div>
-
-          <div onclick="showTicket('TKT-1019')" class="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-300 hover:shadow-sm transition space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-pink-600">#TKT-1019</span>
-              <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 font-bold rounded text-[10px]">Open</span>
-            </div>
-            <p class="text-xs font-bold text-gray-900 leading-snug">How do I place a bulk order for multiple links?</p>
-            <div class="flex items-center justify-between text-[11px] text-gray-400">
-              <span>kwame_pro</span>
-              <span>Yesterday</span>
-            </div>
-          </div>
-
-          <div onclick="showTicket('TKT-1018')" class="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-300 hover:shadow-sm transition space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-pink-600">#TKT-1018</span>
-              <span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">Replied</span>
-            </div>
-            <p class="text-xs font-bold text-gray-900 leading-snug">Can I get a refund for a cancelled order?</p>
-            <div class="flex items-center justify-between text-[11px] text-gray-400">
-              <span>user_gh44</span>
-              <span>2 days ago</span>
-            </div>
-          </div>
-
-          <div onclick="showTicket('TKT-1017')" class="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-300 hover:shadow-sm transition space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-pink-600">#TKT-1017</span>
-              <span class="px-2 py-0.5 bg-gray-100 text-gray-600 font-bold rounded text-[10px]">Closed</span>
-            </div>
-            <p class="text-xs font-bold text-gray-900 leading-snug">Instagram followers dropped after delivery</p>
-            <div class="flex items-center justify-between text-[11px] text-gray-400">
-              <span>nana_boost</span>
-              <span>3 days ago</span>
+          <!-- Ticket Cards Container -->
+          <div id="tickets-list-container" class="space-y-3">
+            <div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-gray-400 text-xs font-medium">
+              Loading support tickets...
             </div>
           </div>
 

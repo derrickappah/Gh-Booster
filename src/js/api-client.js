@@ -4771,23 +4771,141 @@ async function initAdminDepositsPage() {
 
 // ADMIN TRANSACTIONS HANDLER
 async function initAdminTransactionsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('txn-tbody') || document.querySelector('tbody');
+  const searchInput = document.getElementById('txn-search');
+  const typeFilter = document.getElementById('txn-type-filter');
+  const tabContainer = document.getElementById('txn-tabs');
+
+  const creditsElem = document.getElementById('admin-txn-credits');
+  const debitsElem = document.getElementById('admin-txn-debits');
+  const refundsElem = document.getElementById('admin-txn-refunds');
+  const floatElem = document.getElementById('admin-txn-float');
+
   if (!tableBody) return;
 
   try {
-    const res = await API.request('/admin/deposits');
-    if (res.success && res.deposits) {
-      tableBody.innerHTML = res.deposits.map(t => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">${t.reference}</td>
-          <td class="px-6 py-3.5 font-medium text-gray-900">${t.profiles?.username || 'User'}</td>
-          <td class="px-6 py-3.5 font-bold ${t.amount >= 0 ? 'text-green-600' : 'text-red-600'}">GH₵${Math.abs(t.amount).toFixed(2)}</td>
-          <td class="px-6 py-3.5 text-xs text-gray-500">${t.gateway}</td>
-          <td class="px-6 py-3.5 text-xs text-gray-500">${new Date(t.created_at).toLocaleString()}</td>
-        </tr>
-      `).join('');
+    const res = await API.request('/admin/transactions');
+    if (res.success && res.transactions) {
+      const list = res.transactions;
+
+      let totalCredits = 0;
+      let totalDebits = 0;
+      let totalRefunds = 0;
+
+      list.forEach(t => {
+        const amt = parseFloat(t.amount || t.charge || 0);
+        const type = (t.type || t.transaction_type || '').toLowerCase();
+        if (type.includes('credit') || type.includes('deposit')) {
+          totalCredits += amt;
+        } else if (type.includes('debit') || type.includes('order')) {
+          totalDebits += amt;
+        } else if (type.includes('refund')) {
+          totalRefunds += amt;
+        }
+      });
+
+      if (creditsElem) creditsElem.textContent = `GH₵${totalCredits.toFixed(2)}`;
+      if (debitsElem) debitsElem.textContent = `GH₵${totalDebits.toFixed(2)}`;
+      if (refundsElem) refundsElem.textContent = `GH₵${totalRefunds.toFixed(2)}`;
+      if (floatElem) floatElem.textContent = `GH₵${(totalCredits - totalDebits + totalRefunds).toFixed(2)}`;
+
+      let currentTab = 'all';
+
+      function renderTable(data) {
+        if (!data || data.length === 0) {
+          tableBody.innerHTML = `
+            <tr class="hover:bg-gray-50/50 transition">
+              <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No transaction records found.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = data.map(t => {
+          const ref = t.id || t.reference || `#TXN-${String(t.id).substring(0, 6)}`;
+          const user = t.profiles?.username || t.profiles?.email || 'User';
+          const type = (t.type || 'credit').toLowerCase();
+          const desc = t.description || t.details || 'System transaction';
+          const amt = parseFloat(t.amount || t.charge || 0).toFixed(2);
+          const bal = t.balance_after ? parseFloat(t.balance_after).toFixed(2) : '—';
+          const date = t.created_at ? new Date(t.created_at).toLocaleString() : 'N/A';
+          const status = (t.status || 'Completed').toLowerCase();
+
+          let typeBadge = `<span class="px-2.5 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Credit</span>`;
+          let amtClass = 'text-green-600';
+          let sign = '+';
+
+          if (type.includes('debit')) {
+            typeBadge = `<span class="px-2.5 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Debit</span>`;
+            amtClass = 'text-red-600';
+            sign = '-';
+          } else if (type.includes('refund')) {
+            typeBadge = `<span class="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 font-bold rounded text-[10px]">Refund</span>`;
+            amtClass = 'text-yellow-600';
+            sign = '+';
+          }
+
+          return `
+            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+              <td class="py-3.5 px-4 font-bold text-pink-600 font-mono text-xs">${ref}</td>
+              <td class="py-3.5 px-4 font-bold text-gray-900">${user}</td>
+              <td class="py-3.5 px-4">${typeBadge}</td>
+              <td class="py-3.5 px-4 text-gray-600 text-xs max-w-xs truncate">${desc}</td>
+              <td class="py-3.5 px-4 font-extrabold ${amtClass}">${sign}GH₵${amt}</td>
+              <td class="py-3.5 px-4 font-bold text-gray-900">GH₵${bal}</td>
+              <td class="py-3.5 px-4 text-gray-500 text-xs">${date}</td>
+              <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px] capitalize">${status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function applyFilter() {
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        const selectVal = typeFilter ? typeFilter.value.toLowerCase() : 'all';
+        let filtered = list;
+
+        if (currentTab !== 'all') {
+          filtered = filtered.filter(t => (t.type || '').toLowerCase().includes(currentTab));
+        }
+
+        if (selectVal !== 'all') {
+          filtered = filtered.filter(t => (t.type || '').toLowerCase().includes(selectVal));
+        }
+
+        if (query) {
+          filtered = filtered.filter(t =>
+            String(t.id).toLowerCase().includes(query) ||
+            (t.reference || '').toLowerCase().includes(query) ||
+            (t.profiles?.username || '').toLowerCase().includes(query) ||
+            (t.description || '').toLowerCase().includes(query)
+          );
+        }
+
+        renderTable(filtered);
+      }
+
+      if (searchInput) searchInput.oninput = applyFilter;
+      if (typeFilter) typeFilter.onchange = applyFilter;
+
+      if (tabContainer) {
+        tabContainer.querySelectorAll('.txn-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            tabContainer.querySelectorAll('.txn-tab').forEach(b => {
+              b.className = 'txn-tab px-4 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 font-bold';
+            });
+            btn.className = 'txn-tab px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition flex-shrink-0 font-bold';
+            currentTab = btn.getAttribute('data-tab');
+            applyFilter();
+          });
+        });
+      }
+
+      renderTable(list);
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Transactions load error:', e);
+  }
 }
 
 // ADMIN PAYMENTS HANDLER
@@ -4795,63 +4913,157 @@ function initAdminPaymentsPage() {}
 
 // ADMIN TICKETS HANDLER
 async function initAdminTicketsPage() {
-  const tableBody = document.querySelector('tbody');
-  if (!tableBody) return;
+  const container = document.getElementById('tickets-list-container');
+  if (!container) return;
 
   try {
     const res = await API.request('/admin/tickets');
     if (res.success && res.tickets) {
-      tableBody.innerHTML = res.tickets.map(t => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">#${t.id}</td>
-          <td class="px-6 py-3.5 font-medium text-gray-900">${t.profiles?.username || 'User'}</td>
-          <td class="px-6 py-3.5 font-medium text-gray-900">${t.subject}</td>
-          <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-blue-100 text-blue-700">${t.status}</span></td>
-          <td class="px-6 py-3.5 text-xs text-gray-500">${new Date(t.created_at).toLocaleString()}</td>
-        </tr>
-      `).join('');
+      const tickets = res.tickets;
+      if (tickets.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white p-8 rounded-xl border border-gray-200 text-center text-gray-400 text-xs font-medium">
+            No support tickets found.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = tickets.map(t => {
+        const id = t.id || t.ticket_number || `TKT-${String(t.id).substring(0, 6)}`;
+        const user = t.profiles?.username || t.profiles?.email || 'User';
+        const subj = t.subject || 'Support Request';
+        const status = (t.status || 'open').toLowerCase();
+        const date = t.created_at ? new Date(t.created_at).toLocaleString() : 'N/A';
+
+        let badge = `<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 font-bold rounded text-[10px]">Open</span>`;
+        if (status === 'urgent') {
+          badge = `<span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-[10px]">Urgent</span>`;
+        } else if (status === 'replied') {
+          badge = `<span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">Replied</span>`;
+        } else if (status === 'closed') {
+          badge = `<span class="px-2 py-0.5 bg-gray-100 text-gray-600 font-bold rounded text-[10px]">Closed</span>`;
+        }
+
+        return `
+          <div class="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-pink-300 hover:shadow-sm transition space-y-2" data-id="${t.id}">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-pink-600">#${id}</span>
+              ${badge}
+            </div>
+            <p class="text-xs font-bold text-gray-900 leading-snug">${escapeHtml(subj)}</p>
+            <div class="flex items-center justify-between text-[11px] text-gray-400">
+              <span>${escapeHtml(user)}</span>
+              <span>${date}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Tickets load error:', e);
+  }
 }
 
 // ADMIN REFERRALS HANDLER
 async function initAdminReferralsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('referrals-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
   try {
     const res = await API.request('/admin/referrals');
     if (res.success && res.referrals) {
-      tableBody.innerHTML = res.referrals.map(r => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">${r.profiles?.username || 'User'}</td>
-          <td class="px-6 py-3.5 font-bold text-green-600">GH₵${parseFloat(r.amount || 0).toFixed(2)}</td>
-          <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-yellow-100 text-yellow-700">${r.status}</span></td>
-          <td class="px-6 py-3.5 text-xs text-gray-500">${new Date(r.created_at).toLocaleString()}</td>
-        </tr>
-      `).join('');
+      const list = res.referrals;
+      if (list.length === 0) {
+        tableBody.innerHTML = `
+          <tr class="hover:bg-gray-50/50 transition">
+            <td colspan="7" class="py-12 text-center text-gray-400 font-medium">No referral statistics available.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = list.map((r, idx) => {
+        let rankBadge = `<span class="font-bold text-gray-500 text-xs">#${idx + 1}</span>`;
+        if (idx === 0) rankBadge = `<span class="text-yellow-500 font-extrabold text-base">🥇</span>`;
+        else if (idx === 1) rankBadge = `<span class="text-gray-400 font-extrabold text-base">🥈</span>`;
+        else if (idx === 2) rankBadge = `<span class="text-orange-400 font-extrabold text-base">🥉</span>`;
+
+        const username = r.profiles?.username || r.profiles?.email || 'User';
+        const count = r.referred_count || 0;
+        const activeCount = r.active_referred_count || count;
+        const comms = parseFloat(r.total_commission || r.amount || 0).toFixed(2);
+        const lastRef = r.last_referral_date ? new Date(r.last_referral_date).toISOString().split('T')[0] : 'N/A';
+
+        return `
+          <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+            <td class="py-4 px-4">${rankBadge}</td>
+            <td class="py-4 px-4 font-bold text-gray-900">${escapeHtml(username)}</td>
+            <td class="py-4 px-4 font-bold text-gray-900">${count}</td>
+            <td class="py-4 px-4 font-bold text-green-600">${activeCount}</td>
+            <td class="py-4 px-4 font-extrabold text-green-600">GH₵${comms}</td>
+            <td class="py-4 px-4 text-gray-500">${lastRef}</td>
+            <td class="py-4 px-4 text-center">
+              <button class="px-3 py-1 bg-pink-50 text-pink-700 font-bold rounded text-[11px] hover:bg-pink-100 transition" onclick="alert('Viewing referral tree for ${escapeHtml(username)}')">View Tree</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Referrals load error:', e);
+  }
 }
 
 // ADMIN CHILD PANELS HANDLER
 async function initAdminChildPanelsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('child-panels-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
   try {
     const res = await API.request('/admin/child-panels');
     if (res.success && res.childPanels) {
-      tableBody.innerHTML = res.childPanels.map(p => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">${p.domain}</td>
-          <td class="px-6 py-3.5 font-medium text-gray-900">${p.profiles?.username || 'User'}</td>
-          <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${parseFloat(p.price || 25).toFixed(2)}</td>
-          <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-blue-100 text-blue-700">${p.status}</span></td>
-        </tr>
-      `).join('');
+      const list = res.childPanels;
+      if (list.length === 0) {
+        tableBody.innerHTML = `
+          <tr class="hover:bg-gray-50/50 transition">
+            <td colspan="6" class="py-12 text-center text-gray-400 font-medium">No child panels connected.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = list.map(p => {
+        const domain = p.domain || 'N/A';
+        const owner = p.profiles?.username || p.profiles?.email || 'User';
+        const fee = parseFloat(p.monthly_fee || p.price || 25).toFixed(2);
+        const renewal = p.renewal_date ? new Date(p.renewal_date).toISOString().split('T')[0] : 'N/A';
+        const status = (p.status || 'active').toLowerCase();
+
+        let badge = `<span class="px-2.5 py-0.5 text-[11px] font-bold text-green-700 bg-green-100 rounded-full">Active</span>`;
+        if (status === 'pending') {
+          badge = `<span class="px-2.5 py-0.5 text-[11px] font-bold text-yellow-700 bg-yellow-100 rounded-full">Pending DNS</span>`;
+        } else if (status === 'cancelled' || status === 'expired') {
+          badge = `<span class="px-2.5 py-0.5 text-[11px] font-bold text-red-700 bg-red-100 rounded-full">Expired</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-gray-50 border-b border-gray-100">
+            <td class="px-6 py-3.5 font-bold text-pink-600">${escapeHtml(domain)}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900">${escapeHtml(owner)}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${fee}</td>
+            <td class="px-6 py-3.5 text-xs text-gray-500">${renewal}</td>
+            <td class="px-6 py-3.5">${badge}</td>
+            <td class="px-6 py-3.5">
+              <button onclick="alert('Managing ${escapeHtml(domain)}')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-3 py-1 rounded transition">Manage</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Child panels load error:', e);
+  }
 }
 
 // ADMIN BONUSES HANDLER
@@ -4876,22 +5088,57 @@ async function initAdminBonusesPage() {
 
 // ADMIN PROMOTIONS HANDLER
 async function initAdminPromotionsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('promotions-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
   try {
     const res = await API.request('/admin/promotions');
     if (res.success && res.promotions) {
-      tableBody.innerHTML = res.promotions.map(p => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">${p.code}</td>
-          <td class="px-6 py-3.5 font-bold text-pink-600">${p.discount_percentage}%</td>
-          <td class="px-6 py-3.5 text-xs">${p.used_count} / ${p.max_uses}</td>
-          <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-green-100 text-green-700">${p.status}</span></td>
-        </tr>
-      `).join('');
+      const list = res.promotions;
+      if (list.length === 0) {
+        tableBody.innerHTML = `
+          <tr class="hover:bg-gray-50/50 transition">
+            <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No promotional codes found.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = list.map(p => {
+        const code = p.code || 'CODE';
+        const disc = p.discount_percentage ? `${p.discount_percentage}%` : `GH₵${parseFloat(p.discount_amount || 0).toFixed(2)}`;
+        const type = p.type || 'Deposit';
+        const uses = `${p.used_count || 0} / ${p.max_uses || '∞'}`;
+        const applies = p.applies_to || 'All deposits';
+        const expires = p.expires_at ? new Date(p.expires_at).toISOString().split('T')[0] : 'Never';
+        const status = (p.status || 'active').toLowerCase();
+
+        let badge = `<span class="px-2.5 py-1 bg-green-100 text-green-700 font-bold rounded-full text-[11px]">Active</span>`;
+        if (status === 'expired') {
+          badge = `<span class="px-2.5 py-1 bg-gray-100 text-gray-600 font-bold rounded-full text-[11px]">Expired</span>`;
+        } else if (status === 'inactive') {
+          badge = `<span class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-full text-[11px]">Disabled</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+            <td class="py-4 px-4 font-mono font-extrabold text-pink-600 text-sm tracking-widest">${escapeHtml(code)}</td>
+            <td class="py-4 px-4 font-extrabold text-green-600">${disc}</td>
+            <td class="py-4 px-4"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">${escapeHtml(type)}</span></td>
+            <td class="py-4 px-4 font-bold text-gray-900">${uses}</td>
+            <td class="py-4 px-4 text-gray-600">${escapeHtml(applies)}</td>
+            <td class="py-4 px-4 text-gray-500">${expires}</td>
+            <td class="py-4 px-4">${badge}</td>
+            <td class="py-4 px-4 text-center space-x-1">
+              <button onclick="alert('Edit ${escapeHtml(code)}')" class="px-2.5 py-1 bg-gray-100 text-gray-700 font-bold rounded text-[11px]">Edit</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Promotions load error:', e);
+  }
 }
 
 // ADMIN NEWS HANDLER
@@ -4915,22 +5162,43 @@ async function initAdminNewsPage() {
 
 // ADMIN LOGS HANDLER
 async function initAdminLogsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('logs-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
   try {
     const res = await API.request('/admin/logs');
     if (res.success && res.logs) {
-      tableBody.innerHTML = res.logs.map(l => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-mono text-xs text-gray-500">${new Date(l.created_at).toLocaleString()}</td>
-          <td class="px-6 py-3.5 font-bold text-gray-900">${l.action}</td>
-          <td class="px-6 py-3.5 text-xs text-gray-600">${l.details || ''}</td>
-          <td class="px-6 py-3.5 font-mono text-xs text-gray-400">${l.ip_address || '127.0.0.1'}</td>
-        </tr>
-      `).join('');
+      const logs = res.logs;
+      if (logs.length === 0) {
+        tableBody.innerHTML = `
+          <tr class="hover:bg-gray-50/50 transition">
+            <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No audit logs recorded yet.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = logs.map(l => {
+        const time = l.created_at ? new Date(l.created_at).toLocaleString() : 'N/A';
+        const user = l.profiles?.username || l.user_id || 'System';
+        const action = l.action || 'Event Logged';
+        const details = l.details || l.description || '—';
+        const ip = l.ip_address || '127.0.0.1';
+
+        return `
+          <tr class="hover:bg-gray-50 border-b border-gray-100">
+            <td class="px-6 py-3.5 font-medium text-gray-900">${time}</td>
+            <td class="px-6 py-3.5 text-pink-600 font-bold">${escapeHtml(user)}</td>
+            <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-[11px] font-bold text-blue-700 bg-blue-100 rounded-full">${escapeHtml(action)}</span></td>
+            <td class="px-6 py-3.5 text-xs text-gray-700 max-w-xs truncate">${escapeHtml(details)}</td>
+            <td class="px-6 py-3.5 font-mono text-xs text-gray-400">${escapeHtml(ip)}</td>
+          </tr>
+        `;
+      }).join('');
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Logs load error:', e);
+  }
 }
 
 // ADMIN SETTINGS HANDLER
