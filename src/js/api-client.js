@@ -4181,6 +4181,7 @@ async function initAdminServicesPage() {
           if (modalTitle) modalTitle.textContent = 'Add New Service';
           if (modalSvcId) modalSvcId.value = '';
           if (modalForm) modalForm.reset();
+          if (modalSvcCategory && categories.length > 0) modalSvcCategory.value = categories[0].id;
           if (modalSvcRate) modalSvcRate.value = '0';
           if (modalSvcMin) modalSvcMin.value = '100';
           if (modalSvcMax) modalSvcMax.value = '100000';
@@ -4193,7 +4194,14 @@ async function initAdminServicesPage() {
         if (modal) modal.classList.add('hidden');
       }
 
-      if (addSvcBtn) addSvcBtn.onclick = () => openModal();
+      const activeAddBtn = document.getElementById('add-service-btn');
+      if (activeAddBtn) {
+        activeAddBtn.onclick = (e) => {
+          if (e) e.preventDefault();
+          openModal();
+        };
+      }
+
       if (closeModalBtn) closeModalBtn.onclick = closeModal;
       if (cancelModalBtn) cancelModalBtn.onclick = closeModal;
 
