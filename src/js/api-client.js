@@ -3361,19 +3361,65 @@ async function initAdminUsersPage() {
                   <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse" aria-hidden="true"></span> Active
                 </span>
               </td>
-              <td class="py-4 px-4 text-center space-x-1">
-                <button type="button" class="add-funds-btn px-2 py-1 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" aria-label="Add funds to ${escapeHtml(u.username || 'user')}">💳 Add Funds</button>
-                <button type="button" class="edit-phone-btn px-2 py-1 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded text-[11px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400" aria-label="Edit phone for ${escapeHtml(u.username || 'user')}">✏️ Phone</button>
+              <td class="py-4 px-4 text-center relative">
+                <div class="inline-block text-left relative">
+                  <button type="button" class="user-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for ${escapeHtml(u.username || 'user')}" title="Admin Actions">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+
+                  <div class="user-actions-menu hidden absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
+                    <div class="py-1">
+                      <button type="button" class="add-funds-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Add / Deduct Balance
+                      </button>
+                      <button type="button" class="edit-phone-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        Edit Phone Number
+                      </button>
+                    </div>
+                    <div class="py-1">
+                      <a href="/admin-orders?search=${encodeURIComponent(u.username || u.email || '')}" class="w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        View User Orders
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           `;
         }).join('');
+
+        // Toggle 3-dots action menu dropdown
+        tableBody.querySelectorAll('.user-actions-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMenu = btn.nextElementSibling;
+            const isHidden = currentMenu.classList.contains('hidden');
+            // Close any other open user action dropdowns
+            document.querySelectorAll('.user-actions-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) {
+              currentMenu.classList.remove('hidden');
+            }
+          });
+        });
 
         // Bind add funds action
         tableBody.querySelectorAll('.add-funds-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const tr = e.target.closest('tr');
             const userId = tr.getAttribute('data-user-id');
+            const menu = tr.querySelector('.user-actions-menu');
+            if (menu) menu.classList.add('hidden');
             const amountStr = prompt('Enter amount to add/deduct to user balance (e.g. 50 or -10):');
             if (amountStr === null) return;
             const amount = parseFloat(amountStr);
@@ -3396,6 +3442,8 @@ async function initAdminUsersPage() {
           btn.addEventListener('click', async (e) => {
             const tr = e.target.closest('tr');
             const userId = tr.getAttribute('data-user-id');
+            const menu = tr.querySelector('.user-actions-menu');
+            if (menu) menu.classList.add('hidden');
             const newPhone = prompt('Enter new phone number for user (e.g. +233501234567):');
             if (newPhone === null) return;
             try {
@@ -3406,6 +3454,16 @@ async function initAdminUsersPage() {
               alert(err.message);
             }
           });
+        });
+      }
+
+      // Close dropdowns when clicking outside
+      if (!window.__userActionsOutsideClickBound) {
+        window.__userActionsOutsideClickBound = true;
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.user-actions-toggle') && !e.target.closest('.user-actions-menu')) {
+            document.querySelectorAll('.user-actions-menu').forEach(m => m.classList.add('hidden'));
+          }
         });
       }
 
