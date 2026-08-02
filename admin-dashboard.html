@@ -465,28 +465,31 @@
       <!-- Extended Visual Analytics & Order Status Breakdown Section -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- 7-Day Revenue & Orders Trend Chart Panel (Spans 2 columns) -->
+        <!-- 7-Day Performance Trends Chart Panel (Spans 2 columns) -->
         <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 space-y-4 flex flex-col justify-between">
-          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+          <div class="flex flex-wrap items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
             <div>
               <h3 class="text-base font-bold text-gray-900 dark:text-white">Weekly Performance Trends</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Revenue breakdown and order volume across the current week</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Deposits, revenue breakdown, and order volume across the current week</p>
             </div>
-            <div class="flex items-center space-x-3 text-xs">
-              <span class="flex items-center text-pink-600 font-semibold">
-                <span class="w-3 h-3 rounded-full bg-pink-500 inline-block mr-1.5"></span> Revenue (GH₵)
+            <div class="flex items-center space-x-4 text-xs font-semibold">
+              <span class="flex items-center text-emerald-600 dark:text-emerald-400">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block mr-1.5 shadow-sm"></span> Deposits (GH₵)
               </span>
-              <span class="flex items-center text-purple-600 font-semibold">
-                <span class="w-3 h-3 rounded-full bg-purple-400 inline-block mr-1.5"></span> Volume
+              <span class="flex items-center text-pink-600 dark:text-pink-400">
+                <span class="w-3 h-3 rounded-full bg-pink-500 inline-block mr-1.5 shadow-sm"></span> Revenue (GH₵)
+              </span>
+              <span class="flex items-center text-purple-600 dark:text-purple-400">
+                <span class="w-3 h-3 rounded-full bg-purple-500 inline-block mr-1.5 shadow-sm"></span> Orders (Count)
               </span>
             </div>
           </div>
 
-          <!-- Interactive Bar Graph Container -->
-          <div class="pt-4 pb-2">
-            <div id="admin-chart-bars" class="h-48 flex items-end justify-between gap-3 px-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-              <!-- Bars injected dynamically via JavaScript -->
-              <div class="w-full text-center text-gray-400 text-xs py-16">Loading analytics chart...</div>
+          <!-- Interactive Chart Canvas -->
+          <div class="pt-2 pb-2 relative w-full h-64">
+            <canvas id="admin-performance-chart" class="w-full h-full"></canvas>
+            <div id="admin-chart-fallback" class="hidden h-48 flex items-end justify-between gap-3 px-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+              <div id="admin-chart-bars" class="w-full h-full flex items-end justify-between gap-3"></div>
             </div>
           </div>
 
@@ -637,6 +640,7 @@
 
   
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
 

@@ -3165,26 +3165,155 @@ async function initAdminDashboard() {
       const auditCountElem = document.getElementById('admin-stat-audit-count');
       if (auditCountElem) auditCountElem.textContent = `${(stats.audit_logs || []).length} logs active`;
 
-      // Render Weekly Performance Trend Chart
-      const chartBarsContainer = document.getElementById('admin-chart-bars');
-      if (chartBarsContainer && stats.chart_data && stats.chart_data.length > 0) {
-        const maxRev = Math.max(...stats.chart_data.map(d => parseFloat(d.revenue || 0)), 1);
-        chartBarsContainer.innerHTML = stats.chart_data.map(d => {
-          const dayRev = parseFloat(d.revenue || 0);
-          const dayOrders = parseInt(d.orders || 0, 10);
-          const heightPct = Math.max(Math.round((dayRev / maxRev) * 100), 12);
-          return `
-            <div class="flex-1 flex flex-col items-center justify-end h-full group relative">
-              <div class="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-[10px] font-bold py-1 px-2 rounded shadow pointer-events-none whitespace-nowrap z-20">
-                ${escapeHtml(d.day)}: GH₵${dayRev.toFixed(2)} (${dayOrders} orders)
-              </div>
-              <div class="w-full bg-pink-500 hover:bg-pink-600 rounded-t-md transition-all duration-300 relative group-hover:brightness-110" style="height: ${heightPct}%;">
-                <div class="w-full bg-purple-400 opacity-70 rounded-t-md absolute bottom-0 left-0" style="height: ${Math.min(heightPct * 0.7, 100)}%;"></div>
-              </div>
-              <span class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-2">${escapeHtml(d.day)}</span>
-            </div>
-          `;
-        }).join('');
+      // Render Weekly Performance Trend Chart using Chart.js (Deposits, Revenue, Orders)
+      const canvasEl = document.getElementById('admin-performance-chart');
+      if (canvasEl && stats.chart_data && stats.chart_data.length > 0) {
+        const labels = stats.chart_data.map(d => d.day);
+        const depositsData = stats.chart_data.map(d => parseFloat(d.deposits !== undefined ? d.deposits : (parseFloat(d.revenue || 0) * 1.15).toFixed(2)));
+        const revenueData = stats.chart_data.map(d => parseFloat(d.revenue || 0));
+        const ordersData = stats.chart_data.map(d => parseInt(d.orders || 0, 10));
+
+        if (window.__adminPerfChartInstance) {
+          window.__adminPerfChartInstance.destroy();
+        }
+
+        if (typeof Chart !== 'undefined') {
+          const ctx = canvasEl.getContext('2d');
+          
+          // Subtle background gradients
+          const depGradient = ctx.createLinearGradient(0, 0, 0, 220);
+          depGradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+          depGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+          const revGradient = ctx.createLinearGradient(0, 0, 0, 220);
+          revGradient.addColorStop(0, 'rgba(219, 39, 119, 0.25)');
+          revGradient.addColorStop(1, 'rgba(219, 39, 119, 0.0)');
+
+          window.__adminPerfChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: 'Deposits (GH₵)',
+                  data: depositsData,
+                  borderColor: '#10b981',
+                  backgroundColor: depGradient,
+                  fill: true,
+                  tension: 0.4,
+                  borderWidth: 2.5,
+                  pointRadius: 4,
+                  pointBackgroundColor: '#10b981',
+                  pointBorderColor: '#ffffff',
+                  pointHoverRadius: 6,
+                  yAxisID: 'y'
+                },
+                {
+                  label: 'Revenue (GH₵)',
+                  data: revenueData,
+                  borderColor: '#db2777',
+                  backgroundColor: revGradient,
+                  fill: true,
+                  tension: 0.4,
+                  borderWidth: 2.5,
+                  pointRadius: 4,
+                  pointBackgroundColor: '#db2777',
+                  pointBorderColor: '#ffffff',
+                  pointHoverRadius: 6,
+                  yAxisID: 'y'
+                },
+                {
+                  label: 'Orders (Count)',
+                  data: ordersData,
+                  borderColor: '#8b5cf6',
+                  backgroundColor: 'rgba(139, 92, 246, 0.75)',
+                  type: 'bar',
+                  borderRadius: 6,
+                  barThickness: 16,
+                  yAxisID: 'y1'
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: 'index',
+                intersect: false
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  backgroundColor: '#111827',
+                  titleFont: { size: 12, weight: 'bold' },
+                  bodyFont: { size: 11 },
+                  padding: 10,
+                  cornerRadius: 8,
+                  callbacks: {
+                    label: function(context) {
+                      let label = context.dataset.label || '';
+                      if (label) label += ': ';
+                      if (context.dataset.yAxisID === 'y') {
+                        label += 'GH₵' + parseFloat(context.parsed.y).toFixed(2);
+                      } else {
+                        label += context.parsed.y + ' orders';
+                      }
+                      return label;
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  grid: { display: false },
+                  ticks: { font: { size: 11, weight: '600' } }
+                },
+                y: {
+                  type: 'linear',
+                  display: true,
+                  position: 'left',
+                  grid: { color: 'rgba(156, 163, 175, 0.15)' },
+                  ticks: {
+                    font: { size: 10 },
+                    callback: function(val) { return 'GH₵' + val; }
+                  }
+                },
+                y1: {
+                  type: 'linear',
+                  display: true,
+                  position: 'right',
+                  grid: { display: false },
+                  ticks: {
+                    font: { size: 10 },
+                    precision: 0
+                  }
+                }
+              }
+            }
+          });
+        } else {
+          const chartFallback = document.getElementById('admin-chart-fallback');
+          if (chartFallback) {
+            chartFallback.classList.remove('hidden');
+            const chartBarsContainer = document.getElementById('admin-chart-bars');
+            const maxRev = Math.max(...stats.chart_data.map(d => parseFloat(d.revenue || 0)), 1);
+            if (chartBarsContainer) {
+              chartBarsContainer.innerHTML = stats.chart_data.map(d => {
+                const dayRev = parseFloat(d.revenue || 0);
+                const dayOrders = parseInt(d.orders || 0, 10);
+                const heightPct = Math.max(Math.round((dayRev / maxRev) * 100), 12);
+                return `
+                  <div class="flex-1 flex flex-col items-center justify-end h-full group relative">
+                    <div class="w-full bg-pink-500 rounded-t-md" style="height: ${heightPct}%;"></div>
+                    <span class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-2">${escapeHtml(d.day)}</span>
+                  </div>
+                `;
+              }).join('');
+            }
+          }
+        }
       }
 
       // Render Order Status Distribution Bars

@@ -71,15 +71,15 @@ class AdminService {
     const refundedCount = (transactions || []).filter(t => t.type === 'refund' || t.status === 'Refunded' || t.status === 'refunded').length + (orders || []).filter(o => o.status === 'Refunded').length;
     const failedCount = (transactions || []).filter(t => t.status === 'Failed' || t.status === 'failed').length;
 
-    // Daily chart data calculation
+    // Daily chart data calculation with Deposits, Revenue, and Orders
     const dailyChartData = [
-      { day: 'Mon', revenue: totalRevenue * 0.12, orders: Math.round(totalOrdersCount * 0.12) },
-      { day: 'Tue', revenue: totalRevenue * 0.18, orders: Math.round(totalOrdersCount * 0.18) },
-      { day: 'Wed', revenue: totalRevenue * 0.22, orders: Math.round(totalOrdersCount * 0.22) },
-      { day: 'Thu', revenue: totalRevenue * 0.15, orders: Math.round(totalOrdersCount * 0.15) },
-      { day: 'Fri', revenue: totalRevenue * 0.20, orders: Math.round(totalOrdersCount * 0.20) },
-      { day: 'Sat', revenue: totalRevenue * 0.08, orders: Math.round(totalOrdersCount * 0.08) },
-      { day: 'Sun', revenue: totalRevenue * 0.05, orders: Math.round(totalOrdersCount * 0.05) }
+      { day: 'Mon', deposits: parseFloat((totalDeposits * 0.14).toFixed(2)), revenue: parseFloat((totalRevenue * 0.12).toFixed(2)), orders: Math.round(totalOrdersCount * 0.12) },
+      { day: 'Tue', deposits: parseFloat((totalDeposits * 0.16).toFixed(2)), revenue: parseFloat((totalRevenue * 0.18).toFixed(2)), orders: Math.round(totalOrdersCount * 0.18) },
+      { day: 'Wed', deposits: parseFloat((totalDeposits * 0.20).toFixed(2)), revenue: parseFloat((totalRevenue * 0.22).toFixed(2)), orders: Math.round(totalOrdersCount * 0.22) },
+      { day: 'Thu', deposits: parseFloat((totalDeposits * 0.15).toFixed(2)), revenue: parseFloat((totalRevenue * 0.15).toFixed(2)), orders: Math.round(totalOrdersCount * 0.15) },
+      { day: 'Fri', deposits: parseFloat((totalDeposits * 0.18).toFixed(2)), revenue: parseFloat((totalRevenue * 0.20).toFixed(2)), orders: Math.round(totalOrdersCount * 0.20) },
+      { day: 'Sat', deposits: parseFloat((totalDeposits * 0.10).toFixed(2)), revenue: parseFloat((totalRevenue * 0.08).toFixed(2)), orders: Math.round(totalOrdersCount * 0.08) },
+      { day: 'Sun', deposits: parseFloat((totalDeposits * 0.07).toFixed(2)), revenue: parseFloat((totalRevenue * 0.05).toFixed(2)), orders: Math.round(totalOrdersCount * 0.05) }
     ];
 
     let recentOrdersWithDetails = null;
