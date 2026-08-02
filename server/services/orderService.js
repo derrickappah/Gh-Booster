@@ -580,6 +580,7 @@ class OrderService {
         amount: chargeAmount,
         currency: 'GHS',
         gateway: 'Wallet Balance',
+        payment_ref: 'refund_' + orderId,
         reference: 'refund_' + orderId,
         type: 'refund',
         status: 'completed'
@@ -672,6 +673,7 @@ class OrderService {
       amount: refundableAmount,
       currency: 'GHS',
       gateway: 'Wallet Balance',
+      payment_ref: txRef,
       reference: txRef,
       type: 'refund',
       status: 'completed',
