@@ -3106,10 +3106,104 @@ async function initAdminDashboard() {
     const res = await API.request('/admin/stats');
     if (res.success && res.stats) {
       const stats = res.stats;
-      if (revElem) revElem.textContent = `GH₵${parseFloat(stats.total_revenue || 0).toFixed(2)}`;
-      if (ordersElem) ordersElem.textContent = (stats.total_orders || 0).toLocaleString();
-      if (usersElem) usersElem.textContent = (stats.total_users || 0).toLocaleString();
-      if (ticketsElem) ticketsElem.textContent = `${stats.open_tickets || 0} Pending`;
+      const totalRev = parseFloat(stats.total_revenue || 0);
+      const totalOrd = parseInt(stats.total_orders || 0, 10);
+      const totalUsers = parseInt(stats.total_users || 0, 10);
+      const openTickets = parseInt(stats.open_tickets || 0, 10);
+      const walletBal = parseFloat(stats.total_wallet_balance || 0);
+      const completedOrd = parseInt(stats.completed_orders || 0, 10);
+      const activeOrd = parseInt(stats.active_orders || (stats.pending_orders || 0) + (stats.processing_orders || 0), 10);
+      const completionRate = stats.completion_rate !== undefined ? stats.completion_rate : (totalOrd > 0 ? Math.round((completedOrd / totalOrd) * 100) : 0);
+      const servicesCount = parseInt(stats.active_services || 0, 10);
+      const providersCount = parseInt(stats.active_providers || 0, 10);
+      const avgOrderVal = parseFloat(stats.avg_order_value || (totalOrd > 0 ? totalRev / totalOrd : 0));
+      const totalDep = parseFloat(stats.total_deposits || (totalRev + walletBal));
+
+      if (revElem) revElem.textContent = `GH₵${totalRev.toFixed(2)}`;
+      if (ordersElem) ordersElem.textContent = totalOrd.toLocaleString();
+      if (usersElem) usersElem.textContent = totalUsers.toLocaleString();
+      if (ticketsElem) ticketsElem.textContent = `${openTickets} Pending`;
+
+      const walletElem = document.getElementById('admin-kpi-wallet-balance');
+      if (walletElem) walletElem.textContent = `GH₵${walletBal.toFixed(2)}`;
+
+      const completedElem = document.getElementById('admin-kpi-completed-orders');
+      if (completedElem) completedElem.textContent = completedOrd.toLocaleString();
+
+      const rateElem = document.getElementById('admin-kpi-completion-rate');
+      if (rateElem) rateElem.textContent = `${completionRate}% Fulfillment Rate`;
+
+      const activeElem = document.getElementById('admin-kpi-active-orders');
+      if (activeElem) activeElem.textContent = activeOrd.toLocaleString();
+
+      const servProvElem = document.getElementById('admin-kpi-services-providers');
+      if (servProvElem) servProvElem.textContent = `${servicesCount} / ${providersCount}`;
+
+      const aovElem = document.getElementById('admin-stat-aov');
+      if (aovElem) aovElem.textContent = `GH₵${avgOrderVal.toFixed(2)}`;
+
+      const depElem = document.getElementById('admin-stat-deposits');
+      if (depElem) depElem.textContent = `GH₵${totalDep.toFixed(2)}`;
+
+      const auditCountElem = document.getElementById('admin-stat-audit-count');
+      if (auditCountElem) auditCountElem.textContent = `${(stats.audit_logs || []).length} logs active`;
+
+      // Render Weekly Performance Trend Chart
+      const chartBarsContainer = document.getElementById('admin-chart-bars');
+      if (chartBarsContainer && stats.chart_data && stats.chart_data.length > 0) {
+        const maxRev = Math.max(...stats.chart_data.map(d => parseFloat(d.revenue || 0)), 1);
+        chartBarsContainer.innerHTML = stats.chart_data.map(d => {
+          const dayRev = parseFloat(d.revenue || 0);
+          const dayOrders = parseInt(d.orders || 0, 10);
+          const heightPct = Math.max(Math.round((dayRev / maxRev) * 100), 12);
+          return `
+            <div class="flex-1 flex flex-col items-center justify-end h-full group relative">
+              <div class="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-[10px] font-bold py-1 px-2 rounded shadow pointer-events-none whitespace-nowrap z-20">
+                ${escapeHtml(d.day)}: GH₵${dayRev.toFixed(2)} (${dayOrders} orders)
+              </div>
+              <div class="w-full bg-pink-500 hover:bg-pink-600 rounded-t-md transition-all duration-300 relative group-hover:brightness-110" style="height: ${heightPct}%;">
+                <div class="w-full bg-purple-400 opacity-70 rounded-t-md absolute bottom-0 left-0" style="height: ${Math.min(heightPct * 0.7, 100)}%;"></div>
+              </div>
+              <span class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mt-2">${escapeHtml(d.day)}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render Order Status Distribution Bars
+      const breakdown = stats.status_breakdown || {
+        completed: completedOrd,
+        processing: stats.processing_orders || 0,
+        pending: stats.pending_orders || 0,
+        canceled: stats.canceled_orders || 0
+      };
+
+      const grandTotalOrders = Math.max(totalOrd, breakdown.completed + breakdown.processing + breakdown.pending + breakdown.canceled, 1);
+      
+      const compPct = Math.round((breakdown.completed / grandTotalOrders) * 100);
+      const procPct = Math.round((breakdown.processing / grandTotalOrders) * 100);
+      const pendPct = Math.round((breakdown.pending / grandTotalOrders) * 100);
+      const cancPct = Math.round((breakdown.canceled / grandTotalOrders) * 100);
+
+      const compCountElem = document.getElementById('admin-status-completed-count');
+      const compBarElem = document.getElementById('admin-status-completed-bar');
+      if (compCountElem) compCountElem.textContent = `${breakdown.completed.toLocaleString()} (${compPct}%)`;
+      if (compBarElem) compBarElem.style.width = `${compPct}%`;
+
+      const procCountElem = document.getElementById('admin-status-processing-count');
+      const procBarElem = document.getElementById('admin-status-processing-bar');
+      if (procCountElem) procCountElem.textContent = `${breakdown.processing.toLocaleString()} (${procPct}%)`;
+      if (procBarElem) procBarElem.style.width = `${procPct}%`;
+
+      const pendCountElem = document.getElementById('admin-status-pending-count');
+      const pendBarElem = document.getElementById('admin-status-pending-bar');
+      if (pendCountElem) pendCountElem.textContent = `${breakdown.pending.toLocaleString()} (${pendPct}%)`;
+      if (pendBarElem) pendBarElem.style.width = `${pendPct}%`;
+
+      const cancCountElem = document.getElementById('admin-status-canceled-count');
+      const cancBarElem = document.getElementById('admin-status-canceled-bar');
+      if (cancCountElem) cancCountElem.textContent = `${breakdown.canceled.toLocaleString()} (${cancPct}%)`;
+      if (cancBarElem) cancBarElem.style.width = `${cancPct}%`;
 
       if (tableBody) {
         if (!stats.recent_orders || stats.recent_orders.length === 0) {

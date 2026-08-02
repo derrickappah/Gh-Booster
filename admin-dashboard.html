@@ -176,68 +176,237 @@
     <!-- Main View Content -->
     <main class="p-4 md:p-6 space-y-6 flex-grow">
 
-      <!-- 4 KPI Metrics Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <!-- Revenue Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+      <!-- 8 KPI Metrics Summary Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- 1. Revenue Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
           <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-revenue" class="text-base font-bold text-gray-900 leading-tight truncate">GH₵0.00</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Revenue</span>
-            <span class="text-[11px] text-green-600 font-medium flex items-center mt-0.5 truncate">
+            <h3 id="admin-kpi-revenue" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">GH₵0.00</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Total Revenue</span>
+            <span class="text-[11px] text-emerald-600 font-semibold flex items-center mt-1 truncate">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
-              Live revenue
+              Live Gross Income
             </span>
           </div>
-          <div class="p-2.5 bg-green-50 text-green-600 rounded-lg flex-shrink-0">
+          <div class="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
         </div>
 
-        <!-- Orders Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <!-- 2. Orders Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
           <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-orders" class="text-base font-bold text-gray-900 leading-tight truncate">0</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Orders</span>
-            <span class="text-[11px] text-blue-600 font-medium block mt-0.5 truncate">Real-time system orders</span>
+            <h3 id="admin-kpi-orders" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">0</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Total Orders</span>
+            <span class="text-[11px] text-pink-600 dark:text-pink-400 font-semibold block mt-1 truncate">All-time Orders Placed</span>
           </div>
-          <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0">
+          <div class="p-3 bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 rounded-xl flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </div>
         </div>
 
-        <!-- Users Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <!-- 3. Users Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
           <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-users" class="text-base font-bold text-gray-900 leading-tight truncate">0</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Users</span>
-            <span class="text-[11px] text-purple-600 font-medium block mt-0.5 truncate">Registered members</span>
+            <h3 id="admin-kpi-users" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">0</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Registered Users</span>
+            <span class="text-[11px] text-purple-600 dark:text-purple-400 font-semibold block mt-1 truncate">Active Client Accounts</span>
           </div>
-          <div class="p-2.5 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
+          <div class="p-3 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-xl flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
         </div>
 
-        <!-- Pending Tickets Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <!-- 4. User Wallet Balances Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
           <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-tickets" class="text-base font-bold text-gray-900 leading-tight truncate">0 Pending</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Support Inbox</span>
-            <span class="text-[11px] text-yellow-600 font-medium block mt-0.5 truncate">Open support tickets</span>
+            <h3 id="admin-kpi-wallet-balance" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">GH₵0.00</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">User Wallet Funds</span>
+            <span class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold block mt-1 truncate">Unspent User Balance</span>
           </div>
-          <div class="p-2.5 bg-yellow-50 text-yellow-600 rounded-lg flex-shrink-0">
+          <div class="p-3 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
           </div>
         </div>
+
+        <!-- 5. Completed Orders Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
+          <div class="min-w-0 pr-2">
+            <h3 id="admin-kpi-completed-orders" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">0</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Completed Orders</span>
+            <span id="admin-kpi-completion-rate" class="text-[11px] text-green-600 dark:text-green-400 font-semibold block mt-1 truncate">0% Fulfillment Rate</span>
+          </div>
+          <div class="p-3 bg-green-50 dark:bg-green-950/50 text-green-600 dark:text-green-400 rounded-xl flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 6. Active / Pending Orders Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
+          <div class="min-w-0 pr-2">
+            <h3 id="admin-kpi-active-orders" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">0</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Active Queue</span>
+            <span class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold block mt-1 truncate">Processing / Pending</span>
+          </div>
+          <div class="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 7. Support Inbox Tickets Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
+          <div class="min-w-0 pr-2">
+            <h3 id="admin-kpi-tickets" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">0 Pending</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Support Tickets</span>
+            <span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold block mt-1 truncate">Requires Admin Reply</span>
+          </div>
+          <div class="p-3 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 8. Services & Providers Card -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between transition hover:shadow-md">
+          <div class="min-w-0 pr-2">
+            <h3 id="admin-kpi-services-providers" class="text-lg font-extrabold text-gray-900 dark:text-white leading-tight truncate">0 / 0</h3>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 block mt-0.5 truncate">Services / Providers</span>
+            <span class="text-[11px] text-cyan-600 dark:text-cyan-400 font-semibold block mt-1 truncate">Catalog &amp; API Gateways</span>
+          </div>
+          <div class="p-3 bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 rounded-xl flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extended Visual Analytics & Order Status Breakdown Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- 7-Day Revenue & Orders Trend Chart Panel (Spans 2 columns) -->
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 space-y-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+            <div>
+              <h3 class="text-base font-bold text-gray-900 dark:text-white">Weekly Performance Trends</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Revenue breakdown and order volume across the current week</p>
+            </div>
+            <div class="flex items-center space-x-3 text-xs">
+              <span class="flex items-center text-pink-600 font-semibold">
+                <span class="w-3 h-3 rounded-full bg-pink-500 inline-block mr-1.5"></span> Revenue (GH₵)
+              </span>
+              <span class="flex items-center text-purple-600 font-semibold">
+                <span class="w-3 h-3 rounded-full bg-purple-400 inline-block mr-1.5"></span> Volume
+              </span>
+            </div>
+          </div>
+
+          <!-- Interactive Bar Graph Container -->
+          <div class="pt-4 pb-2">
+            <div id="admin-chart-bars" class="h-48 flex items-end justify-between gap-3 px-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+              <!-- Bars injected dynamically via JavaScript -->
+              <div class="w-full text-center text-gray-400 text-xs py-16">Loading analytics chart...</div>
+            </div>
+          </div>
+
+          <!-- Bottom Financial Summary Sub-cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1 border-t border-gray-100 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-gray-900/60 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+              <span class="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Avg Order Value (AOV)</span>
+              <span id="admin-stat-aov" class="text-sm font-extrabold text-gray-900 dark:text-white mt-0.5 block">GH₵0.00</span>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-900/60 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+              <span class="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Total Deposits</span>
+              <span id="admin-stat-deposits" class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5 block">GH₵0.00</span>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-900/60 p-3 rounded-lg border border-gray-100 dark:border-gray-700 col-span-2 sm:col-span-1">
+              <span class="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">System Health &amp; Logs</span>
+              <span id="admin-stat-audit-count" class="text-sm font-extrabold text-blue-600 dark:text-blue-400 mt-0.5 block">Optimal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Status Distribution Panel (Spans 1 column) -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 space-y-4 flex flex-col justify-between">
+          <div class="border-b border-gray-100 dark:border-gray-700 pb-3">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white">Order Status Distribution</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Live status breakdown of system orders</p>
+          </div>
+
+          <div class="space-y-4 flex-grow flex flex-col justify-center">
+            <!-- Completed -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-700 dark:text-gray-300 flex items-center">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-2"></span> Completed
+                </span>
+                <span id="admin-status-completed-count" class="text-gray-900 dark:text-white">0 (0%)</span>
+              </div>
+              <div class="w-full bg-gray-100 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
+                <div id="admin-status-completed-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Processing / In Progress -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-700 dark:text-gray-300 flex items-center">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block mr-2"></span> Processing &amp; In Progress
+                </span>
+                <span id="admin-status-processing-count" class="text-gray-900 dark:text-white">0 (0%)</span>
+              </div>
+              <div class="w-full bg-gray-100 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
+                <div id="admin-status-processing-bar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Pending -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-700 dark:text-gray-300 flex items-center">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block mr-2"></span> Pending Queue
+                </span>
+                <span id="admin-status-pending-count" class="text-gray-900 dark:text-white">0 (0%)</span>
+              </div>
+              <div class="w-full bg-gray-100 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
+                <div id="admin-status-pending-bar" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Canceled & Refunded -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-gray-700 dark:text-gray-300 flex items-center">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block mr-2"></span> Canceled &amp; Refunded
+                </span>
+                <span id="admin-status-canceled-count" class="text-gray-900 dark:text-white">0 (0%)</span>
+              </div>
+              <div class="w-full bg-gray-100 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
+                <div id="admin-status-canceled-bar" class="bg-rose-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-gray-100 dark:border-gray-700 text-[11px] text-gray-500 dark:text-gray-400 text-center">
+            System sync active &bull; Auto-refreshed with live database
+          </div>
+        </div>
+
       </div>
 
 

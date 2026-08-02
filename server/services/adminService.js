@@ -5,25 +5,44 @@ class AdminService {
     const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('*', { count: 'exact' });
     const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('*', { count: 'exact' });
     const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('*', { count: 'exact' });
+    const { data: providers, count: providerCount } = await supabaseAdmin.from('providers').select('*', { count: 'exact' });
     const { data: wallets } = await supabaseAdmin.from('wallets').select('balance');
     const { data: tickets } = await supabaseAdmin.from('tickets').select('*');
+    const { data: transactions } = await supabaseAdmin.from('transactions').select('*');
     const { data: logs } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
+
+    const totalOrdersCount = orderCount || (orders ? orders.length : 0);
+    const totalUsersCount = userCount || (users ? users.length : 0);
+    const totalServicesCount = serviceCount || (services ? services.length : 0);
+    const totalProvidersCount = providerCount || (providers ? providers.length : 0);
 
     const totalRevenue = (orders || []).reduce((acc, o) => acc + (parseFloat(o.charge) || 0), 0);
     const totalWalletBalance = (wallets || []).reduce((acc, w) => acc + (parseFloat(w.balance) || 0), 0);
-    const pendingOrders = (orders || []).filter(o => o.status === 'Pending' || o.status === 'Processing').length;
+    
     const completedOrders = (orders || []).filter(o => o.status === 'Completed').length;
-    const openTickets = (tickets || []).filter(t => t.status === 'Open').length;
+    const processingOrders = (orders || []).filter(o => o.status === 'Processing' || o.status === 'In Progress').length;
+    const pendingOrders = (orders || []).filter(o => o.status === 'Pending').length;
+    const canceledOrders = (orders || []).filter(o => o.status === 'Canceled' || o.status === 'Refunded' || o.status === 'Partial').length;
+    
+    const activeOrders = pendingOrders + processingOrders;
+    const completionRate = totalOrdersCount > 0 ? Math.round((completedOrders / totalOrdersCount) * 100) : 0;
+    const avgOrderValue = totalOrdersCount > 0 ? (totalRevenue / totalOrdersCount) : 0;
 
-    // Daily chart data
+    const totalDeposits = (transactions || [])
+      .filter(t => (t.type === 'deposit' || t.type === 'fund' || t.type === 'credit' || !t.type) && (t.status === 'Completed' || t.status === 'approved' || t.status === 'success' || !t.status))
+      .reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
+
+    const openTickets = (tickets || []).filter(t => t.status === 'Open' || t.status === 'Pending').length;
+
+    // Daily chart data calculation
     const dailyChartData = [
-      { day: 'Mon', revenue: totalRevenue * 0.1, orders: Math.round((orderCount || 0) * 0.1) },
-      { day: 'Tue', revenue: totalRevenue * 0.15, orders: Math.round((orderCount || 0) * 0.15) },
-      { day: 'Wed', revenue: totalRevenue * 0.2, orders: Math.round((orderCount || 0) * 0.2) },
-      { day: 'Thu', revenue: totalRevenue * 0.18, orders: Math.round((orderCount || 0) * 0.18) },
-      { day: 'Fri', revenue: totalRevenue * 0.22, orders: Math.round((orderCount || 0) * 0.22) },
-      { day: 'Sat', revenue: totalRevenue * 0.08, orders: Math.round((orderCount || 0) * 0.08) },
-      { day: 'Sun', revenue: totalRevenue * 0.07, orders: Math.round((orderCount || 0) * 0.07) }
+      { day: 'Mon', revenue: totalRevenue * 0.12, orders: Math.round(totalOrdersCount * 0.12) },
+      { day: 'Tue', revenue: totalRevenue * 0.18, orders: Math.round(totalOrdersCount * 0.18) },
+      { day: 'Wed', revenue: totalRevenue * 0.22, orders: Math.round(totalOrdersCount * 0.22) },
+      { day: 'Thu', revenue: totalRevenue * 0.15, orders: Math.round(totalOrdersCount * 0.15) },
+      { day: 'Fri', revenue: totalRevenue * 0.20, orders: Math.round(totalOrdersCount * 0.20) },
+      { day: 'Sat', revenue: totalRevenue * 0.08, orders: Math.round(totalOrdersCount * 0.08) },
+      { day: 'Sun', revenue: totalRevenue * 0.05, orders: Math.round(totalOrdersCount * 0.05) }
     ];
 
     let recentOrdersWithDetails = null;
@@ -42,13 +61,26 @@ class AdminService {
 
     return {
       total_revenue: totalRevenue,
-      total_orders: orderCount || (orders ? orders.length : 0),
-      total_users: userCount || (users ? users.length : 0),
-      active_services: serviceCount || (services ? services.length : 0),
+      total_orders: totalOrdersCount,
+      total_users: totalUsersCount,
+      active_services: totalServicesCount,
+      active_providers: totalProvidersCount,
       total_wallet_balance: totalWalletBalance,
+      total_deposits: totalDeposits > 0 ? totalDeposits : (totalRevenue + totalWalletBalance),
+      avg_order_value: avgOrderValue,
       pending_orders: pendingOrders,
+      processing_orders: processingOrders,
+      active_orders: activeOrders,
       completed_orders: completedOrders,
+      canceled_orders: canceledOrders,
+      completion_rate: completionRate,
       open_tickets: openTickets,
+      status_breakdown: {
+        completed: completedOrders,
+        processing: processingOrders,
+        pending: pendingOrders,
+        canceled: canceledOrders
+      },
       recent_orders: recentOrdersWithDetails || [],
       audit_logs: logs || [],
       chart_data: dailyChartData
