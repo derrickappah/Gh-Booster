@@ -3162,8 +3162,6 @@ async function initAdminDashboard() {
       const depElem = document.getElementById('admin-stat-deposits');
       if (depElem) depElem.textContent = `GH₵${totalDep.toFixed(2)}`;
 
-      const auditCountElem = document.getElementById('admin-stat-audit-count');
-      if (auditCountElem) auditCountElem.textContent = `${(stats.audit_logs || []).length} logs active`;
 
       // Render Weekly Performance Trend Chart using Chart.js (Deposits, Revenue, Orders)
       const canvasEl = document.getElementById('admin-performance-chart');
