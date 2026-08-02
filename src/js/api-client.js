@@ -5143,21 +5143,87 @@ async function initAdminPromotionsPage() {
 
 // ADMIN NEWS HANDLER
 async function initAdminNewsPage() {
-  const tableBody = document.querySelector('tbody');
+  const tableBody = document.getElementById('news-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
-  try {
-    const res = await API.request('/admin/news');
-    if (res.success && res.news) {
-      tableBody.innerHTML = res.news.map(n => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100">
-          <td class="px-6 py-3.5 font-bold text-gray-900">${n.title}</td>
-          <td class="px-6 py-3.5 text-xs text-gray-500 max-w-xs truncate">${n.content}</td>
-          <td class="px-6 py-3.5 text-xs text-gray-500">${new Date(n.created_at).toLocaleString()}</td>
+  async function loadNews() {
+    try {
+      const res = await API.request('/admin/news');
+      if (res.success && Array.isArray(res.news)) {
+        const news = res.news;
+        if (news.length === 0) {
+          tableBody.innerHTML = `
+            <tr class="hover:bg-gray-50/50 transition">
+              <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No announcements posted yet.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = news.map(n => {
+          const title = n.title || 'Untitled Announcement';
+          const target = n.target === 'all' || !n.target ? 'All Users & Visitors' : (n.target === 'resellers' ? 'Resellers & API Users' : (n.target === 'new' ? 'New Users' : n.target));
+          const date = n.created_at ? new Date(n.created_at).toLocaleDateString() : 'N/A';
+          const status = n.status || 'Active';
+          const content = n.content || '';
+
+          return `
+            <tr class="hover:bg-gray-50 border-b border-gray-100">
+              <td class="px-6 py-3.5 font-bold text-gray-900">
+                <div>${escapeHtml(title)}</div>
+                <div class="text-xs font-normal text-gray-500 max-w-md truncate mt-0.5">${escapeHtml(content)}</div>
+              </td>
+              <td class="px-6 py-3.5 text-xs text-gray-600 font-medium">${escapeHtml(target)}</td>
+              <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(date)}</td>
+              <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold text-green-700 bg-green-100 rounded-full">${escapeHtml(status)}</span></td>
+              <td class="px-6 py-3.5 text-xs text-gray-400">—</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    } catch (e) {
+      console.error('News load error:', e);
+      tableBody.innerHTML = `
+        <tr class="hover:bg-gray-50/50 transition">
+          <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No announcements posted yet.</td>
         </tr>
-      `).join('');
+      `;
     }
-  } catch (e) {}
+  }
+
+  await loadNews();
+
+  const newsForm = document.getElementById('news-form');
+  if (newsForm) {
+    newsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const titleInput = document.getElementById('news-title') || newsForm.querySelector('input[type="text"]');
+      const targetSelect = document.getElementById('news-target') || newsForm.querySelector('select');
+      const contentTextarea = document.getElementById('news-content') || newsForm.querySelector('textarea');
+
+      const title = titleInput ? titleInput.value.trim() : '';
+      const target = targetSelect ? targetSelect.value : 'all';
+      const content = contentTextarea ? contentTextarea.value.trim() : '';
+
+      if (!title || !content) {
+        alert('Please fill out both title and content for the announcement.');
+        return;
+      }
+
+      try {
+        const res = await API.request('/admin/news', 'POST', { title, target, content });
+        if (res.success) {
+          alert('Announcement broadcasted successfully!');
+          newsForm.reset();
+          await loadNews();
+        } else {
+          alert(res.message || 'Failed to create announcement.');
+        }
+      } catch (err) {
+        alert(err.message || 'Error creating announcement.');
+      }
+    });
+  }
 }
 
 // ADMIN LOGS HANDLER
