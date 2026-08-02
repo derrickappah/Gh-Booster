@@ -4073,31 +4073,90 @@ async function initAdminServicesPage() {
               <td class="py-4 px-4 text-xs">${(s.min_quantity || 10).toLocaleString()}</td>
               <td class="py-4 px-4 text-xs">${(s.max_quantity || 100000).toLocaleString()}</td>
               <td class="py-4 px-4">${statusBadge}</td>
-              <td class="py-4 px-4 text-center space-x-1">
-                <button data-action="edit" data-id="${s.id}" class="svc-action-btn px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded text-[11px] transition">Edit</button>
-                ${toggleActionBtn}
+              <td class="py-4 px-4 text-center relative">
+                <div class="inline-block text-left relative">
+                  <button type="button" class="svc-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for ${escapeHtml(s.name || 'service')}" title="Service Actions">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+
+                  <div class="svc-actions-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
+                    <div class="py-1">
+                      <button type="button" data-action="edit" data-id="${s.id}" class="edit-svc-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit Service
+                      </button>
+                    </div>
+                    <div class="py-1">
+                      <button type="button" data-action="toggle" data-id="${s.id}" data-status="${isActive ? 'Disabled' : 'Active'}" class="toggle-svc-btn w-full text-left px-3.5 py-2 ${isActive ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'} dark:hover:bg-gray-700 transition flex items-center">
+                        ${isActive ? `
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          </svg>
+                          Disable Service
+                        ` : `
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Enable Service
+                        `}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           `;
         }).join('');
 
-        // Action Handlers
-        tableBody.querySelectorAll('.svc-action-btn').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const action = e.target.getAttribute('data-action');
-            const svcId = e.target.getAttribute('data-id');
-            const targetSvc = services.find(item => String(item.id) === String(svcId));
+        // Toggle 3-dots action menu dropdown
+        tableBody.querySelectorAll('.svc-actions-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMenu = btn.nextElementSibling;
+            const isHidden = currentMenu.classList.contains('hidden');
+            // Close any other open service action dropdowns
+            document.querySelectorAll('.svc-actions-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) {
+              currentMenu.classList.remove('hidden');
+            }
+          });
+        });
 
-            if (action === 'edit' && targetSvc) {
-              openModal(targetSvc);
-            } else if (action === 'toggle' && targetSvc) {
-              const newStatus = e.target.getAttribute('data-status');
-              try {
-                await API.request(`/admin/services/${svcId}`, 'PUT', { status: newStatus });
-                initAdminServicesPage();
-              } catch (err) {
-                alert('Failed to update service status: ' + err.message);
-              }
+        // Close dropdown when clicking anywhere outside
+        if (!window.__svcDropdownOutsideClickBound) {
+          window.__svcDropdownOutsideClickBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.svc-actions-menu').forEach(m => m.classList.add('hidden'));
+          });
+        }
+
+        // Action Handlers for Edit Service
+        tableBody.querySelectorAll('.edit-svc-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const svcId = btn.getAttribute('data-id');
+            const menu = btn.closest('.svc-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            const targetSvc = services.find(item => String(item.id) === String(svcId));
+            if (targetSvc) openModal(targetSvc);
+          });
+        });
+
+        // Action Handlers for Enable / Disable Service
+        tableBody.querySelectorAll('.toggle-svc-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const svcId = btn.getAttribute('data-id');
+            const newStatus = btn.getAttribute('data-status');
+            const menu = btn.closest('.svc-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            try {
+              await API.request(`/admin/services/${svcId}`, 'PUT', { status: newStatus });
+              initAdminServicesPage();
+            } catch (err) {
+              alert('Failed to update service status: ' + err.message);
             }
           });
         });
