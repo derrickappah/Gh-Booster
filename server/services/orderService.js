@@ -51,6 +51,7 @@ class OrderService {
             : order.remains;
 
           const hasChanged = newStatus !== order.status || newStartCount !== order.start_count || newRemains !== order.remains;
+          const isRefundableStatus = ['Canceled', 'Refunded', 'Partial'].includes(newStatus);
 
           if (hasChanged) {
             const updatePayload = {
@@ -69,6 +70,15 @@ class OrderService {
             order.status = newStatus;
             order.start_count = newStartCount;
             order.remains = newRemains;
+
+            if (isRefundableStatus) {
+              await OrderService.processOrderRefund({
+                order: { ...order, status: newStatus, start_count: newStartCount, remains: newRemains },
+                newStatus,
+                remains: newRemains,
+                startCount: newStartCount
+              });
+            }
           }
         } catch (err) {
           console.error(`[OrderService] Error syncing provider order #${order.provider_order_id}:`, err.message);
@@ -162,6 +172,30 @@ class OrderService {
         console.error(`[OrderCron] Error syncing provider order #${order.provider_order_id}:`, err.message);
       }
     }));
+
+    // Safety sweep: Also process any Canceled / Refunded / Partial orders whose refunds have not been fully issued yet
+    const unrefundedOrders = (rawOrders || []).filter(o => {
+      const st = (o.status || '').toLowerCase();
+      const isRefStatus = st === 'canceled' || st === 'cancelled' || st === 'refunded' || st === 'partial';
+      if (!isRefStatus) return false;
+      const charge = parseFloat(o.total_price || o.charge || 0);
+      const refunded = parseFloat(o.refunded_amount || 0);
+      return charge > 0 && refunded < charge;
+    });
+
+    if (unrefundedOrders.length > 0) {
+      await Promise.all(unrefundedOrders.map(async (order) => {
+        try {
+          await OrderService.processOrderRefund({
+            order,
+            newStatus: order.status,
+            remains: order.remains
+          });
+        } catch (e) {
+          console.error(`[OrderCron] Error sweeping refund for order #${order.id}:`, e.message);
+        }
+      }));
+    }
 
     return updatedCount;
   }
