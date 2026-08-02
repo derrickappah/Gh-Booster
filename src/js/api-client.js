@@ -4202,6 +4202,17 @@ async function initAdminServicesPage() {
         };
       }
 
+      if (!window.__addServiceModalClickBound) {
+        window.__addServiceModalClickBound = true;
+        document.addEventListener('click', (e) => {
+          const targetBtn = e.target.closest('#add-service-btn');
+          if (targetBtn) {
+            e.preventDefault();
+            openModal();
+          }
+        });
+      }
+
       if (closeModalBtn) closeModalBtn.onclick = closeModal;
       if (cancelModalBtn) cancelModalBtn.onclick = closeModal;
 

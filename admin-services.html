@@ -194,9 +194,9 @@
       </div>
 
       <!-- Toolbar Controls (Moved below stats cards) -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-          <div class="relative flex-1 sm:w-64">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <div class="relative w-64">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" id="svc-search" placeholder="Search services..." class="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 transition w-full">
           </div>
@@ -204,9 +204,9 @@
             <option value="all">All Categories</option>
           </select>
         </div>
-        <button id="add-service-btn" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow transition flex items-center justify-center w-full sm:w-auto flex-shrink-0">
+        <button id="add-service-btn" type="button" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center justify-center shrink-0 cursor-pointer" style="white-space: nowrap !important; width: auto !important;">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          + Add Service
+          Add Service
         </button>
       </div>
 
