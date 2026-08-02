@@ -3096,23 +3096,94 @@ fetch('${endpoint}', {
 
 // ADMIN DASHBOARD HANDLER
 async function initAdminDashboard() {
-  const usersTodayElem = document.getElementById('kpi-users-today');
-  const usersTotalElem = document.getElementById('kpi-users-total');
-  const depositsTodayElem = document.getElementById('kpi-deposits-today');
-  const depositsTotalElem = document.getElementById('kpi-deposits-total');
-  const ordersTodayElem = document.getElementById('kpi-orders-today');
-  const ordersTotalElem = document.getElementById('kpi-orders-total');
+  const revElem = document.getElementById('admin-kpi-revenue');
+  const ordersElem = document.getElementById('admin-kpi-orders');
+  const usersElem = document.getElementById('admin-kpi-users');
+  const ticketsElem = document.getElementById('admin-kpi-tickets');
+  const tableBody = document.getElementById('admin-recent-orders-table') || document.querySelector('tbody');
 
   try {
     const res = await API.request('/admin/stats');
-    if (res && res.success && res.stats) {
+    if (res.success && res.stats) {
       const stats = res.stats;
-      if (usersTotalElem && stats.total_users) usersTotalElem.textContent = Number(stats.total_users).toLocaleString();
-      if (depositsTotalElem && stats.total_revenue) depositsTotalElem.textContent = `₵${parseFloat(stats.total_revenue).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-      if (ordersTotalElem && stats.total_orders) ordersTotalElem.textContent = Number(stats.total_orders).toLocaleString();
+      if (revElem) revElem.textContent = `GH₵${parseFloat(stats.total_revenue || 0).toFixed(2)}`;
+      if (ordersElem) ordersElem.textContent = (stats.total_orders || 0).toLocaleString();
+      if (usersElem) usersElem.textContent = (stats.total_users || 0).toLocaleString();
+      if (ticketsElem) ticketsElem.textContent = `${stats.open_tickets || 0} Pending`;
+
+      if (tableBody) {
+        if (!stats.recent_orders || stats.recent_orders.length === 0) {
+          tableBody.innerHTML = `
+            <tr class="hover:bg-gray-50/50 transition">
+              <td colspan="8" class="py-8 text-center text-gray-400 font-medium">No recent orders found.</td>
+            </tr>
+          `;
+        } else {
+          tableBody.innerHTML = stats.recent_orders.map(o => {
+            const shortId = (o.id || '').substring(0, 8);
+            const userObj = o.profiles || {};
+            const walletObj = Array.isArray(userObj.wallets) ? userObj.wallets[0] : userObj.wallets;
+            const username = userObj.username || userObj.full_name || 'User';
+            const userBal = walletObj ? parseFloat(walletObj.balance || 0).toFixed(2) : '0.00';
+            const serviceName = (o.services && o.services.name) ? o.services.name : 'Service Order';
+            const charge = parseFloat(o.charge || 0).toFixed(2);
+            const status = o.status || 'Processing';
+
+            return `
+              <tr class="hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}">
+                <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
+                <td class="py-4 px-4">
+                  <div class="font-bold text-gray-900">${escapeHtml(username)}</div>
+                  <span class="text-[10px] text-gray-400">Balance: GH₵${userBal}</span>
+                </td>
+                <td class="py-4 px-4">
+                  <span class="font-semibold text-gray-900 flex items-center">
+                    ${escapeHtml(serviceName)}
+                  </span>
+                </td>
+                <td class="py-4 px-4">
+                  <a href="${escapeHtml(o.link || '#')}" target="_blank" rel="noopener noreferrer" class="text-pink-600 hover:underline font-mono truncate block max-w-[140px]">${escapeHtml(o.link || 'N/A')}</a>
+                </td>
+                <td class="py-4 px-4 font-mono font-bold text-gray-900">${(o.quantity || 0).toLocaleString()}</td>
+                <td class="py-4 px-4 font-bold text-gray-900">GH₵${charge}</td>
+                <td class="py-4 px-4">
+                  <select class="status-select py-1 px-2 border border-gray-200 font-bold rounded text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 bg-white" aria-label="Order status for order ${escapeHtml(shortId)}">
+                    <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    <option value="Processing" ${status === 'Processing' ? 'selected' : ''}>Processing</option>
+                    <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="Canceled" ${status === 'Canceled' ? 'selected' : ''}>Canceled &amp; Refund</option>
+                  </select>
+                </td>
+                <td class="py-4 px-4 text-center space-x-1">
+                  <button type="button" class="save-status-btn px-2.5 py-1 bg-slate-900 text-white font-bold rounded text-[11px] hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400" aria-label="Save status for order ${escapeHtml(shortId)}">Save</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+          // Bind save status action
+          tableBody.querySelectorAll('.save-status-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const tr = e.target.closest('tr');
+              // Decode URI-encoded ID stored in data attribute
+              const orderId = decodeURIComponent(tr.getAttribute('data-order-id') || '');
+              const select = tr.querySelector('.status-select');
+              const newStatus = select ? select.value : 'Completed';
+              try {
+                await API.request(`/admin/orders/${orderId}/status`, 'PUT', { status: newStatus });
+                alert(`Order status updated to ${newStatus}`);
+                initAdminDashboard();
+              } catch (err) {
+                alert(err.message);
+              }
+            });
+          });
+        }
+      }
     }
   } catch (e) {
-    console.log('Admin dashboard dynamic stats notice:', e.message);
+    console.error('Failed to load admin dashboard stats:', e.message);
   }
 }
 
