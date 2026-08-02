@@ -175,9 +175,9 @@ app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
   etag: true,
   setHeaders: (res, filepath) => {
-    if (filepath.endsWith('.html') || filepath.endsWith('.js')) {
+    if (filepath.endsWith('.html') || filepath.endsWith('.js') || filepath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/)) {
       res.setHeader('Cache-Control', 'no-cache, must-revalidate');
-    } else if (filepath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico|css|woff|woff2|ttf|eot)$/)) {
+    } else if (filepath.match(/\.(css|woff|woff2|ttf|eot)$/)) {
       res.setHeader('Cache-Control', 'public, max-age=86400');
     }
   }

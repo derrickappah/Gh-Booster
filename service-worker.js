@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ghbooster-cache-v1';
+const CACHE_NAME = 'ghbooster-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -7,7 +7,8 @@ const ASSETS_TO_CACHE = [
   'src/css/style.min.css',
   'src/js/theme.min.js',
   'src/img/favicon.png',
-  'src/img/logo.png'
+  'src/img/logo.png',
+  'src/img/logo.webp'
 ];
 
 self.addEventListener('install', (event) => {
@@ -24,6 +25,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
+            console.log('[ServiceWorker] Deleting old cache:', cache);
             return caches.delete(cache);
           }
         })
