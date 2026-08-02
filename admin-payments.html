@@ -335,15 +335,15 @@
           Webhook Configuration
         </h3>
         <p class="text-xs text-gray-500 mb-3">Configure this URL in your Moolre dashboard under <strong>Settings → Webhooks</strong> to automatically receive payment notifications.</p>
-        <div class="flex items-center gap-2">
-          <code id="webhook-url-display" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-xs font-mono text-gray-800 select-all">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <code id="webhook-url-display" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs font-mono text-gray-800 select-all break-all min-w-0">
             http://localhost:5000/api/payments/moolre/webhook
           </code>
-          <button id="btn-copy-webhook" class="px-3 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition whitespace-nowrap">
+          <button id="btn-copy-webhook" class="px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 cursor-pointer">
             Copy URL
           </button>
         </div>
-        <p class="text-[11px] text-gray-400 mt-2">⚠️ Replace <code>localhost:5000</code> with your production domain before going live.</p>
+        <p class="text-[11px] text-gray-400 mt-2 break-words">⚠️ Replace <code class="break-all">localhost:5000</code> with your production domain before going live.</p>
       </div>
 
     </main>
