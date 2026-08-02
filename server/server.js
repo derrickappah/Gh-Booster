@@ -14,8 +14,8 @@ app.listen(PORT, () => {
     if (count > 0) console.log(`[AutoRepair Startup] Marked ${count} credited deposit transaction(s) as completed.`);
   }).catch(() => {});
 
-  // Start Background Order & Deposit Status Sync Worker (Runs every 60 seconds)
-  const SYNC_INTERVAL_MS = 60000;
+  // Start Background Order & Deposit Status Sync Worker (Runs every 15 seconds)
+  const SYNC_INTERVAL_MS = 15000;
   setInterval(async () => {
     try {
       const updatedCount = await OrderService.syncAllNonFinalizedOrders();

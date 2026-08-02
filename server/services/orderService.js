@@ -513,6 +513,61 @@ class OrderService {
       throw new Error('Access denied: You do not have permission to view this order');
     }
 
+    // Live provider sync for active non-finalized orders
+    const nonFinalized = ['processing', 'pending', 'in progress', 'in-progress'];
+    if (dbOrder.provider_order_id && nonFinalized.includes((dbOrder.status || '').toLowerCase())) {
+      try {
+        const providerStatusRes = await SmmgenService.getOrderStatus(dbOrder.provider_order_id);
+        if (providerStatusRes && !providerStatusRes.error && providerStatusRes.status) {
+          let newStatus = providerStatusRes.status;
+          const statusLower = (newStatus || '').toLowerCase();
+          if (statusLower === 'completed') newStatus = 'Completed';
+          else if (statusLower === 'processing') newStatus = 'Processing';
+          else if (statusLower === 'pending') newStatus = 'Pending';
+          else if (statusLower === 'in progress' || statusLower === 'in-progress') newStatus = 'In Progress';
+          else if (statusLower === 'canceled' || statusLower === 'cancelled') newStatus = 'Canceled';
+          else if (statusLower === 'partial') newStatus = 'Partial';
+          else if (statusLower === 'refunded') newStatus = 'Refunded';
+
+          const newStartCount = providerStatusRes.start_count !== undefined && providerStatusRes.start_count !== null
+            ? parseInt(providerStatusRes.start_count, 10)
+            : dbOrder.start_count;
+          const newRemains = providerStatusRes.remains !== undefined && providerStatusRes.remains !== null
+            ? parseInt(providerStatusRes.remains, 10)
+            : dbOrder.remains;
+
+          const hasChanged = newStatus !== dbOrder.status || newStartCount !== dbOrder.start_count || newRemains !== dbOrder.remains;
+
+          if (hasChanged) {
+            await supabaseAdmin
+              .from('orders')
+              .update({
+                status: newStatus,
+                start_count: newStartCount,
+                remains: newRemains,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', dbOrder.id);
+
+            dbOrder.status = newStatus;
+            dbOrder.start_count = newStartCount;
+            dbOrder.remains = newRemains;
+
+            if (['Canceled', 'Refunded', 'Partial'].includes(newStatus)) {
+              await OrderService.processOrderRefund({
+                order: dbOrder,
+                newStatus,
+                remains: newRemains,
+                startCount: newStartCount
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[getOrderById] Live provider sync error:', err.message);
+      }
+    }
+
       const formatDate = (d) => {
         if (!d) return new Date().toISOString().replace('T', ' ').substring(0, 19);
         try {
