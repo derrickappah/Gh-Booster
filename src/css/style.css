@@ -6211,3 +6211,29 @@ iframe.wait-autoplay {
 .\[\&\:\:-webkit-scrollbar\]\:hidden::-webkit-scrollbar {
   display:none;
 }
+
+/* Custom Balance Modal Utilities */
+.pl-16 {
+  padding-left: 4rem !important;
+}
+.pl-14 {
+  padding-left: 3.5rem !important;
+}
+.pl-12 {
+  padding-left: 3rem !important;
+}
+.bg-emerald-600 {
+  background-color: #059669 !important;
+}
+.bg-rose-600 {
+  background-color: #e11d48 !important;
+}
+.bg-red-600 {
+  background-color: #dc2626 !important;
+}
+.bg-emerald-700 {
+  background-color: #047857 !important;
+}
+.bg-rose-700 {
+  background-color: #be123c !important;
+}

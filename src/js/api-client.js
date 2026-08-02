@@ -3476,16 +3476,24 @@ async function initAdminUsersPage() {
         if (action === 'deduct') {
           if (btnAdd) {
             btnAdd.className = `${baseClass} text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800`;
+            btnAdd.style.backgroundColor = 'transparent';
+            btnAdd.style.color = '';
           }
           if (btnDeduct) {
             btnDeduct.className = `${baseClass} bg-rose-600 text-white shadow-sm`;
+            btnDeduct.style.backgroundColor = '#e11d48';
+            btnDeduct.style.color = '#ffffff';
           }
         } else {
           if (btnAdd) {
             btnAdd.className = `${baseClass} bg-emerald-600 text-white shadow-sm`;
+            btnAdd.style.backgroundColor = '#059669';
+            btnAdd.style.color = '#ffffff';
           }
           if (btnDeduct) {
             btnDeduct.className = `${baseClass} text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800`;
+            btnDeduct.style.backgroundColor = 'transparent';
+            btnDeduct.style.color = '';
           }
         }
       }
