@@ -138,11 +138,25 @@
 
   <div class="flex-grow flex flex-col min-w-0">
     <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
-      <h1 class="text-xl font-bold text-gray-900">API Providers</h1>
-      <button id="add-provider-btn" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        + Add Provider
-      </button>
+      <div class="flex items-center space-x-3">
+        <!-- Mobile Logo (visible on mobile only) -->
+        <a href="/admin-dashboard" class="flex items-center md:hidden">
+          <img src="/src/img/logo.png?v=2" alt="GhBooster Logo" class="h-8 w-auto object-contain">
+        </a>
+        <h1 class="text-xl font-bold text-gray-900">API Providers</h1>
+      </div>
+
+      <!-- Mobile Hamburger Toggle Button (Right Side) -->
+      <div class="flex items-center space-x-3 md:hidden">
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </header>
 
     <main class="p-4 md:p-6 space-y-6 flex-grow">
@@ -172,15 +186,23 @@
         </div>
       </div>
 
-      <!-- Providers Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-          <h3 class="font-bold text-gray-900 text-sm">Connected Wholesale Providers</h3>
-          <button id="sync-all-btn" class="px-4 py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition flex items-center">
+      <!-- Toolbar Controls (Moved below stats cards) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <h3 class="font-bold text-gray-900 text-sm">Wholesale API Providers</h3>
+        <div class="flex items-center space-x-2.5 w-full sm:w-auto justify-end">
+          <button id="sync-all-btn" type="button" class="px-4 py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition flex items-center shrink-0" style="white-space: nowrap !important; width: auto !important;">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Sync All
           </button>
+          <button id="add-provider-btn" type="button" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center shrink-0 cursor-pointer" style="white-space: nowrap !important; width: auto !important;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Provider
+          </button>
         </div>
+      </div>
+
+      <!-- Providers Table -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-gray-600">
             <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">

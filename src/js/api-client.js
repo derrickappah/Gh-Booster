@@ -4342,27 +4342,81 @@ async function initAdminProvidersPage() {
               <td class="py-4 px-4 font-mono text-xs text-gray-500">${maskedKey}</td>
               <td class="py-4 px-4 font-extrabold text-green-600">GH₵${bal}</td>
               <td class="py-4 px-4">${statusBadge}</td>
-              <td class="py-4 px-4 text-center space-x-1">
-                <button data-action="sync" data-id="${p.id}" class="prov-btn px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded text-[11px] transition">Sync</button>
-                <button data-action="edit" data-id="${p.id}" class="prov-btn px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded text-[11px] transition">Edit</button>
+              <td class="py-4 px-4 text-center relative">
+                <div class="inline-block text-left relative">
+                  <button type="button" class="prov-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for ${escapeHtml(p.name || 'provider')}" title="Provider Actions">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+
+                  <div class="prov-actions-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
+                    <div class="py-1">
+                      <button type="button" data-action="sync" data-id="${p.id}" class="sync-prov-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Sync Provider
+                      </button>
+                    </div>
+                    <div class="py-1">
+                      <button type="button" data-action="edit" data-id="${p.id}" class="edit-prov-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit Provider
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           `;
         }).join('');
 
-        // Attach action handlers
-        tableBody.querySelectorAll('.prov-btn').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const action = e.target.getAttribute('data-action');
-            const provId = e.target.getAttribute('data-id');
-            const targetProv = providers.find(item => String(item.id) === String(provId));
+        // Toggle 3-dots action menu dropdown
+        tableBody.querySelectorAll('.prov-actions-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMenu = btn.nextElementSibling;
+            const isHidden = currentMenu.classList.contains('hidden');
+            document.querySelectorAll('.prov-actions-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) {
+              currentMenu.classList.remove('hidden');
+            }
+          });
+        });
 
-            if (action === 'edit' && targetProv) {
-              openModal(targetProv);
-            } else if (action === 'sync' && targetProv) {
+        // Close dropdown when clicking anywhere outside
+        if (!window.__provDropdownOutsideClickBound) {
+          window.__provDropdownOutsideClickBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.prov-actions-menu').forEach(m => m.classList.add('hidden'));
+          });
+        }
+
+        // Action Handlers for Edit Provider
+        tableBody.querySelectorAll('.edit-prov-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const provId = btn.getAttribute('data-id');
+            const menu = btn.closest('.prov-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            const targetProv = providers.find(item => String(item.id) === String(provId));
+            if (targetProv) openModal(targetProv);
+          });
+        });
+
+        // Action Handlers for Sync Provider
+        tableBody.querySelectorAll('.sync-prov-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const provId = btn.getAttribute('data-id');
+            const menu = btn.closest('.prov-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            const targetProv = providers.find(item => String(item.id) === String(provId));
+            if (targetProv) {
               try {
-                e.target.disabled = true;
-                e.target.textContent = 'Syncing...';
+                btn.disabled = true;
+                btn.textContent = 'Syncing...';
                 const syncRes = await API.request(`/admin/providers/${provId}/sync`, 'POST');
                 alert(`✅ ${targetProv.name} Synced: ${syncRes.message || 'Updated!'}`);
                 initAdminProvidersPage();
