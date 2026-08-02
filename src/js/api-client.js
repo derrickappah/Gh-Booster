@@ -872,149 +872,8 @@ async function initDashboardPage() {
     });
   }
 
-  // ── Quick-pick amount buttons — active state ────────────────────────
-  const amountInput = document.getElementById('deposit-amount');
-  const quickBtns   = document.querySelectorAll('.quick-amt');
-
-  const activeClasses   = ['border-green-500','text-green-600','bg-green-50','dark:bg-green-900/20','dark:text-green-400'];
-  const inactiveClasses = ['border-gray-200','dark:border-gray-600','text-gray-600','dark:text-gray-300','bg-gray-50','dark:bg-gray-900'];
-
-  function setActiveQuick(amount) {
-    quickBtns.forEach(btn => {
-      const isActive = String(btn.dataset.amount) === String(amount);
-      activeClasses.forEach(c   => btn.classList.toggle(c, isActive));
-      inactiveClasses.forEach(c => btn.classList.toggle(c, !isActive));
-    });
-  }
-
-  quickBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const val = btn.dataset.amount;
-      if (amountInput) amountInput.value = val;
-      setActiveQuick(val);
-    });
-  });
-
-  if (amountInput) {
-    amountInput.addEventListener('input', () => setActiveQuick(amountInput.value));
-  }
-
-  // ── Handle return from Moolre hosted page ───────────────────────────
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('deposit') === 'success') {
-    const ref = urlParams.get('ref') || '';
-
-    // Clean URL immediately so it doesn't re-trigger on refresh
-    window.history.replaceState({}, '', window.location.pathname);
-
-    if (ref) {
-      const dismissPending = showToast('Confirming your payment and crediting your wallet…', 'info', 0);
-      try {
-        // Call /complete — this credits the wallet server-side
-        const completeRes = await API.request('/payments/moolre/complete', 'POST', { reference: ref });
-        dismissPending();
-
-        if (completeRes.success) {
-          const amount  = parseFloat(completeRes.amount || 0).toFixed(2);
-          const balance = parseFloat(completeRes.balance || 0).toFixed(2);
-
-          showToast(`GH₵${amount} deposited successfully! New balance: GH₵${balance}`, 'success', 7000);
-
-          // Update all balance display elements on the page
-          const balEls = document.querySelectorAll('[id*="balance"], [id*="wallet"], [id*="dash-balance"]');
-          balEls.forEach(el => { el.textContent = `GH₵${balance}`; });
-
-          // Also refresh from /auth/me to sync full user state
-          try {
-            const meRes = await API.request('/auth/me');
-            if (meRes.success && meRes.user) { API.setUser(meRes.user); updateUserUI(meRes.user); }
-          } catch (_) {}
-        } else {
-          showToast(`Payment processed but could not confirm credit. Please contact support. Ref: ${ref}`, 'warning', 10000);
-        }
-      } catch (err) {
-        dismissPending();
-        showToast(`Payment may have succeeded. Please refresh or contact support. Ref: ${ref}`, 'warning', 10000);
-      }
-    }
-  }
-
-  const depositForm = document.getElementById('deposit-form');
-  if (depositForm) {
-    depositForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const amountInput = document.getElementById('deposit-amount');
-      const submitBtn   = document.getElementById('deposit-submit-btn');
-      const btnText     = document.getElementById('deposit-btn-text');
-      const alertEl     = document.getElementById('deposit-alert');
-      const pendingBox  = document.getElementById('deposit-pending-box');
-      const refDisplay  = document.getElementById('deposit-ref-display');
-
-      const amount = amountInput ? parseFloat(amountInput.value) : 0;
-      const user   = API.getUser();
-
-      const showAlert = (msg, success = false) => {
-        showToast(msg, success ? 'success' : 'error');
-        if (!alertEl) return;
-        alertEl.className = `rounded-xl p-3.5 text-xs font-semibold border ${
-          success
-            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50'
-            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50'
-        }`;
-        alertEl.textContent = msg;
-        alertEl.classList.remove('hidden');
-      };
-
-      if (!amount || amount < 1) {
-        return showAlert('Minimum deposit amount is GH₵1.00.');
-      }
-
-      if (alertEl) alertEl.classList.add('hidden');
-      if (submitBtn) submitBtn.disabled = true;
-      if (btnText)   btnText.textContent = 'Generating link...';
-
-      try {
-        const res = await API.request('/payments/moolre/initiate', 'POST', {
-          amount,
-          email: user ? user.email : '',
-          description: 'GhBooster wallet top-up'
-        });
-
-        if (!res.success) {
-          showAlert(res.error || res.message || 'Payment request failed. Please try again.');
-          if (submitBtn) submitBtn.disabled = false;
-          if (btnText)   btnText.textContent = 'Pay Now & Deposit';
-          return;
-        }
-
-        // ── Sandbox mode: no real URL generated ──
-        if (res.sandbox || !res.authorization_url) {
-          if (pendingBox) pendingBox.classList.remove('hidden');
-          if (refDisplay) refDisplay.textContent = `Sandbox Reference: ${res.reference}`;
-          if (btnText)    btnText.textContent = 'Awaiting Confirmation...';
-          showAlert(`[Sandbox] Payment link simulated. Reference: ${res.reference}. An admin can manually approve this.`);
-          if (submitBtn) submitBtn.disabled = false;
-          return;
-        }
-
-        // ── Live mode: redirect to Moolre hosted checkout ──
-        if (pendingBox) pendingBox.classList.remove('hidden');
-        if (refDisplay) refDisplay.textContent = `Reference: ${res.reference}`;
-        if (btnText)    btnText.textContent = 'Opening checkout...';
-
-        // Small delay so user sees the pending state, then redirect
-        setTimeout(() => {
-          window.location.href = res.authorization_url;
-        }, 800);
-
-      } catch (err) {
-        showAlert(err.message || 'An error occurred. Please try again.');
-        if (submitBtn) submitBtn.disabled = false;
-        if (btnText)   btnText.textContent = 'Pay Now & Deposit';
-      }
-    });
-  }
+  // ── Initialize Deposit Form & Return Payment Handlers ────────────────
+  await initDepositForm();
 
   // Populate Dashboard Stats Cards & Recent Orders
 
@@ -1702,8 +1561,158 @@ async function initServicesPage() {
   }
 }
 
+// DEPOSIT FORM HANDLER
+async function initDepositForm() {
+  const amountInput = document.getElementById('deposit-amount');
+  const quickBtns   = document.querySelectorAll('.quick-amt');
+
+  const activeClasses   = ['border-green-500','text-green-600','bg-green-50','dark:bg-green-900/20','dark:text-green-400'];
+  const inactiveClasses = ['border-gray-200','dark:border-gray-600','text-gray-600','dark:text-gray-300','bg-gray-50','dark:bg-gray-900'];
+
+  function setActiveQuick(amount) {
+    quickBtns.forEach(btn => {
+      const isActive = String(btn.dataset.amount) === String(amount);
+      activeClasses.forEach(c   => btn.classList.toggle(c, isActive));
+      inactiveClasses.forEach(c => btn.classList.toggle(c, !isActive));
+    });
+  }
+
+  quickBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.amount;
+      if (amountInput) amountInput.value = val;
+      setActiveQuick(val);
+    });
+  });
+
+  if (amountInput) {
+    amountInput.addEventListener('input', () => setActiveQuick(amountInput.value));
+  }
+
+  // ── Handle return from Moolre hosted page ───────────────────────────
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('deposit') === 'success') {
+    const ref = urlParams.get('ref') || '';
+
+    // Clean URL immediately so it doesn't re-trigger on refresh
+    window.history.replaceState({}, '', window.location.pathname);
+
+    if (ref) {
+      const dismissPending = showToast('Confirming your payment and crediting your wallet…', 'info', 0);
+      try {
+        // Call /complete — this credits the wallet server-side
+        const completeRes = await API.request('/payments/moolre/complete', 'POST', { reference: ref });
+        dismissPending();
+
+        if (completeRes.success) {
+          const amount  = parseFloat(completeRes.amount || 0).toFixed(2);
+          const balance = parseFloat(completeRes.balance || 0).toFixed(2);
+
+          showToast(`GH₵${amount} deposited successfully! New balance: GH₵${balance}`, 'success', 7000);
+
+          // Update all balance display elements on the page
+          const balEls = document.querySelectorAll('[id*="balance"], [id*="wallet"], [id*="dash-balance"]');
+          balEls.forEach(el => { el.textContent = `GH₵${balance}`; });
+
+          // Also refresh from /auth/me to sync full user state
+          try {
+            const meRes = await API.request('/auth/me');
+            if (meRes.success && meRes.user) { API.setUser(meRes.user); updateUserUI(meRes.user); }
+          } catch (_) {}
+        } else {
+          showToast(`Payment processed but could not confirm credit. Please contact support. Ref: ${ref}`, 'warning', 10000);
+        }
+      } catch (err) {
+        dismissPending();
+        showToast(`Payment may have succeeded. Please refresh or contact support. Ref: ${ref}`, 'warning', 10000);
+      }
+    }
+  }
+
+  const depositForm = document.getElementById('deposit-form');
+  if (depositForm) {
+    if (depositForm.dataset.listenerAttached) return;
+    depositForm.dataset.listenerAttached = 'true';
+
+    depositForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const amountInput = document.getElementById('deposit-amount');
+      const submitBtn   = document.getElementById('deposit-submit-btn');
+      const btnText     = document.getElementById('deposit-btn-text');
+      const alertEl     = document.getElementById('deposit-alert');
+      const pendingBox  = document.getElementById('deposit-pending-box');
+      const refDisplay  = document.getElementById('deposit-ref-display');
+
+      const amount = amountInput ? parseFloat(amountInput.value) : 0;
+      const user   = API.getUser();
+
+      const showAlert = (msg, success = false) => {
+        showToast(msg, success ? 'success' : 'error');
+        if (!alertEl) return;
+        alertEl.className = `rounded-xl p-3.5 text-xs font-semibold border ${
+          success
+            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800/50'
+            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800/50'
+        }`;
+        alertEl.textContent = msg;
+        alertEl.classList.remove('hidden');
+      };
+
+      if (!amount || amount < 1) {
+        return showAlert('Minimum deposit amount is GH₵1.00.');
+      }
+
+      if (alertEl) alertEl.classList.add('hidden');
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnText)   btnText.textContent = 'Generating link...';
+
+      try {
+        const res = await API.request('/payments/moolre/initiate', 'POST', {
+          amount,
+          email: user ? user.email : '',
+          description: 'GhBooster wallet top-up'
+        });
+
+        if (!res.success) {
+          showAlert(res.error || res.message || 'Payment request failed. Please try again.');
+          if (submitBtn) submitBtn.disabled = false;
+          if (btnText)   btnText.textContent = 'Pay Now & Deposit';
+          return;
+        }
+
+        // ── Sandbox mode: no real URL generated ──
+        if (res.sandbox || !res.authorization_url) {
+          if (pendingBox) pendingBox.classList.remove('hidden');
+          if (refDisplay) refDisplay.textContent = `Sandbox Reference: ${res.reference}`;
+          if (btnText)    btnText.textContent = 'Awaiting Confirmation...';
+          showAlert(`[Sandbox] Payment link simulated. Reference: ${res.reference}. An admin can manually approve this.`);
+          if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+
+        // ── Live mode: redirect to Moolre hosted checkout ──
+        if (pendingBox) pendingBox.classList.remove('hidden');
+        if (refDisplay) refDisplay.textContent = `Reference: ${res.reference}`;
+        if (btnText)    btnText.textContent = 'Opening checkout...';
+
+        // Small delay so user sees the pending state, then redirect
+        setTimeout(() => {
+          window.location.href = res.authorization_url;
+        }, 800);
+
+      } catch (err) {
+        showAlert(err.message || 'An error occurred. Please try again.');
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnText)   btnText.textContent = 'Pay Now & Deposit';
+      }
+    });
+  }
+}
+
 // ADD FUNDS & TRANSACTIONS HISTORY HANDLER
 async function initAddFundsPage() {
+  await initDepositForm();
   const tableBody = document.getElementById('add-funds-tbody') || document.querySelector('tbody');
 
   // Copy Pending Ref handler
