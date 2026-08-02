@@ -3509,12 +3509,6 @@ async function initAdminUsersPage() {
                         </svg>
                         Add / Deduct Balance
                       </button>
-                      <button type="button" class="edit-phone-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        Edit Phone Number
-                      </button>
                     </div>
                     <div class="py-1">
                       <a href="/admin-orders?search=${encodeURIComponent(u.username || u.email || '')}" class="w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
@@ -3569,25 +3563,6 @@ async function initAdminUsersPage() {
 
             setModalAction('add');
             modal.classList.remove('hidden');
-          });
-        });
-
-        // Bind edit phone action
-        tableBody.querySelectorAll('.edit-phone-btn').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const tr = e.target.closest('tr');
-            const userId = tr.getAttribute('data-user-id');
-            const menu = tr.querySelector('.user-actions-menu');
-            if (menu) menu.classList.add('hidden');
-            const newPhone = prompt('Enter new phone number for user (e.g. +233501234567):');
-            if (newPhone === null) return;
-            try {
-              await API.request(`/admin/users/${userId}/phone`, 'PUT', { phone: newPhone });
-              alert('Phone number updated successfully!');
-              initAdminUsersPage();
-            } catch (err) {
-              alert(err.message);
-            }
           });
         });
       }
