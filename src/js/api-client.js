@@ -5107,53 +5107,123 @@ async function initAdminPromotionsPage() {
   const tableBody = document.getElementById('promotions-tbody') || document.querySelector('tbody');
   if (!tableBody) return;
 
-  try {
-    const res = await API.request('/admin/promotions');
-    if (res.success && res.promotions) {
-      const list = res.promotions;
-      if (list.length === 0) {
-        tableBody.innerHTML = `
-          <tr class="hover:bg-gray-50/50 transition">
-            <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No promotional codes found.</td>
-          </tr>
-        `;
+  async function loadPromotions() {
+    try {
+      const res = await API.request('/admin/promotions');
+      if (res.success && Array.isArray(res.promotions)) {
+        const list = res.promotions;
+
+        // Dynamically compute KPI metrics from real promo codes array
+        const activeElem = document.getElementById('admin-promo-active');
+        const redemptionsElem = document.getElementById('admin-promo-redemptions');
+        const discountElem = document.getElementById('admin-promo-discount');
+        const expiredElem = document.getElementById('admin-promo-expired');
+
+        const now = new Date();
+        const activeList = list.filter(p => (p.status || 'active').toLowerCase() === 'active' && (!p.expires_at || new Date(p.expires_at) >= now));
+        const expiredList = list.filter(p => (p.status || '').toLowerCase() === 'expired' || (p.expires_at && new Date(p.expires_at) < now));
+
+        const totalRedemptions = list.reduce((sum, p) => sum + (parseInt(p.used_count || 0, 10)), 0);
+        const totalDiscountValue = list.reduce((sum, p) => {
+          const uses = parseInt(p.used_count || 0, 10);
+          const amt = parseFloat(p.discount_amount || p.value || 0);
+          return sum + (uses * amt);
+        }, 0);
+
+        if (activeElem) activeElem.textContent = activeList.length.toLocaleString();
+        if (redemptionsElem) redemptionsElem.textContent = totalRedemptions.toLocaleString();
+        if (discountElem) discountElem.textContent = `GH₵${totalDiscountValue.toFixed(2)}`;
+        if (expiredElem) expiredElem.textContent = expiredList.length.toLocaleString();
+
+        if (list.length === 0) {
+          tableBody.innerHTML = `
+            <tr class="hover:bg-gray-50/50 transition">
+              <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No promotional codes found.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = list.map(p => {
+          const code = p.code || 'CODE';
+          const disc = p.discount_percentage ? `${p.discount_percentage}%` : `GH₵${parseFloat(p.discount_amount || p.value || 0).toFixed(2)}`;
+          const type = p.type || 'Deposit';
+          const uses = `${p.used_count || 0} / ${p.max_uses || '∞'}`;
+          const applies = p.applies_to || 'All deposits';
+          const expires = p.expires_at ? new Date(p.expires_at).toISOString().split('T')[0] : 'Never';
+          const status = (p.status || 'active').toLowerCase();
+
+          let badge = `<span class="px-2.5 py-1 bg-green-100 text-green-700 font-bold rounded-full text-[11px]">Active</span>`;
+          if (status === 'expired' || (p.expires_at && new Date(p.expires_at) < now)) {
+            badge = `<span class="px-2.5 py-1 bg-gray-100 text-gray-600 font-bold rounded-full text-[11px]">Expired</span>`;
+          } else if (status === 'inactive') {
+            badge = `<span class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-full text-[11px]">Disabled</span>`;
+          }
+
+          return `
+            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+              <td class="py-4 px-4 font-mono font-extrabold text-pink-600 text-sm tracking-widest">${escapeHtml(code)}</td>
+              <td class="py-4 px-4 font-extrabold text-green-600">${disc}</td>
+              <td class="py-4 px-4"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">${escapeHtml(type)}</span></td>
+              <td class="py-4 px-4 font-bold text-gray-900">${uses}</td>
+              <td class="py-4 px-4 text-gray-600">${escapeHtml(applies)}</td>
+              <td class="py-4 px-4 text-gray-500">${expires}</td>
+              <td class="py-4 px-4">${badge}</td>
+              <td class="py-4 px-4 text-center space-x-1">
+                <button onclick="alert('Edit ${escapeHtml(code)}')" class="px-2.5 py-1 bg-gray-100 text-gray-700 font-bold rounded text-[11px]">Edit</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    } catch (e) {
+      console.error('Promotions load error:', e);
+    }
+  }
+
+  await loadPromotions();
+
+  const addPromoForm = document.getElementById('add-promo-form');
+  if (addPromoForm) {
+    addPromoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = (document.getElementById('promo-code')?.value || '').trim().toUpperCase();
+      const discType = document.getElementById('promo-type')?.value || 'percentage';
+      const val = parseFloat(document.getElementById('promo-value')?.value || 0);
+      const maxUses = parseInt(document.getElementById('promo-max-uses')?.value || 0, 10) || null;
+      const expiresAt = document.getElementById('promo-expires-at')?.value || null;
+      const appliesTo = document.getElementById('promo-applies-to')?.value || 'All Deposits';
+
+      if (!code || !val) {
+        alert('Please provide code and discount value.');
         return;
       }
 
-      tableBody.innerHTML = list.map(p => {
-        const code = p.code || 'CODE';
-        const disc = p.discount_percentage ? `${p.discount_percentage}%` : `GH₵${parseFloat(p.discount_amount || 0).toFixed(2)}`;
-        const type = p.type || 'Deposit';
-        const uses = `${p.used_count || 0} / ${p.max_uses || '∞'}`;
-        const applies = p.applies_to || 'All deposits';
-        const expires = p.expires_at ? new Date(p.expires_at).toISOString().split('T')[0] : 'Never';
-        const status = (p.status || 'active').toLowerCase();
+      const payload = {
+        code,
+        type: discType === 'percentage' ? 'Percentage' : 'Fixed Amount',
+        discount_percentage: discType === 'percentage' ? val : null,
+        discount_amount: discType === 'fixed' ? val : null,
+        value: val,
+        max_uses: maxUses,
+        expires_at: expiresAt,
+        applies_to: appliesTo
+      };
 
-        let badge = `<span class="px-2.5 py-1 bg-green-100 text-green-700 font-bold rounded-full text-[11px]">Active</span>`;
-        if (status === 'expired') {
-          badge = `<span class="px-2.5 py-1 bg-gray-100 text-gray-600 font-bold rounded-full text-[11px]">Expired</span>`;
-        } else if (status === 'inactive') {
-          badge = `<span class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-full text-[11px]">Disabled</span>`;
+      try {
+        const res = await API.request('/admin/promotions', 'POST', payload);
+        if (res.success) {
+          alert('Promo code created successfully!');
+          addPromoForm.reset();
+          document.getElementById('add-promo-modal')?.classList.add('hidden');
+          await loadPromotions();
+        } else {
+          alert(res.message || 'Failed to create promo code.');
         }
-
-        return `
-          <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
-            <td class="py-4 px-4 font-mono font-extrabold text-pink-600 text-sm tracking-widest">${escapeHtml(code)}</td>
-            <td class="py-4 px-4 font-extrabold text-green-600">${disc}</td>
-            <td class="py-4 px-4"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">${escapeHtml(type)}</span></td>
-            <td class="py-4 px-4 font-bold text-gray-900">${uses}</td>
-            <td class="py-4 px-4 text-gray-600">${escapeHtml(applies)}</td>
-            <td class="py-4 px-4 text-gray-500">${expires}</td>
-            <td class="py-4 px-4">${badge}</td>
-            <td class="py-4 px-4 text-center space-x-1">
-              <button onclick="alert('Edit ${escapeHtml(code)}')" class="px-2.5 py-1 bg-gray-100 text-gray-700 font-bold rounded text-[11px]">Edit</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-  } catch (e) {
-    console.error('Promotions load error:', e);
+      } catch (err) {
+        alert(err.message || 'Error creating promo code.');
+      }
+    });
   }
 }
 
