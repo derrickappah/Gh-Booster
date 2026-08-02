@@ -119,59 +119,59 @@ class OrderService {
       return nonFinalizedStatuses.includes(st) && o.provider_order_id;
     });
 
-    if (ordersToSync.length === 0) return 0;
-
     let updatedCount = 0;
-    await Promise.all(ordersToSync.map(async (order) => {
-      try {
-        const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
-        if (!providerStatusRes || providerStatusRes.error) return;
+    if (ordersToSync.length > 0) {
+      await Promise.all(ordersToSync.map(async (order) => {
+        try {
+          const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
+          if (!providerStatusRes || providerStatusRes.error) return;
 
-        let newStatus = providerStatusRes.status || order.status;
-        const statusLower = (newStatus || '').toLowerCase();
-        if (statusLower === 'completed') newStatus = 'Completed';
-        else if (statusLower === 'processing') newStatus = 'Processing';
-        else if (statusLower === 'pending') newStatus = 'Pending';
-        else if (statusLower === 'in progress' || statusLower === 'in-progress') newStatus = 'In Progress';
-        else if (statusLower === 'canceled' || statusLower === 'cancelled') newStatus = 'Canceled';
-        else if (statusLower === 'partial') newStatus = 'Partial';
-        else if (statusLower === 'refunded') newStatus = 'Refunded';
+          let newStatus = providerStatusRes.status || order.status;
+          const statusLower = (newStatus || '').toLowerCase();
+          if (statusLower === 'completed') newStatus = 'Completed';
+          else if (statusLower === 'processing') newStatus = 'Processing';
+          else if (statusLower === 'pending') newStatus = 'Pending';
+          else if (statusLower === 'in progress' || statusLower === 'in-progress') newStatus = 'In Progress';
+          else if (statusLower === 'canceled' || statusLower === 'cancelled') newStatus = 'Canceled';
+          else if (statusLower === 'partial') newStatus = 'Partial';
+          else if (statusLower === 'refunded') newStatus = 'Refunded';
 
-        const newStartCount = providerStatusRes.start_count !== undefined && providerStatusRes.start_count !== null
-          ? parseInt(providerStatusRes.start_count, 10)
-          : order.start_count;
-        const newRemains = providerStatusRes.remains !== undefined && providerStatusRes.remains !== null
-          ? parseInt(providerStatusRes.remains, 10)
-          : order.remains;
+          const newStartCount = providerStatusRes.start_count !== undefined && providerStatusRes.start_count !== null
+            ? parseInt(providerStatusRes.start_count, 10)
+            : order.start_count;
+          const newRemains = providerStatusRes.remains !== undefined && providerStatusRes.remains !== null
+            ? parseInt(providerStatusRes.remains, 10)
+            : order.remains;
 
-        const hasChanged = newStatus !== order.status || newStartCount !== order.start_count || newRemains !== order.remains;
-        const isRefundableStatus = ['Canceled', 'Refunded', 'Partial'].includes(newStatus);
+          const hasChanged = newStatus !== order.status || newStartCount !== order.start_count || newRemains !== order.remains;
+          const isRefundableStatus = ['Canceled', 'Refunded', 'Partial'].includes(newStatus);
 
-        if (hasChanged) {
-          await supabaseAdmin
-            .from('orders')
-            .update({
-              status: newStatus,
-              start_count: newStartCount,
-              remains: newRemains,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', order.id);
-          updatedCount++;
+          if (hasChanged) {
+            await supabaseAdmin
+              .from('orders')
+              .update({
+                status: newStatus,
+                start_count: newStartCount,
+                remains: newRemains,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', order.id);
+            updatedCount++;
 
-          if (isRefundableStatus) {
-            await OrderService.processOrderRefund({
-              order: { ...order, status: newStatus, start_count: newStartCount, remains: newRemains },
-              newStatus,
-              remains: newRemains,
-              startCount: newStartCount
-            });
+            if (isRefundableStatus) {
+              await OrderService.processOrderRefund({
+                order: { ...order, status: newStatus, start_count: newStartCount, remains: newRemains },
+                newStatus,
+                remains: newRemains,
+                startCount: newStartCount
+              });
+            }
           }
+        } catch (err) {
+          console.error(`[OrderCron] Error syncing provider order #${order.provider_order_id}:`, err.message);
         }
-      } catch (err) {
-        console.error(`[OrderCron] Error syncing provider order #${order.provider_order_id}:`, err.message);
-      }
-    }));
+      }));
+    }
 
     // Safety sweep: Also process any Canceled / Refunded / Partial orders whose refunds have not been fully issued yet
     const unrefundedOrders = (rawOrders || []).filter(o => {
