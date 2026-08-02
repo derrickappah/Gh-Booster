@@ -5022,8 +5022,24 @@ async function initAdminChildPanelsPage() {
 
   try {
     const res = await API.request('/admin/child-panels');
-    if (res.success && res.childPanels) {
+    if (res.success && Array.isArray(res.childPanels)) {
       const list = res.childPanels;
+
+      // Update KPI metrics dynamically based on real data
+      const activeElem = document.getElementById('admin-cp-active');
+      const mrrElem = document.getElementById('admin-cp-mrr');
+      const pendingElem = document.getElementById('admin-cp-pending');
+      const rateElem = document.getElementById('admin-cp-rate');
+
+      const activePanels = list.filter(p => (p.status || 'active').toLowerCase() === 'active');
+      const pendingPanels = list.filter(p => (p.status || '').toLowerCase() === 'pending');
+      const mrr = activePanels.reduce((sum, p) => sum + parseFloat(p.monthly_fee || p.price || 25), 0);
+
+      if (activeElem) activeElem.textContent = `${activePanels.length} Active`;
+      if (mrrElem) mrrElem.textContent = `GH₵${mrr.toFixed(2)}`;
+      if (pendingElem) pendingElem.textContent = `${pendingPanels.length} Pending`;
+      if (rateElem) rateElem.textContent = `GH₵25.00 / mo`;
+
       if (list.length === 0) {
         tableBody.innerHTML = `
           <tr class="hover:bg-gray-50/50 transition">
