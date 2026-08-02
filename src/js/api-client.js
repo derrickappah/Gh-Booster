@@ -3109,38 +3109,54 @@ async function initAdminDashboard() {
       const totalRev = parseFloat(stats.total_revenue || 0);
       const totalOrd = parseInt(stats.total_orders || 0, 10);
       const totalUsers = parseInt(stats.total_users || 0, 10);
-      const openTickets = parseInt(stats.open_tickets || 0, 10);
-      const walletBal = parseFloat(stats.total_wallet_balance || 0);
+      const usersToday = parseInt(stats.users_today || 0, 10);
+      const depositsToday = parseFloat(stats.deposits_today || 0);
+      const totalDep = parseFloat(stats.total_deposits || (totalRev + parseFloat(stats.total_wallet_balance || 0)));
+      const ordersToday = parseInt(stats.orders_today || 0, 10);
       const completedOrd = parseInt(stats.completed_orders || 0, 10);
-      const activeOrd = parseInt(stats.active_orders || (stats.pending_orders || 0) + (stats.processing_orders || 0), 10);
-      const completionRate = stats.completion_rate !== undefined ? stats.completion_rate : (totalOrd > 0 ? Math.round((completedOrd / totalOrd) * 100) : 0);
-      const servicesCount = parseInt(stats.active_services || 0, 10);
-      const providersCount = parseInt(stats.active_providers || 0, 10);
+      const confirmedOrd = parseInt(stats.confirmed_orders || 0, 10);
+      const processingOrd = parseInt(stats.processing_orders || 0, 10);
+      const pendingOrd = parseInt(stats.pending_orders || 0, 10);
+      const canceledOrd = parseInt(stats.canceled_orders || 0, 10);
+      const openTickets = parseInt(stats.open_tickets || 0, 10);
+      const ticketsInProgress = parseInt(stats.tickets_in_progress || 0, 10);
+      const pendingReferrals = parseInt(stats.pending_referrals || 0, 10);
+      const activeServices = parseInt(stats.active_services || 0, 10);
+      const totalTransactions = parseInt(stats.total_transactions || 0, 10);
       const avgOrderVal = parseFloat(stats.avg_order_value || (totalOrd > 0 ? totalRev / totalOrd : 0));
-      const totalDep = parseFloat(stats.total_deposits || (totalRev + walletBal));
+      const rejectedDeposits = parseInt(stats.rejected_deposits || 0, 10);
+      const refundedCount = parseInt(stats.refunded_count || 0, 10);
+      const failedCount = parseInt(stats.failed_count || 0, 10);
+      const activePaymentMethods = parseInt(stats.active_payment_methods || 4, 10);
 
-      if (revElem) revElem.textContent = `GH₵${totalRev.toFixed(2)}`;
-      if (ordersElem) ordersElem.textContent = totalOrd.toLocaleString();
-      if (usersElem) usersElem.textContent = totalUsers.toLocaleString();
-      if (ticketsElem) ticketsElem.textContent = `${openTickets} Pending`;
+      // Populate elements
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
 
-      const walletElem = document.getElementById('admin-kpi-wallet-balance');
-      if (walletElem) walletElem.textContent = `GH₵${walletBal.toFixed(2)}`;
-
-      const completedElem = document.getElementById('admin-kpi-completed-orders');
-      if (completedElem) completedElem.textContent = completedOrd.toLocaleString();
-
-      const rateElem = document.getElementById('admin-kpi-completion-rate');
-      if (rateElem) rateElem.textContent = `${completionRate}% Fulfillment Rate`;
-
-      const activeElem = document.getElementById('admin-kpi-active-orders');
-      if (activeElem) activeElem.textContent = activeOrd.toLocaleString();
-
-      const servProvElem = document.getElementById('admin-kpi-services-providers');
-      if (servProvElem) servProvElem.textContent = `${servicesCount} / ${providersCount}`;
-
-      const aovElem = document.getElementById('admin-stat-aov');
-      if (aovElem) aovElem.textContent = `GH₵${avgOrderVal.toFixed(2)}`;
+      setVal('admin-stat-users-today', usersToday.toLocaleString());
+      setVal('admin-kpi-users', totalUsers.toLocaleString());
+      setVal('admin-stat-deposits-today', `GH₵${depositsToday.toFixed(2)}`);
+      setVal('admin-stat-deposits-confirmed', `GH₵${totalDep.toFixed(2)}`);
+      setVal('admin-stat-orders-today', ordersToday.toLocaleString());
+      setVal('admin-kpi-orders', totalOrd.toLocaleString());
+      setVal('admin-kpi-completed-orders', completedOrd.toLocaleString());
+      setVal('admin-stat-orders-confirmed', confirmedOrd.toLocaleString());
+      setVal('admin-stat-orders-processing', processingOrd.toLocaleString());
+      setVal('admin-stat-orders-pending', pendingOrd.toLocaleString());
+      setVal('admin-stat-orders-cancelled', canceledOrd.toLocaleString());
+      setVal('admin-kpi-tickets', openTickets.toLocaleString());
+      setVal('admin-stat-tickets-in-progress', ticketsInProgress.toLocaleString());
+      setVal('admin-stat-referrals-pending', pendingReferrals.toLocaleString());
+      setVal('admin-stat-services-active', activeServices.toLocaleString());
+      setVal('admin-stat-transactions-total', totalTransactions.toLocaleString());
+      setVal('admin-kpi-revenue', `GH₵${totalRev.toFixed(2)}`);
+      setVal('admin-stat-aov', `GH₵${avgOrderVal.toFixed(2)}`);
+      setVal('admin-stat-deposits-rejected', rejectedDeposits.toLocaleString());
+      setVal('admin-stat-refunded', refundedCount.toLocaleString());
+      setVal('admin-stat-failed', failedCount.toLocaleString());
+      setVal('admin-stat-payment-methods-active', activePaymentMethods.toLocaleString());
 
       const depElem = document.getElementById('admin-stat-deposits');
       if (depElem) depElem.textContent = `GH₵${totalDep.toFixed(2)}`;

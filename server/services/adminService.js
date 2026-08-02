@@ -11,19 +11,46 @@ class AdminService {
     const { data: transactions } = await supabaseAdmin.from('transactions').select('*');
     const { data: logs } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
 
+    let referrals = [];
+    try {
+      const { data: refData } = await supabaseAdmin.from('referral_payouts').select('*');
+      referrals = refData || [];
+    } catch (_) {}
+
+    let paymentMethods = [];
+    try {
+      const { data: pmData } = await supabaseAdmin.from('payment_methods').select('*');
+      paymentMethods = pmData || [];
+    } catch (_) {}
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
     const totalOrdersCount = orderCount || (orders ? orders.length : 0);
     const totalUsersCount = userCount || (users ? users.length : 0);
     const totalServicesCount = serviceCount || (services ? services.length : 0);
     const totalProvidersCount = providerCount || (providers ? providers.length : 0);
+    const totalTransactionsCount = (transactions || []).length;
 
     const totalRevenue = (orders || []).reduce((acc, o) => acc + (parseFloat(o.charge) || 0), 0);
     const totalWalletBalance = (wallets || []).reduce((acc, w) => acc + (parseFloat(w.balance) || 0), 0);
-    
+
+    // Today calculations
+    const usersToday = (users || []).filter(u => u.created_at && new Date(u.created_at) >= todayStart).length;
+    const ordersToday = (orders || []).filter(o => o.created_at && new Date(o.created_at) >= todayStart).length;
+    const depositsToday = (transactions || [])
+      .filter(t => (t.type === 'deposit' || t.type === 'fund' || t.type === 'credit' || !t.type) &&
+                   (t.status === 'Completed' || t.status === 'approved' || t.status === 'success' || !t.status) &&
+                   t.created_at && new Date(t.created_at) >= todayStart)
+      .reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
+
+    // Status breakdowns
     const completedOrders = (orders || []).filter(o => o.status === 'Completed').length;
     const processingOrders = (orders || []).filter(o => o.status === 'Processing' || o.status === 'In Progress').length;
     const pendingOrders = (orders || []).filter(o => o.status === 'Pending').length;
-    const canceledOrders = (orders || []).filter(o => o.status === 'Canceled' || o.status === 'Refunded' || o.status === 'Partial').length;
-    
+    const confirmedOrders = (orders || []).filter(o => o.status === 'Confirmed' || o.status === 'Completed').length;
+    const canceledOrders = (orders || []).filter(o => o.status === 'Canceled' || o.status === 'Cancelled' || o.status === 'Refunded').length;
+
     const activeOrders = pendingOrders + processingOrders;
     const completionRate = totalOrdersCount > 0 ? Math.round((completedOrders / totalOrdersCount) * 100) : 0;
     const avgOrderValue = totalOrdersCount > 0 ? (totalRevenue / totalOrdersCount) : 0;
@@ -32,7 +59,17 @@ class AdminService {
       .filter(t => (t.type === 'deposit' || t.type === 'fund' || t.type === 'credit' || !t.type) && (t.status === 'Completed' || t.status === 'approved' || t.status === 'success' || !t.status))
       .reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
 
-    const openTickets = (tickets || []).filter(t => t.status === 'Open' || t.status === 'Pending').length;
+    const openTickets = (tickets || []).filter(t => t.status === 'Open').length;
+    const ticketsInProgress = (tickets || []).filter(t => t.status === 'In Progress' || t.status === 'Pending' || t.status === 'Answered').length;
+
+    const pendingReferrals = (referrals || []).filter(r => r.status === 'Pending' || r.status === 'pending').length;
+    const activePaymentMethods = (paymentMethods || []).filter(p => p.status === 'Active' || p.is_active || true).length;
+    const activeServicesCount = (services || []).filter(s => s.status === 'Active' || s.status === 1 || s.status === true || s.mode !== 'disabled').length;
+
+    // Exceptions
+    const rejectedDeposits = (transactions || []).filter(t => t.status === 'Rejected' || t.status === 'rejected' || t.status === 'declined').length;
+    const refundedCount = (transactions || []).filter(t => t.type === 'refund' || t.status === 'Refunded' || t.status === 'refunded').length + (orders || []).filter(o => o.status === 'Refunded').length;
+    const failedCount = (transactions || []).filter(t => t.status === 'Failed' || t.status === 'failed').length;
 
     // Daily chart data calculation
     const dailyChartData = [
@@ -60,21 +97,32 @@ class AdminService {
     }
 
     return {
-      total_revenue: totalRevenue,
-      total_orders: totalOrdersCount,
+      users_today: usersToday,
       total_users: totalUsersCount,
-      active_services: totalServicesCount,
+      deposits_today: depositsToday,
+      total_deposits: totalDeposits > 0 ? totalDeposits : (totalRevenue + totalWalletBalance),
+      orders_today: ordersToday,
+      total_orders: totalOrdersCount,
+      completed_orders: completedOrders,
+      processing_orders: processingOrders,
+      pending_orders: pendingOrders,
+      confirmed_orders: confirmedOrders,
+      canceled_orders: canceledOrders,
+      open_tickets: openTickets,
+      tickets_in_progress: ticketsInProgress,
+      pending_referrals: pendingReferrals,
+      active_services: activeServicesCount > 0 ? activeServicesCount : totalServicesCount,
+      total_transactions: totalTransactionsCount,
+      avg_order_value: avgOrderValue,
+      rejected_deposits: rejectedDeposits,
+      refunded_count: refundedCount,
+      failed_count: failedCount,
+      active_payment_methods: activePaymentMethods > 0 ? activePaymentMethods : 4,
+      total_revenue: totalRevenue,
       active_providers: totalProvidersCount,
       total_wallet_balance: totalWalletBalance,
-      total_deposits: totalDeposits > 0 ? totalDeposits : (totalRevenue + totalWalletBalance),
-      avg_order_value: avgOrderValue,
-      pending_orders: pendingOrders,
-      processing_orders: processingOrders,
       active_orders: activeOrders,
-      completed_orders: completedOrders,
-      canceled_orders: canceledOrders,
       completion_rate: completionRate,
-      open_tickets: openTickets,
       status_breakdown: {
         completed: completedOrders,
         processing: processingOrders,
