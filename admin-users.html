@@ -336,18 +336,18 @@
         <!-- Action Type Segmented Controls -->
         <div>
           <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Action Type</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-gray-900 rounded-xl">
-            <button type="button" id="btn-action-add" class="fund-action-btn py-2 px-3 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow-sm transition flex items-center justify-center" data-action="add">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          <div class="grid grid-cols-2 gap-2 p-1.5 bg-gray-100 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+            <button type="button" id="btn-action-add" class="fund-action-btn py-2.5 px-3 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow-sm transition-all duration-150 flex items-center justify-center space-x-1.5" data-action="add">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              + Add Funds
+              <span>+ Add Funds</span>
             </button>
-            <button type="button" id="btn-action-deduct" class="fund-action-btn py-2 px-3 rounded-lg font-bold text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition flex items-center justify-center" data-action="deduct">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            <button type="button" id="btn-action-deduct" class="fund-action-btn py-2.5 px-3 rounded-lg font-bold text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all duration-150 flex items-center justify-center space-x-1.5" data-action="deduct">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
               </svg>
-              - Deduct Funds
+              <span>- Deduct Funds</span>
             </button>
           </div>
           <input type="hidden" id="modal-fund-action" value="add">
@@ -356,17 +356,17 @@
         <!-- Amount Input Field with Presets -->
         <div>
           <label for="modal-fund-amount" class="block font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Amount (GH₵)</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-2.5 text-gray-400 font-extrabold text-sm">GH₵</span>
-            <input type="number" id="modal-fund-amount" step="0.01" min="0.01" required placeholder="50.00" class="w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white font-extrabold text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-800 transition">
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-700 dark:text-gray-300 font-extrabold text-sm select-none z-10">GH₵</span>
+            <input type="number" id="modal-fund-amount" step="0.01" min="0.01" required placeholder="50.00" class="w-full pl-16 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white font-extrabold text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-800 transition">
           </div>
 
           <!-- Quick Amount Preset Pills -->
           <div class="flex items-center space-x-2 mt-2">
-            <button type="button" class="preset-pill px-2.5 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 hover:text-pink-600 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg text-[11px] font-bold transition" data-val="10">+10</button>
-            <button type="button" class="preset-pill px-2.5 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 hover:text-pink-600 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg text-[11px] font-bold transition" data-val="50">+50</button>
-            <button type="button" class="preset-pill px-2.5 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 hover:text-pink-600 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg text-[11px] font-bold transition" data-val="100">+100</button>
-            <button type="button" class="preset-pill px-2.5 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 hover:text-pink-600 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg text-[11px] font-bold transition" data-val="500">+500</button>
+            <button type="button" class="preset-pill px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-600 hover:text-white dark:hover:bg-pink-600 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-bold transition shadow-xs" data-val="10">+10</button>
+            <button type="button" class="preset-pill px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-600 hover:text-white dark:hover:bg-pink-600 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-bold transition shadow-xs" data-val="50">+50</button>
+            <button type="button" class="preset-pill px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-600 hover:text-white dark:hover:bg-pink-600 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-bold transition shadow-xs" data-val="100">+100</button>
+            <button type="button" class="preset-pill px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-pink-600 hover:text-white dark:hover:bg-pink-600 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-bold transition shadow-xs" data-val="500">+500</button>
           </div>
         </div>
 

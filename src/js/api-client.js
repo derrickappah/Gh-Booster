@@ -3472,19 +3472,20 @@ async function initAdminUsersPage() {
       function setModalAction(action) {
         if (!actionInput) return;
         actionInput.value = action;
+        const baseClass = 'fund-action-btn py-2.5 px-3 rounded-lg font-bold text-xs transition-all duration-150 flex items-center justify-center space-x-1.5';
         if (action === 'deduct') {
           if (btnAdd) {
-            btnAdd.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition flex items-center justify-center';
+            btnAdd.className = `${baseClass} text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800`;
           }
           if (btnDeduct) {
-            btnDeduct.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs bg-rose-600 text-white shadow-sm transition flex items-center justify-center';
+            btnDeduct.className = `${baseClass} bg-rose-600 text-white shadow-sm`;
           }
         } else {
           if (btnAdd) {
-            btnAdd.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow-sm transition flex items-center justify-center';
+            btnAdd.className = `${baseClass} bg-emerald-600 text-white shadow-sm`;
           }
           if (btnDeduct) {
-            btnDeduct.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition flex items-center justify-center';
+            btnDeduct.className = `${baseClass} text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800`;
           }
         }
       }
