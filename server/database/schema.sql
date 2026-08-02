@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     gateway TEXT NOT NULL,
     reference TEXT UNIQUE NOT NULL,
     type TEXT NOT NULL DEFAULT 'deposit' CHECK (type IN ('deposit', 'withdrawal', 'refund', 'bonus', 'order_charge')),
-    status TEXT NOT NULL DEFAULT 'completed' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
+    status TEXT NOT NULL DEFAULT 'completed' CHECK (status IN ('pending', 'completed', 'failed', 'refunded', 'expired')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

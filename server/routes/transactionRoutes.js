@@ -6,9 +6,10 @@ const MoolreService = require('../services/moolreService');
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    // 0. Auto-repair any pending deposit transactions that were already credited
+    // 0. Auto-repair and expire pending deposit transactions
     try {
       await MoolreService.repairPendingCompletedTransactions(req.user.id);
+      await MoolreService.expirePendingDeposits();
     } catch (e) {
       console.warn('[Transaction Repair Warning]', e.message);
     }

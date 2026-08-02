@@ -346,8 +346,19 @@ class MoolreService {
         return { success: true, status: 'completed', reference, transaction: txn };
       }
 
+      const is30MinOld = txn.created_at && (Date.now() - new Date(txn.created_at).getTime() > 30 * 60 * 1000);
+      if (is30MinOld) {
+        await supabaseAdmin.from('transactions').update({ status: 'expired' }).eq('id', txn.id);
+        return { success: true, status: 'expired', reference, transaction: { ...txn, status: 'expired' } };
+      }
+
       return { success: true, status: gatewayStatus || 'pending', reference, transaction: txn };
     } catch {
+      const is30MinOld = txn.created_at && (Date.now() - new Date(txn.created_at).getTime() > 30 * 60 * 1000);
+      if (is30MinOld) {
+        await supabaseAdmin.from('transactions').update({ status: 'expired' }).eq('id', txn.id);
+        return { success: true, status: 'expired', reference, transaction: { ...txn, status: 'expired' } };
+      }
       return { success: true, status: txn.status, reference, transaction: txn };
     }
   }
@@ -610,6 +621,64 @@ class MoolreService {
       return repairedCount;
     } catch (err) {
       console.warn('[AutoRepair Error]', err.message);
+      return 0;
+    }
+  }
+
+  /**
+   * Expire pending deposit transactions that are older than 30 minutes.
+   */
+  static async expirePendingDeposits() {
+    try {
+      // 1. Try invoking stored procedure if available in Supabase
+      const { data: rpcRes, error: rpcErr } = await supabaseAdmin.rpc('expire_old_pending_deposits');
+      if (!rpcErr && typeof rpcRes === 'number') {
+        if (rpcRes > 0) console.log(`[AutoExpire] Expired ${rpcRes} pending deposit(s) via database function.`);
+        return rpcRes;
+      }
+
+      // 2. Fallback query if RPC procedure is not executed directly
+      const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { data: oldPendingTxns, error } = await supabaseAdmin
+        .from('transactions')
+        .select('*')
+        .eq('type', 'deposit')
+        .eq('status', 'pending')
+        .lt('created_at', thirtyMinsAgo);
+
+      if (error || !oldPendingTxns || oldPendingTxns.length === 0) return 0;
+
+      let expiredCount = 0;
+      for (const txn of oldPendingTxns) {
+        // Double check audit logs to ensure wallet was not credited
+        const ref = txn.reference || txn.payment_ref;
+        if (ref) {
+          const { data: logs } = await supabaseAdmin
+            .from('audit_logs')
+            .select('id')
+            .eq('user_id', txn.user_id)
+            .ilike('details', `%${ref}%`);
+
+          if (logs && logs.length > 0) {
+            // Was actually credited, mark completed
+            await supabaseAdmin.from('transactions').update({ status: 'completed', updated_at: new Date().toISOString() }).eq('id', txn.id);
+            continue;
+          }
+        }
+
+        const { error: updateErr } = await supabaseAdmin
+          .from('transactions')
+          .update({ status: 'expired' })
+          .eq('id', txn.id);
+
+        if (!updateErr) {
+          expiredCount++;
+          console.log(`[AutoExpire] Expired pending deposit #${txn.id} (${ref || 'no-ref'}).`);
+        }
+      }
+      return expiredCount;
+    } catch (err) {
+      console.warn('[AutoExpire Error]', err.message);
       return 0;
     }
   }

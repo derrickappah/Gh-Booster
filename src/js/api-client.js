@@ -1753,6 +1753,7 @@ async function initAddFundsPage() {
 
           let badgeClass = 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300';
           if (st === 'pending') badgeClass = 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
+          if (st === 'expired') badgeClass = 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
           if (st === 'failed' || st === 'canceled') badgeClass = 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300';
 
           return `
@@ -1910,6 +1911,8 @@ async function initTransactionsPage() {
         statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">Completed</span>';
       } else if (statusStr === 'pending' || statusStr === 'processing') {
         statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">Pending</span>';
+      } else if (statusStr === 'expired') {
+        statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Expired</span>';
       } else {
         statusBadge = '<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">Failed</span>';
       }
@@ -4053,6 +4056,9 @@ async function initAdminDepositsPage() {
           if (status === 'completed' || status === 'approved') {
             badgeClass = 'bg-green-100 text-green-800';
             statusText = 'Approved';
+          } else if (status === 'expired') {
+            badgeClass = 'bg-gray-100 text-gray-700';
+            statusText = 'Expired';
           } else if (status === 'failed' || status === 'rejected' || status === 'canceled') {
             badgeClass = 'bg-red-100 text-red-800';
             statusText = 'Rejected';
