@@ -234,14 +234,14 @@
 
         <!-- Filter Status Tabs -->
         <div class="flex items-center space-x-2 overflow-x-auto border-t border-gray-100 dark:border-gray-700 pt-4 text-xs font-semibold" aria-label="Order status filter tabs" id="order-status-tabs">
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active" data-status="all">All</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="in-progress">In Progress</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="pending">Pending</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="completed">Completed</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="processing">Processing</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="partial">Partial</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="canceled">Canceled</button>
-          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition" data-status="refunded">Refunded</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active" data-status="all">All</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="in-progress">In Progress</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="pending">Pending</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="completed">Completed</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="processing">Processing</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="partial">Partial</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="canceled">Canceled</button>
+          <button class="status-tab whitespace-nowrap flex-shrink-0 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition" data-status="refunded">Refunded</button>
         </div>
 
       </div>
@@ -279,7 +279,7 @@
             </div>
             <div class="flex items-center space-x-1.5 text-gray-500 dark:text-gray-400">
               <span>Per page:</span>
-              <select id="orders-page-size" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500" aria-label="Orders per page">
+              <select id="orders-page-size" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-2 py-1 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-pink-500" aria-label="Orders per page">
                 <option value="10" selected>10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
@@ -289,9 +289,9 @@
           </div>
 
           <div class="flex items-center space-x-1" id="orders-pagination-controls" aria-label="Pagination controls">
-            <button id="orders-prev-btn" class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" disabled aria-label="Previous page">Previous</button>
+            <button id="orders-prev-btn" class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" disabled aria-label="Previous page">Previous</button>
             <div id="orders-page-buttons" class="flex items-center space-x-1"></div>
-            <button id="orders-next-btn" class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" disabled aria-label="Next page">Next</button>
+            <button id="orders-next-btn" class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" disabled aria-label="Next page">Next</button>
           </div>
         </div>
 

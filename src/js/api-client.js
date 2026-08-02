@@ -1061,8 +1061,8 @@ async function initOrdersPage() {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = p === currentPage
-              ? 'px-3 py-1.5 bg-pink-600 text-white font-bold rounded shadow-sm text-xs transition'
-              : 'px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs';
+              ? 'px-3 py-1.5 bg-pink-600 text-white font-bold rounded-2xl shadow-sm text-xs transition'
+              : 'px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs';
             btn.textContent = p;
             btn.onclick = () => {
               currentPage = p;
@@ -1087,7 +1087,7 @@ async function initOrdersPage() {
               <tr>
                 <td colspan="9" class="px-6 py-12 text-center space-y-3">
                   <p class="text-gray-500 dark:text-gray-400 font-medium text-xs">No orders found matching your search criteria.</p>
-                  <button type="button" id="clear-filters-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg shadow transition">Clear Search & Filters</button>
+                  <button type="button" id="clear-filters-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-2xl shadow transition">Clear Search & Filters</button>
                 </td>
               </tr>`;
             const clearBtn = document.getElementById('clear-filters-btn');
@@ -1098,9 +1098,9 @@ async function initOrdersPage() {
                 const statusTabs = document.querySelectorAll('.status-tab');
                 statusTabs.forEach(t => {
                   if (t.getAttribute('data-status') === 'all') {
-                    t.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active text-xs font-semibold';
+                    t.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold';
                   } else {
-                    t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition text-xs font-semibold';
+                    t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold';
                   }
                 });
                 applyOrderFilters();
@@ -1311,9 +1311,9 @@ async function initOrdersPage() {
         statusTabs.forEach(tab => {
           tab.addEventListener('click', () => {
             statusTabs.forEach(t => {
-              t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition text-xs font-semibold';
+              t.className = 'status-tab px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-2xl transition text-xs font-semibold';
             });
-            tab.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active text-xs font-semibold';
+            tab.className = 'status-tab px-4 py-2 bg-pink-600 text-white rounded-2xl shadow-sm transition active text-xs font-semibold';
             currentStatusFilter = tab.getAttribute('data-status') || 'all';
             applyOrderFilters();
           });
