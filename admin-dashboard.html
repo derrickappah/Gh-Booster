@@ -3,7 +3,7 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="EDGE">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Title & Description -->
@@ -11,129 +11,125 @@
   <meta name="description" content="GhBooster SMM Panel Super Admin Dashboard. Monitor total revenue, manage user balances, control live orders, and configure provider APIs.">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS -->
   <link rel="stylesheet" href="src/css/style.css">
   <link rel="icon" href="/src/img/favicon.png?v=2">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+<body class="bg-slate-900 text-gray-100 font-sans min-h-screen flex dark:bg-slate-950 dark:text-gray-100 transition-colors duration-200 antialiased selection:bg-pink-500 selection:text-white">
 
   <!-- Admin Sidebar -->
-    <!-- Sidebar -->
-  <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden">
-    <!-- Brand Header (Fixed at top of sidebar) -->
-    <div id="brand-header" class="bg-gray-900 z-10 h-20 flex items-center justify-between px-6 border-b border-gray-800 transition-all duration-300 flex-shrink-0">
+  <aside id="sidebar" class="w-64 bg-slate-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-2xl border-r border-slate-800/80 overflow-hidden">
+    <!-- Brand Header -->
+    <div id="brand-header" class="bg-slate-900 z-10 h-20 flex items-center justify-between px-6 border-b border-slate-800 transition-all duration-300 flex-shrink-0">
         <a href="/admin-dashboard" id="brand-full" class="h-full flex items-center text-2xl md:text-3xl font-extrabold text-white tracking-wide flex-shrink-0 select-none">
           <img src="/src/img/logo.png?v=2" alt="GhBooster Logo" class="h-9 w-auto object-contain max-h-12">
         </a>
-        <button id="toggle-sidebar" class="hidden md:flex p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition focus:outline-none flex-shrink-0" title="Toggle Sidebar">
-          <!-- Collapse Left Icon (shown when expanded) -->
+        <button id="toggle-sidebar" class="hidden md:flex p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition focus:outline-none flex-shrink-0" title="Toggle Sidebar">
           <svg id="icon-collapse" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
           </svg>
-          <!-- Expand Right Icon (shown when collapsed) -->
           <svg id="icon-expand" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
           </svg>
         </button>
-      </div>
+    </div>
 
     <!-- Scrollable Navigation Area -->
     <div class="flex-1 min-h-0 overflow-y-auto sidebar-scrollbar">
-      <!-- Navigation Links -->
       <nav id="sidebar-nav" class="py-6 px-4 space-y-1 transition-all duration-300">
-        <a href="/admin-dashboard" class="sidebar-link flex items-center px-4 py-3 text-sm font-semibold text-white bg-pink-600 rounded-lg shadow-lg shadow-pink-600/30 transition group">
+        <a href="/admin-dashboard" class="sidebar-link flex items-center px-4 py-3 text-sm font-semibold text-white bg-pink-600 rounded-xl shadow-lg shadow-pink-600/30 transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 text-white group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
           <span class="sidebar-text truncate">Overview</span>
         </a>
-        <a href="/admin-users" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-users" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
           <span class="sidebar-text truncate">Users</span>
         </a>
-        <a href="/admin-referrals" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-referrals" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           <span class="sidebar-text truncate">Referrals</span>
         </a>
-        <a href="/admin-orders" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-orders" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
           <span class="sidebar-text truncate">Orders</span>
         </a>
-        <a href="/admin-deposits" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-deposits" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
           </svg>
           <span class="sidebar-text truncate">Deposits</span>
         </a>
-        <a href="/admin-services" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-services" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           <span class="sidebar-text truncate">Services</span>
         </a>
-        <a href="/admin-providers" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-providers" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
           </svg>
           <span class="sidebar-text truncate">Providers</span>
         </a>
-        <a href="/admin-transactions" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-transactions" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
           <span class="sidebar-text truncate">Transactions</span>
         </a>
-        <a href="/admin-payments" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-payments" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           <span class="sidebar-text truncate">Payment Methods</span>
         </a>
-        <a href="/admin-bonuses" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-bonuses" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 13C10.832 21 4 20 4 20V9a2 2 0 012-2h12a2 2 0 012 2v11s-6.832 1-8 1z" />
           </svg>
           <span class="sidebar-text truncate">Bonuses</span>
         </a>
-        <a href="/admin-promotions" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-promotions" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
           </svg>
           <span class="sidebar-text truncate">Promotions</span>
         </a>
-        <a href="/admin-child-panels" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-child-panels" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
           </svg>
           <span class="sidebar-text truncate">Child Panels</span>
         </a>
-        <a href="/admin-news" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-news" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
           </svg>
           <span class="sidebar-text truncate">Announcements</span>
         </a>
-        <a href="/admin-logs" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-logs" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span class="sidebar-text truncate">System Audit Logs</span>
         </a>
-        <a href="/admin-settings" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-settings" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           </svg>
           <span class="sidebar-text truncate">Settings</span>
         </a>
-        <a href="/admin-tickets" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition group">
+        <a href="/admin-tickets" class="sidebar-link flex items-center px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-slate-800 rounded-xl transition group">
           <svg xmlns="http://www.w3.org/2000/svg" class="sidebar-icon h-5 w-5 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
@@ -141,32 +137,51 @@
         </a>
       </nav>
     </div>
-
   </aside>
 
   <!-- Main Admin Content Body -->
-  <div class="flex-grow flex flex-col min-w-0">
+  <div class="flex-grow flex flex-col min-w-0 bg-slate-900">
 
     <!-- Top Admin Sticky Header -->
-    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+    <header class="sticky top-0 z-30 h-20 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 md:px-8 flex items-center justify-between shadow-lg flex-shrink-0">
       <div class="flex items-center space-x-3">
-        <!-- Mobile Logo (visible on mobile only) -->
+        <!-- Mobile Logo -->
         <a href="/admin-dashboard" class="flex items-center md:hidden">
           <img src="/src/img/logo.png?v=2" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
-
-        <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">Admin Overview</h1>
+        <div class="flex flex-col">
+          <h1 class="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span>Admin Control Panel</span>
+            <span class="text-xs bg-pink-500/20 text-pink-400 border border-pink-500/30 px-2 py-0.5 rounded-full font-bold">LIVE</span>
+          </h1>
+          <p class="text-xs text-gray-400 hidden md:block">Real-time GhBooster Platform Overview &amp; Analytics</p>
+        </div>
       </div>
-      <!-- Mobile Hamburger Toggle Button (Right Side) -->
-      <div class="flex items-center space-x-3 md:hidden">
-        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Toggle Sidebar Menu">
-          <!-- Hamburger Icon (shown when closed) -->
-          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+
+      <!-- Quick Action Buttons Header Bar -->
+      <div class="flex items-center space-x-2 md:space-x-3">
+        <a href="/admin-deposits" class="px-3.5 py-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-pink-600/20 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          <span class="hidden sm:inline">Review Deposits</span>
+          <span class="bg-white/20 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md">7</span>
+        </a>
+        <a href="/admin-tickets" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-gray-200 font-bold rounded-xl text-xs border border-slate-700 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="hidden sm:inline">Tickets</span>
+          <span class="bg-amber-500/20 text-amber-300 text-[10px] font-black px-1.5 py-0.5 rounded-md">4</span>
+        </a>
+        <a href="/admin-orders" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-gray-200 font-bold rounded-xl text-xs border border-slate-700 transition hidden sm:flex items-center gap-1.5">
+          <span>Orders</span>
+        </a>
+        <a href="/admin-users" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-gray-200 font-bold rounded-xl text-xs border border-slate-700 transition hidden sm:flex items-center gap-1.5">
+          <span>Users</span>
+        </a>
+        <!-- Mobile Hamburger Toggle Button -->
+        <button id="mobile-hamburger-btn" type="button" class="md:hidden p-2 rounded-xl text-gray-400 hover:text-white hover:bg-slate-800 transition focus:outline-none" aria-label="Toggle Sidebar Menu">
+          <svg id="mobile-icon-hamburger" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <!-- Close Icon (shown when expanded) -->
-          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <svg id="mobile-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -174,165 +189,660 @@
     </header>
 
     <!-- Main View Content -->
-    <main class="p-4 md:p-6 space-y-6 flex-grow">
+    <main class="p-4 md:p-8 space-y-8 flex-grow">
 
-      <!-- 4 KPI Metrics Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <!-- Revenue Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
-          <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-revenue" class="text-base font-bold text-gray-900 leading-tight truncate">GH₵0.00</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Revenue</span>
-            <span class="text-[11px] text-green-600 font-medium flex items-center mt-0.5 truncate">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              Live revenue
-            </span>
+      <!-- Alerts & Notifications Banner Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Deposit Alert -->
+        <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-slate-900 border border-amber-500/30 rounded-2xl p-4 md:p-5 flex items-center justify-between shadow-lg">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-extrabold text-white text-base">7 Pending Deposits</h4>
+                <span class="animate-pulse w-2 h-2 rounded-full bg-amber-400"></span>
+              </div>
+              <p class="text-xs text-amber-200/80 mt-0.5">Requires your manual review &amp; confirmation</p>
+            </div>
           </div>
-          <div class="p-2.5 bg-green-50 text-green-600 rounded-lg flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <a href="/admin-deposits" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition">
+            Review
+          </a>
+        </div>
+
+        <!-- Ticket Alert -->
+        <div class="bg-gradient-to-r from-pink-500/10 via-pink-500/5 to-slate-900 border border-pink-500/30 rounded-2xl p-4 md:p-5 flex items-center justify-between shadow-lg">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-extrabold text-white text-base">4 Open Tickets</h4>
+                <span class="animate-pulse w-2 h-2 rounded-full bg-pink-400"></span>
+              </div>
+              <p class="text-xs text-pink-200/80 mt-0.5">Awaiting staff response</p>
+            </div>
+          </div>
+          <a href="/admin-tickets" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white font-black rounded-xl text-xs shadow-md transition">
+            View
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Actions Bar -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+        <div class="flex items-center space-x-2">
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Quick Actions:</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <a href="/admin-deposits" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-950 text-white font-bold rounded-xl text-xs border border-slate-700/80 transition flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            Review Deposits (<span id="quick-action-deposits-count">7</span>)
+          </a>
+          <a href="/admin-tickets" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-950 text-white font-bold rounded-xl text-xs border border-slate-700/80 transition flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-pink-400"></span>
+            Support Tickets (<span id="quick-action-tickets-count">4</span>)
+          </a>
+          <a href="/admin-orders" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-950 text-white font-bold rounded-xl text-xs border border-slate-700/80 transition flex items-center gap-2">
+            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            View Orders
+          </a>
+          <a href="/admin-users" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-950 text-white font-bold rounded-xl text-xs border border-slate-700/80 transition flex items-center gap-2">
+            <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            Manage Users
+          </a>
+        </div>
+      </div>
+
+      <!-- KPI Metrics Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+        <!-- 1. Users Metric Card -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl hover:border-purple-500/40 transition group">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">User Growth</span>
+            <div class="p-2.5 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+          </div>
+          <div class="space-y-1.5">
+            <div class="flex items-baseline justify-between">
+              <span class="text-3xl font-black text-white tracking-tight" id="kpi-users-today">273</span>
+              <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">Users Today</span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-slate-700/60">
+              <span>Total Registered</span>
+              <span class="font-bold text-white" id="kpi-users-total">60,992</span>
+            </div>
           </div>
         </div>
 
-        <!-- Orders Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
-          <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-orders" class="text-base font-bold text-gray-900 leading-tight truncate">0</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Orders</span>
-            <span class="text-[11px] text-blue-600 font-medium block mt-0.5 truncate">Real-time system orders</span>
+        <!-- 2. Deposits Metric Card -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl hover:border-emerald-500/40 transition group">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Deposits Overview</span>
+            <div class="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
+          <div class="space-y-1.5">
+            <div class="flex items-baseline justify-between">
+              <span class="text-3xl font-black text-white tracking-tight" id="kpi-deposits-today">₵4,688</span>
+              <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">Deposits Today</span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-slate-700/60">
+              <span>Total Deposits</span>
+              <span class="font-bold text-emerald-400" id="kpi-deposits-total">₵893,194</span>
+            </div>
+            <!-- Deposit Breakdown Chips -->
+            <div class="grid grid-cols-2 gap-1.5 pt-2 text-[11px]">
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-emerald-300 flex justify-between">
+                <span>Confirmed:</span>
+                <span class="font-bold">45,890</span>
+              </div>
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-rose-300 flex justify-between">
+                <span>Rejected:</span>
+                <span class="font-bold">40,440</span>
+              </div>
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-sky-300 flex justify-between">
+                <span>Refunded:</span>
+                <span class="font-bold">39,038</span>
+              </div>
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-amber-300 flex justify-between">
+                <span>Failed:</span>
+                <span class="font-bold">862</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Users Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
-          <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-users" class="text-base font-bold text-gray-900 leading-tight truncate">0</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Users</span>
-            <span class="text-[11px] text-purple-600 font-medium block mt-0.5 truncate">Registered members</span>
+        <!-- 3. Orders Metric Card -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl hover:border-pink-500/40 transition group">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Orders System</span>
+            <div class="p-2.5 bg-pink-500/10 border border-pink-500/20 text-pink-400 rounded-xl group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
+          <div class="space-y-1.5">
+            <div class="flex items-baseline justify-between">
+              <span class="text-3xl font-black text-white tracking-tight" id="kpi-orders-today">768</span>
+              <span class="text-xs font-bold text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-md border border-pink-500/20">Orders Today</span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-slate-700/60">
+              <span>Total Orders</span>
+              <span class="font-bold text-white" id="kpi-orders-total">230,115</span>
+            </div>
+            <!-- Order Status Breakdown Chips -->
+            <div class="grid grid-cols-2 gap-1.5 pt-2 text-[11px]">
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-emerald-300 flex justify-between">
+                <span>Completed:</span>
+                <span class="font-bold">187,121</span>
+              </div>
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-blue-300 flex justify-between">
+                <span>Confirmed:</span>
+                <span class="font-bold">45,890</span>
+              </div>
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-amber-300 flex justify-between">
+                <span>Processing:</span>
+                <span class="font-bold">730</span>
+              </div>
+              <div class="bg-slate-900/80 px-2 py-1 rounded-lg text-slate-300 flex justify-between">
+                <span>Cancelled:</span>
+                <span class="font-bold">1,051</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Pending Tickets Card -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
-          <div class="min-w-0 pr-2">
-            <h3 id="admin-kpi-tickets" class="text-base font-bold text-gray-900 leading-tight truncate">0 Pending</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Support Inbox</span>
-            <span class="text-[11px] text-yellow-600 font-medium block mt-0.5 truncate">Open support tickets</span>
+        <!-- 4. Support & Operations Metric Card -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl hover:border-amber-500/40 transition group">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tickets &amp; Referrals</span>
+            <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            </div>
           </div>
-          <div class="p-2.5 bg-yellow-50 text-yellow-600 rounded-lg flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
+          <div class="space-y-2 text-xs">
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 flex items-center justify-between">
+              <div>
+                <span class="text-gray-400 block">Open Tickets</span>
+                <span class="text-lg font-black text-amber-400">4</span>
+              </div>
+              <div class="text-right">
+                <span class="text-gray-400 block">In Progress</span>
+                <span class="text-sm font-bold text-gray-300">0</span>
+              </div>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 flex items-center justify-between">
+              <div>
+                <span class="text-gray-400 block">Total Referrals</span>
+                <span class="text-lg font-black text-white">0</span>
+              </div>
+              <div class="text-right">
+                <span class="text-gray-400 block">Pending</span>
+                <span class="text-sm font-bold text-gray-300">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- System Health & Platform Operations Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-gray-400 uppercase">Active Services</span>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-xl font-black text-white">203</span>
+            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Active</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-gray-400 uppercase">Transactions</span>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-xl font-black text-white">90,936</span>
+            <span class="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">All Time</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-gray-400 uppercase">Avg Order Value</span>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-xl font-black text-emerald-400">₵4</span>
+            <span class="text-[10px] font-bold text-gray-400 bg-slate-700/50 px-2 py-0.5 rounded">Per Order</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-gray-400 uppercase">Payment Methods</span>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-xl font-black text-white">2</span>
+            <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Active</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 flex flex-col justify-between col-span-2 sm:col-span-1">
+          <span class="text-[11px] font-bold text-gray-400 uppercase">Profit Risks</span>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-xl font-black text-rose-400">3</span>
+            <span class="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded animate-pulse">Sync needed</span>
           </div>
         </div>
       </div>
 
-
-
-      <!-- Live Recent Orders Control Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden space-y-4">
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+      <!-- Service Statistics Section -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700/80 pb-4">
           <div>
-            <h3 class="text-base font-bold text-gray-900">Live Orders Control & Status Manager</h3>
-            <p class="text-xs text-gray-500 mt-0.5">Override order status, change quantities, or issue instant balance refunds.</p>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Service Statistics
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">Total engagement items delivered across all active SMM services</p>
           </div>
-          <a href="/admin-orders" class="text-xs font-bold text-pink-600 hover:underline">View All Orders &rarr;</a>
+          <span class="text-xs font-bold text-pink-400 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-xl">Delivered Totals</span>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600">
-            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">
-              <tr>
-                <th class="py-3.5 px-4">Order ID</th>
-                <th class="py-3.5 px-4">User Account</th>
-                <th class="py-3.5 px-4">Service Details</th>
-                <th class="py-3.5 px-4">Target Link</th>
-                <th class="py-3.5 px-4">Qty</th>
-                <th class="py-3.5 px-4">Charge</th>
-                <th class="py-3.5 px-4">Status Control</th>
-                <th class="py-3.5 px-4 text-center">Admin Actions</th>
-              </tr>
-            </thead>
-            <tbody id="admin-recent-orders-table" class="divide-y divide-gray-100">
-              <tr>
-                <td colspan="8" class="py-8 text-center text-gray-400 font-medium">Loading live orders...</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div class="bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl text-center space-y-1">
+            <span class="text-xs text-gray-400 font-medium block">Likes Sent</span>
+            <span class="text-lg sm:text-xl font-black text-white block">80,961,118</span>
+            <span class="text-[10px] text-pink-400 font-bold uppercase tracking-wider">Total</span>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl text-center space-y-1">
+            <span class="text-xs text-gray-400 font-medium block">Followers Sent</span>
+            <span class="text-lg sm:text-xl font-black text-white block">18,846,883</span>
+            <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Total</span>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl text-center space-y-1">
+            <span class="text-xs text-gray-400 font-medium block">Views Sent</span>
+            <span class="text-lg sm:text-xl font-black text-white block">74,706,405</span>
+            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Total</span>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl text-center space-y-1">
+            <span class="text-xs text-gray-400 font-medium block">Comments Sent</span>
+            <span class="text-lg sm:text-xl font-black text-white block">1,398,367</span>
+            <span class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Total</span>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl text-center space-y-1">
+            <span class="text-xs text-gray-400 font-medium block">Shares Sent</span>
+            <span class="text-lg sm:text-xl font-black text-white block">801,770</span>
+            <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">Total</span>
+          </div>
+
+          <div class="bg-slate-900/80 border border-slate-700/60 p-4 rounded-xl text-center space-y-1">
+            <span class="text-xs text-gray-400 font-medium block">Subscribers Sent</span>
+            <span class="text-lg sm:text-xl font-black text-gray-300 block">0</span>
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Total</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Responsive Grid: Recent Orders & Recent Deposits -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Recent Orders (2 Columns on Large Screen) -->
+        <div class="lg:col-span-2 bg-slate-800/90 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+          <div class="p-5 border-b border-slate-700/80 flex items-center justify-between bg-slate-800/50">
+            <div>
+              <h3 class="text-base font-black text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                Recent Orders
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">Live real-time user order stream</p>
+            </div>
+            <a href="/admin-orders" class="text-xs font-black text-pink-400 hover:text-pink-300 hover:underline transition flex items-center gap-1">
+              View All &rarr;
+            </a>
+          </div>
+
+          <div class="divide-y divide-slate-700/60 overflow-x-auto flex-1">
+            <!-- Order Item 1 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">Tiktok Views no drop permanent ❤️</span>
+                  <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">processing</span>
+                </div>
+                <div class="text-xs text-gray-400 flex items-center gap-3 flex-wrap">
+                  <span>Customer: <strong class="text-gray-200">Isabella Diamond Abena Nyarkoh</strong></span>
+                  <span>•</span>
+                  <span>Date: <strong class="text-gray-300">8/2/2026</strong></span>
+                  <span>•</span>
+                  <span>Qty: <strong class="text-white font-mono">1,000</strong></span>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="text-base font-black text-emerald-400 block">₵4.00</span>
+              </div>
+            </div>
+
+            <!-- Order Item 2 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">Tiktok Likes - fast ❤️ read description after “place order “</span>
+                  <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">processing</span>
+                </div>
+                <div class="text-xs text-gray-400 flex items-center gap-3 flex-wrap">
+                  <span>Customer: <strong class="text-gray-200">Sampson Agyei</strong></span>
+                  <span>•</span>
+                  <span>Date: <strong class="text-gray-300">8/2/2026</strong></span>
+                  <span>•</span>
+                  <span>Qty: <strong class="text-white font-mono">500</strong></span>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="text-base font-black text-emerald-400 block">₵5.00</span>
+              </div>
+            </div>
+
+            <!-- Order Item 3 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">Tiktok likes + 1k views -read description 👇 low drops</span>
+                  <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">processing</span>
+                </div>
+                <div class="text-xs text-gray-400 flex items-center gap-3 flex-wrap">
+                  <span>Customer: <strong class="text-gray-200">Lara</strong></span>
+                  <span>•</span>
+                  <span>Date: <strong class="text-gray-300">8/2/2026</strong></span>
+                  <span>•</span>
+                  <span>Qty: <strong class="text-white font-mono">1,000</strong></span>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="text-base font-black text-emerald-400 block">₵10.00</span>
+              </div>
+            </div>
+
+            <!-- Order Item 4 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">Tiktok Likes instant 🤯</span>
+                  <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">processing</span>
+                </div>
+                <div class="text-xs text-gray-400 flex items-center gap-3 flex-wrap">
+                  <span>Customer: <strong class="text-gray-200">mike danso</strong></span>
+                  <span>•</span>
+                  <span>Date: <strong class="text-gray-300">8/2/2026</strong></span>
+                  <span>•</span>
+                  <span>Qty: <strong class="text-white font-mono">500</strong></span>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="text-base font-black text-emerald-400 block">₵1.00</span>
+              </div>
+            </div>
+
+            <!-- Order Item 5 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-bold text-white text-sm">Tiktok Views no drop permanent ❤️</span>
+                  <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase">processing</span>
+                </div>
+                <div class="text-xs text-gray-400 flex items-center gap-3 flex-wrap">
+                  <span>Customer: <strong class="text-gray-200">Sarah Zell</strong></span>
+                  <span>•</span>
+                  <span>Date: <strong class="text-gray-300">8/2/2026</strong></span>
+                  <span>•</span>
+                  <span>Qty: <strong class="text-white font-mono">1,000</strong></span>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <span class="text-base font-black text-emerald-400 block">₵4.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Deposits (1 Column on Large Screen) -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+          <div class="p-5 border-b border-slate-700/80 flex items-center justify-between bg-slate-800/50">
+            <div>
+              <h3 class="text-base font-black text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Recent Deposits
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">Latest balance additions</p>
+            </div>
+            <a href="/admin-deposits" class="text-xs font-black text-pink-400 hover:text-pink-300 hover:underline transition flex items-center gap-1">
+              View All &rarr;
+            </a>
+          </div>
+
+          <div class="divide-y divide-slate-700/60 flex-1">
+            <!-- Deposit 1 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex items-center justify-between">
+              <div>
+                <h5 class="font-bold text-white text-sm">Boahemaa</h5>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span class="text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded uppercase">approved</span>
+                  <span>•</span>
+                  <span>8/2/2026</span>
+                </div>
+              </div>
+              <span class="text-base font-black text-emerald-400">₵15.00</span>
+            </div>
+
+            <!-- Deposit 2 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex items-center justify-between">
+              <div>
+                <h5 class="font-bold text-white text-sm">Isabella Diamond Abena Nyarkoh</h5>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span class="text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded uppercase">approved</span>
+                  <span>•</span>
+                  <span>8/2/2026</span>
+                </div>
+              </div>
+              <span class="text-base font-black text-emerald-400">₵15.00</span>
+            </div>
+
+            <!-- Deposit 3 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex items-center justify-between">
+              <div>
+                <h5 class="font-bold text-white text-sm">Lara</h5>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span class="text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded uppercase">approved</span>
+                  <span>•</span>
+                  <span>8/2/2026</span>
+                </div>
+              </div>
+              <span class="text-base font-black text-emerald-400">₵15.00</span>
+            </div>
+
+            <!-- Deposit 4 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex items-center justify-between">
+              <div>
+                <h5 class="font-bold text-white text-sm">Skhypher Studio</h5>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span class="text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded uppercase">approved</span>
+                  <span>•</span>
+                  <span>8/2/2026</span>
+                </div>
+              </div>
+              <span class="text-base font-black text-emerald-400">₵15.00</span>
+            </div>
+
+            <!-- Deposit 5 -->
+            <div class="p-4 hover:bg-slate-700/30 transition flex items-center justify-between">
+              <div>
+                <h5 class="font-bold text-white text-sm">Son official joker</h5>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded uppercase">pending</span>
+                  <span>•</span>
+                  <span>8/2/2026</span>
+                </div>
+              </div>
+              <span class="text-base font-black text-amber-400">₵15.00</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Top Customers Leaderboard Section -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700/80 pb-4">
+          <div>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+              Top Customers
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">Highest depositing users on GhBooster</p>
+          </div>
+          <a href="/admin-users" class="text-xs font-black text-pink-400 hover:text-pink-300 hover:underline transition">
+            View All Users &rarr;
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <!-- Customer 1 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-amber-500/50 transition">
+            <div class="w-9 h-9 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-black text-sm flex-shrink-0">
+              1
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Diana Quao</h5>
+              <p class="text-[11px] text-gray-400 truncate">quaodiana23@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">69 deposits</span>
+                <span class="font-black text-emerald-400">₵2,616.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 2 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-amber-500/50 transition">
+            <div class="w-9 h-9 rounded-full bg-slate-700 text-gray-300 border border-slate-600 flex items-center justify-center font-black text-sm flex-shrink-0">
+              2
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Spankyladi🌈❤️</h5>
+              <p class="text-[11px] text-gray-400 truncate">boadumdeborah@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">45 deposits</span>
+                <span class="font-black text-emerald-400">₵2,343.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 3 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-amber-500/50 transition">
+            <div class="w-9 h-9 rounded-full bg-amber-800/30 text-amber-500 border border-amber-700/40 flex items-center justify-center font-black text-sm flex-shrink-0">
+              3
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">De stik</h5>
+              <p class="text-[11px] text-gray-400 truncate">ghajabusybk@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">152 deposits</span>
+                <span class="font-black text-emerald-400">₵2,300.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 4 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-slate-600 transition">
+            <div class="w-9 h-9 rounded-full bg-slate-800 text-gray-400 border border-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+              4
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Ama success</h5>
+              <p class="text-[11px] text-gray-400 truncate">success100@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">84 deposits</span>
+                <span class="font-black text-emerald-400">₵2,020.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 5 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-slate-600 transition">
+            <div class="w-9 h-9 rounded-full bg-slate-800 text-gray-400 border border-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+              5
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Ghgghg</h5>
+              <p class="text-[11px] text-gray-400 truncate">stellaobenewaayaapapabi@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">34 deposits</span>
+                <span class="font-black text-emerald-400">₵2,005.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 6 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-slate-600 transition">
+            <div class="w-9 h-9 rounded-full bg-slate-800 text-gray-400 border border-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+              6
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Asare Henry</h5>
+              <p class="text-[11px] text-gray-400 truncate">asarejunior457@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">74 deposits</span>
+                <span class="font-black text-emerald-400">₵1,901.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 7 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-slate-600 transition">
+            <div class="w-9 h-9 rounded-full bg-slate-800 text-gray-400 border border-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+              7
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Ametsikor Vincent</h5>
+              <p class="text-[11px] text-gray-400 truncate">ametsikorvincent3@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">59 deposits</span>
+                <span class="font-black text-emerald-400">₵1,882.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer 8 -->
+          <div class="bg-slate-900/90 border border-slate-700/70 rounded-xl p-4 flex items-center space-x-3 hover:border-slate-600 transition">
+            <div class="w-9 h-9 rounded-full bg-slate-800 text-gray-400 border border-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+              8
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="font-bold text-white text-sm truncate">Godfred Yeboah</h5>
+              <p class="text-[11px] text-gray-400 truncate">godfredy770@gmail.com</p>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-400 text-[10px]">91 deposits</span>
+                <span class="font-black text-emerald-400">₵1,832.50</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
+    <footer class="py-4 bg-slate-950 border-t border-slate-800/80 text-center text-xs text-gray-500">
       Copyright © GhBooster Admin Control Panel | All rights reserved.
     </footer>
 
   </div>
 
-  <!-- Add User Balance Modal -->
-  <div id="fund-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h3 class="font-bold text-gray-900 text-base flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Add / Deduct User Balance
-        </h3>
-        <button id="close-fund-modal" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
-      </div>
-
-      <form id="admin-fund-form" class="space-y-4 text-xs">
-        <div>
-          <label for="fund-username" class="block font-semibold text-gray-700 mb-1">Username / Email</label>
-          <input type="text" id="fund-username" required placeholder="e.g. appiahattah" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-pink-600">
-        </div>
-
-        <div>
-          <label for="fund-action" class="block font-semibold text-gray-700 mb-1">Action Type</label>
-          <select id="fund-action" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 focus:outline-none">
-            <option value="add">+ Add Balance (Deposit)</option>
-            <option value="deduct">- Deduct Balance (Correction)</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="fund-amount" class="block font-semibold text-gray-700 mb-1">Amount (GHS)</label>
-          <input type="number" id="fund-amount" step="0.01" required placeholder="50.00" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-bold focus:outline-none">
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg shadow transition">
-          Confirm Balance Update
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Dynamic Script -->
-  
-  
-
-
-  
-
-
-  
-
+  <!-- Dynamic Scripts -->
   <script src="src/js/theme.js"></script>
   <script src="src/js/api-client.js"></script>
 
