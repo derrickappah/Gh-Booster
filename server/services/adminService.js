@@ -87,21 +87,46 @@ class AdminService {
     const refundedCount = (transactions || []).filter(t => t.type === 'refund' || String(t.status || '').toLowerCase() === 'refunded').length + (orders || []).filter(o => String(o.status || '').toLowerCase() === 'refunded').length;
     const failedCount = (transactions || []).filter(t => String(t.status || '').toLowerCase() === 'failed').length;
 
-    // Effective totals for trends
-    const finalDeposits = totalDeposits > 0 ? totalDeposits : (totalWalletBalance > 0 ? totalWalletBalance : 1250.00);
-    const finalRevenue = totalRevenue > 0 ? totalRevenue : (totalOrdersCount > 0 ? totalOrdersCount * 4.50 : 850.00);
-    const finalOrders = totalOrdersCount > 0 ? totalOrdersCount : 45;
+    // Calculate 7-day actual breakdown (Mon -> Sun) for current week
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const curr = new Date();
+    const dayOfWeek = curr.getDay(); // 0 is Sun, 1 is Mon... 6 is Sat
+    const distanceToMon = (dayOfWeek + 6) % 7; // distance back to Mon
+    const monday = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() - distanceToMon);
 
-    // Daily chart data calculation with Deposits, Revenue, and Orders
-    const dailyChartData = [
-      { day: 'Mon', deposits: parseFloat((finalDeposits * 0.14).toFixed(2)), revenue: parseFloat((finalRevenue * 0.12).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.12), 3) },
-      { day: 'Tue', deposits: parseFloat((finalDeposits * 0.16).toFixed(2)), revenue: parseFloat((finalRevenue * 0.18).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.18), 5) },
-      { day: 'Wed', deposits: parseFloat((finalDeposits * 0.20).toFixed(2)), revenue: parseFloat((finalRevenue * 0.22).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.22), 8) },
-      { day: 'Thu', deposits: parseFloat((finalDeposits * 0.15).toFixed(2)), revenue: parseFloat((finalRevenue * 0.15).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.15), 4) },
-      { day: 'Fri', deposits: parseFloat((finalDeposits * 0.18).toFixed(2)), revenue: parseFloat((finalRevenue * 0.20).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.20), 7) },
-      { day: 'Sat', deposits: parseFloat((finalDeposits * 0.10).toFixed(2)), revenue: parseFloat((finalRevenue * 0.08).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.08), 2) },
-      { day: 'Sun', deposits: parseFloat((finalDeposits * 0.07).toFixed(2)), revenue: parseFloat((finalRevenue * 0.05).toFixed(2)), orders: Math.max(Math.round(finalOrders * 0.05), 1) }
-    ];
+    const dailyChartData = days.map((dayName, idx) => {
+      const dayStart = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + idx, 0, 0, 0, 0);
+      const dayEnd = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + idx, 23, 59, 59, 999);
+
+      const dayOrders = (orders || []).filter(o => {
+        if (!o.created_at) return false;
+        const d = new Date(o.created_at);
+        return d >= dayStart && d <= dayEnd;
+      });
+
+      const dayTxs = (transactions || []).filter(t => {
+        if (!t.created_at) return false;
+        const d = new Date(t.created_at);
+        const amt = parseFloat(t.amount || t.charge || t.value || 0);
+        const st = String(t.status || 'completed').toLowerCase();
+        const tp = String(t.type || 'deposit').toLowerCase();
+        const isFailed = st === 'failed' || st === 'expired' || st === 'rejected' || st === 'cancelled' || st === 'canceled';
+        return d >= dayStart && d <= dayEnd && !isFailed && amt > 0 && !tp.includes('order');
+      });
+
+      const dayDeposits = dayTxs.reduce((sum, t) => sum + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
+      const dayRevenue = dayOrders.reduce((sum, o) => {
+        const val = parseFloat(o.charge || o.total_price || o.price || o.amount || o.cost || 0);
+        return sum + (isNaN(val) ? 0 : Math.abs(val));
+      }, 0);
+
+      return {
+        day: dayName,
+        deposits: parseFloat(dayDeposits.toFixed(2)),
+        revenue: parseFloat(dayRevenue.toFixed(2)),
+        orders: dayOrders.length
+      };
+    });
 
     let recentOrdersWithDetails = null;
     try {
@@ -121,7 +146,7 @@ class AdminService {
       users_today: usersToday,
       total_users: totalUsersCount,
       deposits_today: depositsToday,
-      total_deposits: finalDeposits,
+      total_deposits: totalDeposits,
       orders_today: ordersToday,
       total_orders: totalOrdersCount,
       completed_orders: completedOrders,

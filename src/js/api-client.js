@@ -3167,18 +3167,9 @@ async function initAdminDashboard() {
       const canvasEl = document.getElementById('admin-performance-chart');
       if (canvasEl && stats.chart_data && stats.chart_data.length > 0) {
         const labels = stats.chart_data.map(d => d.day);
-        const depositsData = stats.chart_data.map(d => {
-          const val = parseFloat(d.deposits);
-          return (!isNaN(val) && val > 0) ? val : parseFloat((parseFloat(stats.total_deposits || 1250) * 0.14).toFixed(2));
-        });
-        const revenueData = stats.chart_data.map(d => {
-          const val = parseFloat(d.revenue);
-          return (!isNaN(val) && val > 0) ? val : parseFloat((parseFloat(stats.total_revenue || 850) * 0.12).toFixed(2));
-        });
-        const ordersData = stats.chart_data.map(d => {
-          const val = parseInt(d.orders || 0, 10);
-          return (!isNaN(val) && val > 0) ? val : 5;
-        });
+        const depositsData = stats.chart_data.map(d => parseFloat(d.deposits || 0));
+        const revenueData = stats.chart_data.map(d => parseFloat(d.revenue || 0));
+        const ordersData = stats.chart_data.map(d => parseInt(d.orders || 0, 10));
 
         if (window.__adminPerfChartInstance) {
           window.__adminPerfChartInstance.destroy();
