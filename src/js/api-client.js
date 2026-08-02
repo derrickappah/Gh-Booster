@@ -1752,9 +1752,17 @@ async function initAddFundsPage() {
           const st = (t.status || 'Completed').toLowerCase();
 
           let badgeClass = 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300';
-          if (st === 'pending') badgeClass = 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
-          if (st === 'expired') badgeClass = 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
-          if (st === 'failed' || st === 'canceled') badgeClass = 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300';
+          let amtClass = 'text-green-600 dark:text-green-400';
+          if (st === 'pending') {
+            badgeClass = 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
+            amtClass = 'text-amber-600 dark:text-amber-400';
+          } else if (st === 'expired') {
+            badgeClass = 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+            amtClass = 'text-gray-400 dark:text-gray-500 line-through';
+          } else if (st === 'failed' || st === 'canceled') {
+            badgeClass = 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300';
+            amtClass = 'text-red-500 dark:text-red-400 line-through';
+          }
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50 text-xs">
@@ -1767,7 +1775,7 @@ async function initAddFundsPage() {
                 </div>
               </td>
               <td class="px-4 py-3.5 text-xs text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(gateway)}</td>
-              <td class="px-4 py-3.5 font-extrabold text-green-600 dark:text-green-400">GH₵${amtVal}</td>
+              <td class="px-4 py-3.5 font-extrabold ${amtClass}">GH₵${amtVal}</td>
               <td class="px-4 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full ${badgeClass}">${escapeHtml(t.status || 'Completed')}</span></td>
               <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(t.created_at || '')}</td>
             </tr>
@@ -1905,6 +1913,16 @@ async function initTransactionsPage() {
         typeBadge = '<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">Refund</span>';
       }
 
+      // Amount styling
+      let amtColorClass = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400';
+      if (statusStr === 'pending') {
+        amtColorClass = 'text-amber-600 dark:text-amber-400';
+      } else if (statusStr === 'expired') {
+        amtColorClass = 'text-gray-400 dark:text-gray-500 line-through';
+      } else if (statusStr === 'failed' || statusStr === 'canceled') {
+        amtColorClass = 'text-red-500 dark:text-red-400 line-through';
+      }
+
       // Status Badge
       let statusBadge = '';
       if (statusStr === 'completed' || statusStr === 'approved' || statusStr === 'success') {
@@ -1928,7 +1946,7 @@ async function initTransactionsPage() {
             </div>
           </td>
           <td class="px-4 py-4">${typeBadge}</td>
-          <td class="px-4 py-4 font-extrabold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} text-xs">${formattedAmt}</td>
+          <td class="px-4 py-4 font-extrabold ${amtColorClass} text-xs">${formattedAmt}</td>
           <td class="px-4 py-4 text-xs text-gray-600 dark:text-gray-300 font-medium">${escapeHtml(gateway)}</td>
           <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400 font-mono">${escapeHtml(dateStr)}</td>
           <td class="px-4 py-4">${statusBadge}</td>
@@ -4053,15 +4071,19 @@ async function initAdminDepositsPage() {
 
           let badgeClass = 'bg-yellow-100 text-yellow-800';
           let statusText = 'Pending';
+          let amtClass = 'text-gray-900';
           if (status === 'completed' || status === 'approved') {
             badgeClass = 'bg-green-100 text-green-800';
             statusText = 'Approved';
+            amtClass = 'text-green-700 font-extrabold';
           } else if (status === 'expired') {
             badgeClass = 'bg-gray-100 text-gray-700';
             statusText = 'Expired';
+            amtClass = 'text-gray-400 line-through';
           } else if (status === 'failed' || status === 'rejected' || status === 'canceled') {
             badgeClass = 'bg-red-100 text-red-800';
             statusText = 'Rejected';
+            amtClass = 'text-red-500 line-through';
           }
 
           let actionButtons = '';
@@ -4086,7 +4108,7 @@ async function initAdminDepositsPage() {
               <td class="py-3.5 px-4 font-bold text-gray-900">${username}</td>
               <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded text-[10px] uppercase">${method}</span></td>
               <td class="py-3.5 px-4 text-gray-500 font-mono text-xs max-w-xs truncate">${notes}</td>
-              <td class="py-3.5 px-4 font-extrabold text-gray-900">GH₵${amt}</td>
+              <td class="py-3.5 px-4 font-extrabold ${amtClass}">GH₵${amt}</td>
               <td class="py-3.5 px-4 text-gray-500 text-xs">${dateFormatted}</td>
               <td class="py-3.5 px-4"><span class="px-2.5 py-1 ${badgeClass} font-bold rounded-full text-[11px] capitalize">${statusText}</span></td>
               <td class="py-3.5 px-4 text-center space-x-1">${actionButtons}</td>
