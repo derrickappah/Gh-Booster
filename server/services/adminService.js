@@ -67,7 +67,7 @@ class AdminService {
     const activeServicesCount = (services || []).filter(s => s.status === 'Active' || s.status === 1 || s.status === true || s.mode !== 'disabled').length;
 
     // Exceptions
-    const rejectedDeposits = (transactions || []).filter(t => t.status === 'Rejected' || t.status === 'rejected' || t.status === 'declined').length;
+    const expiredDeposits = (transactions || []).filter(t => t.status === 'Expired' || t.status === 'expired' || t.status === 'Rejected' || t.status === 'rejected' || t.status === 'declined').length;
     const refundedCount = (transactions || []).filter(t => t.type === 'refund' || t.status === 'Refunded' || t.status === 'refunded').length + (orders || []).filter(o => o.status === 'Refunded').length;
     const failedCount = (transactions || []).filter(t => t.status === 'Failed' || t.status === 'failed').length;
 
@@ -114,7 +114,8 @@ class AdminService {
       active_services: activeServicesCount > 0 ? activeServicesCount : totalServicesCount,
       total_transactions: totalTransactionsCount,
       avg_order_value: avgOrderValue,
-      rejected_deposits: rejectedDeposits,
+      expired_deposits: expiredDeposits,
+      rejected_deposits: expiredDeposits,
       refunded_count: refundedCount,
       failed_count: failedCount,
       active_payment_methods: activePaymentMethods > 0 ? activePaymentMethods : 4,

@@ -3124,7 +3124,7 @@ async function initAdminDashboard() {
       const activeServices = parseInt(stats.active_services || 0, 10);
       const totalTransactions = parseInt(stats.total_transactions || 0, 10);
       const avgOrderVal = parseFloat(stats.avg_order_value || (totalOrd > 0 ? totalRev / totalOrd : 0));
-      const rejectedDeposits = parseInt(stats.rejected_deposits || 0, 10);
+      const expiredDeposits = parseInt(stats.expired_deposits || stats.rejected_deposits || 0, 10);
       const refundedCount = parseInt(stats.refunded_count || 0, 10);
       const failedCount = parseInt(stats.failed_count || 0, 10);
       const activePaymentMethods = parseInt(stats.active_payment_methods || 4, 10);
@@ -3153,7 +3153,8 @@ async function initAdminDashboard() {
       setVal('admin-stat-transactions-total', totalTransactions.toLocaleString());
       setVal('admin-kpi-revenue', `GH₵${totalRev.toFixed(2)}`);
       setVal('admin-stat-aov', `GH₵${avgOrderVal.toFixed(2)}`);
-      setVal('admin-stat-deposits-rejected', rejectedDeposits.toLocaleString());
+      setVal('admin-stat-deposits-expired', expiredDeposits.toLocaleString());
+      setVal('admin-stat-deposits-rejected', expiredDeposits.toLocaleString());
       setVal('admin-stat-refunded', refundedCount.toLocaleString());
       setVal('admin-stat-failed', failedCount.toLocaleString());
       setVal('admin-stat-payment-methods-active', activePaymentMethods.toLocaleString());
