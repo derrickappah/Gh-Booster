@@ -1117,6 +1117,8 @@ async function initOrdersPage() {
 
         tableBody.innerHTML = paginatedList.map(o => {
           const shortId = typeof o.id === 'string' && o.id.length > 8 ? o.id.substring(0, 8) : o.id;
+          const displayRef = o.provider_order_id ? `Ref: #${o.provider_order_id}` : `Ref: #${shortId}`;
+          const copyValue = o.provider_order_id || o.id;
           const icon = getPlatformIconByService(o.service_name);
           const chargeVal = parseFloat(o.charge || 0).toFixed(2);
           const startCount = (o.start_count || 0).toLocaleString();
@@ -1126,10 +1128,10 @@ async function initOrdersPage() {
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition border-b border-gray-100 dark:border-gray-700/50">
-              <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400">
+              <td class="py-4 px-4 font-mono font-bold text-pink-600 dark:text-pink-400 whitespace-nowrap">
                 <div class="inline-flex items-center space-x-1">
-                  <a href="/dashboard/orders/${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(shortId))}">#${escapeHtml(String(shortId))}</a>
-                  <button type="button" class="btn-copy-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-text="${escapeHtml(String(o.id))}" title="Copy Order ID" aria-label="Copy order ID">
+                  <a href="/dashboard/orders/${encodeURIComponent(o.id)}" class="hover:underline" aria-label="View order ${escapeHtml(String(displayRef))}">${escapeHtml(String(displayRef))}</a>
+                  <button type="button" class="btn-copy-id p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-text="${escapeHtml(String(copyValue))}" title="Copy Order Reference" aria-label="Copy order reference">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                   </button>
                 </div>
@@ -1139,7 +1141,6 @@ async function initOrdersPage() {
                   <img src="${escapeHtml(icon)}" class="w-4 h-4 mr-1.5 object-contain flex-shrink-0" alt="${escapeHtml(o.service_name || 'Social platform')} icon">
                   ${escapeHtml(o.service_name || '')}
                 </span>
-                ${o.provider_order_id ? `<span class="text-[10px] text-gray-400 block mt-0.5 font-mono">Ref: #${escapeHtml(String(o.provider_order_id))}</span>` : ''}
               </td>
               <td class="py-4 px-4">
                 <div class="flex items-center space-x-1">
