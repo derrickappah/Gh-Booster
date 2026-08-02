@@ -3911,10 +3911,16 @@ async function initAdminOrdersPage() {
         });
       }
 
-      renderTable(orders);
-
       // Search & Status Tabs Handling
       let currentStatusFilter = 'all';
+
+      // Parse initial URL search query parameter (e.g. /admin-orders?search=john_doe)
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialQuery = urlParams.get('search') || urlParams.get('user') || urlParams.get('user_id') || urlParams.get('username') || '';
+
+      if (initialQuery && searchInput) {
+        searchInput.value = initialQuery;
+      }
 
       if (searchInput) {
         searchInput.addEventListener('input', () => applyFilters());
@@ -3952,15 +3958,19 @@ async function initAdminOrdersPage() {
         if (query) {
           filtered = filtered.filter(o => {
             const id = String(o.id || '').toLowerCase();
-            const user = (o.profiles?.username || o.profiles?.email || o.user_id || '').toLowerCase();
-            const link = (o.link || '').toLowerCase();
-            const svc = (o.services?.name || '').toLowerCase();
-            return id.includes(query) || user.includes(query) || link.includes(query) || svc.includes(query);
+            const username = String(o.profiles?.username || '').toLowerCase();
+            const email = String(o.profiles?.email || '').toLowerCase();
+            const userId = String(o.user_id || '').toLowerCase();
+            const link = String(o.link || '').toLowerCase();
+            const svc = String(o.services?.name || '').toLowerCase();
+            return id.includes(query) || username.includes(query) || email.includes(query) || userId.includes(query) || link.includes(query) || svc.includes(query);
           });
         }
 
         renderTable(filtered);
       }
+
+      applyFilters();
 
       // Batch Refill All handler
       if (batchRefillBtn) {
