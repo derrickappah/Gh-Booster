@@ -3413,27 +3413,30 @@ async function initAdminUsersPage() {
           });
         });
 
-        // Bind add funds action
+        // Bind add/deduct funds action to modal
         tableBody.querySelectorAll('.add-funds-btn').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
+          btn.addEventListener('click', (e) => {
             const tr = e.target.closest('tr');
             const userId = tr.getAttribute('data-user-id');
+            const decodedId = decodeURIComponent(userId);
+            const userObj = users.find(u => u.id === userId || u.id === decodedId);
+            const username = userObj ? (userObj.username || userObj.email || 'User Account') : 'User Account';
+            const currentBal = userObj ? parseFloat(userObj.balance || 0).toFixed(2) : '0.00';
+
             const menu = tr.querySelector('.user-actions-menu');
             if (menu) menu.classList.add('hidden');
-            const amountStr = prompt('Enter amount to add/deduct to user balance (e.g. 50 or -10):');
-            if (amountStr === null) return;
-            const amount = parseFloat(amountStr);
-            if (isNaN(amount)) {
-              alert('Invalid amount entered.');
-              return;
-            }
-            try {
-              const addRes = await API.request(`/admin/users/${userId}/fund`, 'POST', { amount });
-              alert(`Success! Updated balance: GH₵${parseFloat(addRes.new_balance || 0).toFixed(2)}`);
-              initAdminUsersPage();
-            } catch (err) {
-              alert(err.message);
-            }
+
+            const modal = document.getElementById('fund-user-modal');
+            if (!modal) return;
+
+            document.getElementById('modal-fund-user-id').value = userId;
+            document.getElementById('modal-fund-username').textContent = username;
+            document.getElementById('modal-fund-current-bal').textContent = `GH₵${currentBal}`;
+            document.getElementById('modal-fund-amount').value = '';
+            document.getElementById('modal-fund-reason').value = '';
+
+            setModalAction('add');
+            modal.classList.remove('hidden');
           });
         });
 
@@ -3454,6 +3457,95 @@ async function initAdminUsersPage() {
               alert(err.message);
             }
           });
+        });
+      }
+
+      // Modal Action Controls setup
+      const modal = document.getElementById('fund-user-modal');
+      const fundForm = document.getElementById('admin-user-fund-form');
+      const closeBtn = document.getElementById('close-user-fund-modal');
+      const cancelBtn = document.getElementById('cancel-user-fund-modal');
+      const btnAdd = document.getElementById('btn-action-add');
+      const btnDeduct = document.getElementById('btn-action-deduct');
+      const actionInput = document.getElementById('modal-fund-action');
+
+      function setModalAction(action) {
+        if (!actionInput) return;
+        actionInput.value = action;
+        if (action === 'deduct') {
+          if (btnAdd) {
+            btnAdd.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition flex items-center justify-center';
+          }
+          if (btnDeduct) {
+            btnDeduct.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs bg-rose-600 text-white shadow-sm transition flex items-center justify-center';
+          }
+        } else {
+          if (btnAdd) {
+            btnAdd.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow-sm transition flex items-center justify-center';
+          }
+          if (btnDeduct) {
+            btnDeduct.className = 'fund-action-btn py-2 px-3 rounded-lg font-bold text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition flex items-center justify-center';
+          }
+        }
+      }
+
+      if (btnAdd) btnAdd.onclick = () => setModalAction('add');
+      if (btnDeduct) btnDeduct.onclick = () => setModalAction('deduct');
+
+      document.querySelectorAll('.preset-pill').forEach(pill => {
+        pill.onclick = () => {
+          const amtInput = document.getElementById('modal-fund-amount');
+          if (amtInput) amtInput.value = pill.getAttribute('data-val');
+        };
+      });
+
+      const closeModal = () => {
+        if (modal) modal.classList.add('hidden');
+      };
+
+      if (closeBtn) closeBtn.onclick = closeModal;
+      if (cancelBtn) cancelBtn.onclick = closeModal;
+
+      if (fundForm && !fundForm.__bound) {
+        fundForm.__bound = true;
+        fundForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const rawUserId = document.getElementById('modal-fund-user-id').value;
+          const userId = decodeURIComponent(rawUserId || '');
+          const action = document.getElementById('modal-fund-action').value;
+          const amount = parseFloat(document.getElementById('modal-fund-amount').value || 0);
+          const reason = document.getElementById('modal-fund-reason').value.trim();
+
+          if (!userId || isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid numeric amount.');
+            return;
+          }
+
+          const submitBtn = document.getElementById('submit-user-fund-btn');
+          const originalText = submitBtn ? submitBtn.innerHTML : 'Confirm Update';
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Updating balance...';
+          }
+
+          try {
+            const addRes = await API.request('/admin/users/balance', 'POST', {
+              userId,
+              amount,
+              action,
+              reason
+            });
+            alert(`Success! ${addRes.message || 'User balance updated successfully.'}`);
+            closeModal();
+            initAdminUsersPage();
+          } catch (err) {
+            alert(err.message || 'Failed to update user balance');
+          } finally {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalText;
+            }
+          }
         });
       }
 

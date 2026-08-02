@@ -38,9 +38,29 @@ class AdminController {
 
   static async updateUserBalance(req, res, next) {
     try {
-      const { userId, newBalance } = req.body;
-      const result = await AdminService.updateUserBalance({ userId, newBalance });
-      res.json({ success: true, ...result });
+      const userId = req.params.userId || req.body.userId;
+      const { amount, action, newBalance, reason } = req.body;
+      let targetBalance = newBalance;
+
+      if ((targetBalance === undefined || targetBalance === null) && amount !== undefined) {
+        const { supabaseAdmin } = require('../config/supabase');
+        const { data: wallet } = await supabaseAdmin
+          .from('wallets')
+          .select('balance')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        const currentBal = wallet ? parseFloat(wallet.balance || 0) : 0;
+        const numAmount = parseFloat(amount);
+        if (action === 'deduct') {
+          targetBalance = currentBal - Math.abs(numAmount);
+        } else {
+          targetBalance = currentBal + Math.abs(numAmount);
+        }
+      }
+
+      const result = await AdminService.updateUserBalance({ userId, newBalance: targetBalance, reason });
+      res.json({ success: true, new_balance: targetBalance, ...result });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });
     }

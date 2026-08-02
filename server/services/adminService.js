@@ -182,7 +182,7 @@ class AdminService {
     return { message: 'Phone number updated successfully', profile: data };
   }
 
-  static async updateUserBalance({ userId, newBalance }) {
+  static async updateUserBalance({ userId, newBalance, reason }) {
     const balance = parseFloat(newBalance);
     if (isNaN(balance)) throw new Error('Valid numeric balance is required');
 
@@ -205,14 +205,17 @@ class AdminService {
       if (error) throw new Error(error.message);
     }
 
+    const note = reason ? ` (Note: ${reason})` : '';
     // Write Audit Log
-    await supabaseAdmin.from('audit_logs').insert({
-      user_id: userId,
-      action: 'UPDATE_BALANCE',
-      details: `Admin set user balance to GH₵${balance.toFixed(2)}`
-    });
+    try {
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: userId,
+        action: 'UPDATE_BALANCE',
+        details: `Admin set user balance to GH₵${balance.toFixed(2)}${note}`
+      });
+    } catch (_) {}
 
-    return { success: true, message: `User balance updated to GH₵${balance.toFixed(2)}` };
+    return { success: true, new_balance: balance, message: `User balance updated to GH₵${balance.toFixed(2)}` };
   }
 
   static async getAllOrders() {

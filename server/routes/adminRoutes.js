@@ -10,6 +10,7 @@ router.use(requireRole(['admin', 'super_admin']));
 router.get('/stats', AdminController.getStats);
 router.get('/users', AdminController.getUsers);
 router.post('/users/balance', AdminController.updateUserBalance);
+router.post('/users/:userId/fund', AdminController.updateUserBalance);
 router.put('/users/:userId/phone', AdminController.updateUserPhone);
 
 // Orders
