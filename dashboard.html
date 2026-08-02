@@ -327,7 +327,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input type="text" id="service-search-input" autocomplete="off" placeholder="Search service by name, platform, or ID (e.g. TikTok Followers, Instagram, #101)..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
+                <input type="text" id="service-search-input" autocomplete="off" placeholder="Search service by name, platform, or ID (e.g. TikTok Followers, Instagram, #101)..." class="w-full py-3.5 pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white text-xs md:text-sm font-medium focus:outline-none focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 focus:bg-white dark:focus:bg-gray-900 transition shadow-sm cursor-pointer">
                 
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" id="combobox-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -337,12 +337,12 @@
               </div>
 
               <!-- Custom Floating Dropdown Menu (Strict 220px Height Limit with Vertical Scroll) -->
-              <div id="service-dropdown-menu" style="max-height: 220px; overflow-y: auto;" class="hidden absolute z-50 mt-1.5 w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700/50 backdrop-blur-md">
+              <div id="service-dropdown-menu" style="max-height: 220px; overflow-y: auto;" class="hidden absolute z-50 mt-1.5 w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700/50 backdrop-blur-md">
                 <div class="p-3 text-center text-xs text-gray-400 font-medium" id="dropdown-loading-state">Loading services...</div>
               </div>
 
               <!-- White Theme Selected Service Summary Card -->
-              <div id="selected-service-card" class="hidden mt-6 p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+              <div id="selected-service-card" class="hidden mt-6 p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
                 <div class="flex items-start justify-between gap-3">
                   <div class="flex items-center space-x-2.5 min-w-0">
                     <img id="selected-svc-icon" src="src/img/platforms/instagram.png" class="w-6 h-6 object-contain flex-shrink-0" alt="Platform Icon">
@@ -391,7 +391,7 @@
               <!-- Link -->
               <div>
                 <label for="link" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Target Link / URL</label>
-                <input type="text" id="link" name="link" required placeholder="https://instagram.com/yourusername" class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+                <input type="text" id="link" name="link" required placeholder="https://instagram.com/yourusername" class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
               </div>
 
               <!-- Quantity -->
@@ -400,13 +400,13 @@
                   <label for="quantity-input" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Quantity</label>
                   <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">Min/Max limits apply</span>
                 </div>
-                <input type="number" id="quantity-input" value="1000" min="10" max="500000" class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
+                <input type="number" id="quantity-input" value="1000" min="10" max="500000" class="w-full py-3 px-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
                 <span id="quantity-validation-msg" class="text-[11px] font-bold text-red-500 mt-1 block hidden"></span>
               </div>
             </div>
 
             <!-- Total Charge Calculation -->
-            <div class="p-4 bg-pink-50 dark:bg-pink-950/40 border border-pink-100 dark:border-pink-900/50 rounded-lg flex items-center justify-between">
+            <div class="p-4 bg-pink-50 dark:bg-pink-950/40 border border-pink-100 dark:border-pink-900/50 rounded-2xl flex items-center justify-between">
               <div>
                 <span class="text-xs text-pink-700 dark:text-pink-400 font-semibold uppercase block">Total Charge</span>
                 <span class="text-2xl font-extrabold text-pink-600 dark:text-pink-400" id="total-charge-display">GH₵0.00</span>
@@ -417,7 +417,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" id="order-submit-btn" class="w-full py-4 px-6 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm rounded-lg shadow-lg hover:shadow-pink-600/30 transform transition duration-200 active:scale-95 flex items-center justify-center space-x-2">
+            <button type="submit" id="order-submit-btn" class="w-full py-4 px-6 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm rounded-2xl shadow-lg hover:shadow-pink-600/30 transform transition duration-200 active:scale-95 flex items-center justify-center space-x-2">
               <span>Submit Order</span>
             </button>
           </form>
