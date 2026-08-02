@@ -3226,10 +3226,15 @@ async function initAdminDashboard() {
                   label: 'Orders (Count)',
                   data: ordersData,
                   borderColor: '#8b5cf6',
-                  backgroundColor: 'rgba(139, 92, 246, 0.75)',
-                  type: 'bar',
-                  borderRadius: 6,
-                  barThickness: 16,
+                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                  fill: true,
+                  tension: 0.4,
+                  borderWidth: 2,
+                  borderDash: [5, 5],
+                  pointRadius: 3.5,
+                  pointBackgroundColor: '#8b5cf6',
+                  pointBorderColor: '#ffffff',
+                  pointHoverRadius: 6,
                   yAxisID: 'y1'
                 }
               ]
