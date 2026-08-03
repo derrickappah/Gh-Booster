@@ -82,13 +82,15 @@ CREATE OR REPLACE FUNCTION public.create_policy_if_table_exists(
   p_policy_name TEXT,
   p_table_name TEXT,
   p_cmd TEXT,
-  p_using TEXT,
+  p_using TEXT DEFAULT NULL,
   p_with_check TEXT DEFAULT NULL
 ) RETURNS VOID AS $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = p_table_name) THEN
     EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I;', p_policy_name, p_table_name);
-    IF p_with_check IS NOT NULL THEN
+    IF p_cmd = 'INSERT' THEN
+      EXECUTE format('CREATE POLICY %I ON public.%I FOR INSERT WITH CHECK (%s);', p_policy_name, p_table_name, COALESCE(p_with_check, p_using));
+    ELSIF p_with_check IS NOT NULL THEN
       EXECUTE format('CREATE POLICY %I ON public.%I FOR %s USING (%s) WITH CHECK (%s);', p_policy_name, p_table_name, p_cmd, p_using, p_with_check);
     ELSE
       EXECUTE format('CREATE POLICY %I ON public.%I FOR %s USING (%s);', p_policy_name, p_table_name, p_cmd, p_using);
@@ -105,9 +107,9 @@ SELECT public.create_policy_if_table_exists('transactions_select_own', 'transact
 SELECT public.create_policy_if_table_exists('orders_select_own', 'orders', 'SELECT', 'auth.uid() = user_id');
 SELECT public.create_policy_if_table_exists('batches_select_own', 'batches', 'SELECT', 'auth.uid() = user_id');
 SELECT public.create_policy_if_table_exists('tickets_select_own', 'tickets', 'SELECT', 'auth.uid() = user_id');
-SELECT public.create_policy_if_table_exists('tickets_insert_own', 'tickets', 'INSERT', 'true', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('tickets_insert_own', 'tickets', 'INSERT', NULL, 'auth.uid() = user_id');
 SELECT public.create_policy_if_table_exists('ticket_messages_select_own', 'ticket_messages', 'SELECT', 'EXISTS (SELECT 1 FROM public.tickets t WHERE t.id = ticket_id AND t.user_id = auth.uid())');
-SELECT public.create_policy_if_table_exists('ticket_messages_insert_own', 'ticket_messages', 'INSERT', 'true', 'auth.uid() = sender_id');
+SELECT public.create_policy_if_table_exists('ticket_messages_insert_own', 'ticket_messages', 'INSERT', NULL, 'EXISTS (SELECT 1 FROM public.tickets t WHERE t.id = ticket_id AND t.user_id = auth.uid())');
 SELECT public.create_policy_if_table_exists('notifications_select_own', 'notifications', 'SELECT', 'auth.uid() = user_id');
 SELECT public.create_policy_if_table_exists('child_panels_select_own', 'child_panels', 'SELECT', 'auth.uid() = user_id');
 SELECT public.create_policy_if_table_exists('referral_payouts_select_own', 'referral_payouts', 'SELECT', 'auth.uid() = user_id');
