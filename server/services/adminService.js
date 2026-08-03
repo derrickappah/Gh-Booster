@@ -502,6 +502,17 @@ class AdminService {
     return data || [];
   }
 
+  static async getAllTransactions() {
+    const { data, error } = await supabaseAdmin
+      .from('transactions')
+      .select('*, profiles(username, email)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+
+
   static async updateDepositStatus({ id, status }) {
     const { data: txn, error: getErr } = await supabaseAdmin
       .from('transactions')

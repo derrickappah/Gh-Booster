@@ -1,9 +1,7 @@
-const CACHE_NAME = 'ghbooster-cache-v3';
+const CACHE_NAME = 'ghbooster-cache-v4';
 const ASSETS_TO_CACHE = [
-  './',
+  '/',
   'index.html',
-  'login.html',
-  'register.html',
   'src/css/style.min.css',
   'src/js/theme.min.js',
   '/src/img/favicon.png?v=2',
@@ -14,7 +12,15 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return Promise.allSettled(
+        ASSETS_TO_CACHE.map(url =>
+          fetch(url, { redirect: 'follow' }).then(res => {
+            if (res.ok && !res.redirected) {
+              return cache.put(url, res);
+            }
+          }).catch(() => {})
+        )
+      );
     }).then(() => self.skipWaiting())
   );
 });
@@ -42,10 +48,10 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
+      if (cachedResponse && !cachedResponse.redirected) {
         // Fetch fresh in background and update cache (Stale-While-Revalidate)
         fetch(event.request).then((networkResponse) => {
-          if (networkResponse.ok) {
+          if (networkResponse.ok && !networkResponse.redirected && networkResponse.type === 'basic') {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
           }
         }).catch(() => {/* Ignore network errors for background fetch */});
@@ -54,7 +60,7 @@ self.addEventListener('fetch', (event) => {
       }
 
       return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' || networkResponse.redirected) {
           return networkResponse;
         }
 
@@ -73,3 +79,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+

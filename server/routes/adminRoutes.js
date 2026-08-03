@@ -36,6 +36,8 @@ router.post('/providers/:id/sync', AdminController.syncProvider);
 // Deposits & Transactions
 router.get('/deposits', AdminController.getDeposits);
 router.post('/deposits/status', AdminController.updateDepositStatus);
+router.get('/transactions', AdminController.getTransactions);
+
 
 // Support Tickets
 router.get('/tickets', AdminController.getTickets);

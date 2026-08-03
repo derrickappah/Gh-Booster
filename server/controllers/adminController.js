@@ -199,6 +199,16 @@ class AdminController {
     }
   }
 
+  static async getTransactions(req, res, next) {
+    try {
+      const transactions = await AdminService.getAllTransactions();
+      res.json({ success: true, transactions });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+
   static async updateDepositStatus(req, res, next) {
     try {
       const { id, status } = req.body;
