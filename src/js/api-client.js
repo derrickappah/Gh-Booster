@@ -94,7 +94,14 @@ const API = {
       return null;
     }
   },
-  setUser: (user) => localStorage.setItem('ghb_user', JSON.stringify(user)),
+  setUser: (user) => {
+    if (!user) {
+      localStorage.removeItem('ghb_user');
+      return;
+    }
+    const { api_key, ...safeUser } = user;
+    localStorage.setItem('ghb_user', JSON.stringify(safeUser));
+  },
   logout: () => {
     localStorage.removeItem('ghb_token');
     localStorage.removeItem('ghb_user');
@@ -171,20 +178,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Do not auto-logout on transient network or auth errors.
       // Retain cached session in localStorage so user is never logged out unless pressing signout.
       console.warn('[Auth] Error refreshing profile, retaining cached user session:', e.message);
-    }
-
-    // Dynamic Admin Probe: If logged in user isn't marked as admin locally, verify against backend admin endpoint
-    const currentUser = API.getUser();
-    if (currentUser && !isAdminUser(currentUser)) {
-      try {
-        const adminProbe = await API.request('/admin/stats');
-        if (adminProbe && adminProbe.success) {
-          currentUser.role = 'admin';
-          currentUser.is_admin = true;
-          API.setUser(currentUser);
-          updateUserUI(currentUser);
-        }
-      } catch (_) {}
     }
   }
 

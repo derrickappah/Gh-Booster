@@ -1,5 +1,6 @@
-const { supabaseAdmin } = require('../config/supabase');
-const SmmgenService = require('./smmgenService');
+function roundMoney(val) {
+  return Math.round((parseFloat(val) || 0) * 10000) / 10000;
+}
 
 class OrderService {
   static async getUserOrders(userId) {
@@ -200,7 +201,7 @@ class OrderService {
     return updatedCount;
   }
 
-  static async createOrder({ userId, serviceId, link, quantity, batchId }) {
+  static async createOrder({ userId, serviceId, link, quantity, batchId, skipWalletDeduction = false }) {
     const qty = parseInt(quantity, 10);
     if (!qty || qty <= 0) {
       throw new Error('Valid quantity greater than 0 is required');
@@ -218,40 +219,44 @@ class OrderService {
 
     const ratePer1k = parseFloat(service.rate_per_1k || service.rate_per_1000 || service.our_price_per_1000 || service.rate || 0);
     const serviceName = service.name;
-    const totalCharge = (qty / 1000) * ratePer1k;
+    const totalCharge = roundMoney((qty / 1000) * ratePer1k);
 
-    // Check user balance
-    const { data: wallet } = await supabaseAdmin
-      .from('wallets')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
+    let newBalance = null;
 
-    const currentBalance = wallet ? parseFloat(wallet.balance) : 0.0;
-
-    if (currentBalance < totalCharge) {
-      throw new Error(`Insufficient wallet balance (GH₵${currentBalance.toFixed(2)}). Total charge is GH₵${totalCharge.toFixed(2)}. Please add funds.`);
-    }
-
-    // ATOMIC balance deduction FIRST (before provider order)
-    const newBalance = currentBalance - totalCharge;
-    if (wallet && wallet.id) {
-      const { data: updatedWallet, error: wErr } = await supabaseAdmin
+    if (!skipWalletDeduction) {
+      // Check user balance
+      const { data: wallet } = await supabaseAdmin
         .from('wallets')
-        .update({
-          balance: newBalance,
-          updated_at: new Date().toISOString()
-        })
+        .select('*')
         .eq('user_id', userId)
-        .gte('balance', totalCharge)
-        .select('balance')
         .maybeSingle();
 
-      if (wErr || !updatedWallet) {
-        throw new Error('Insufficient balance. Your balance may have changed due to another transaction. Please try again.');
+      const currentBalance = wallet ? parseFloat(wallet.balance) : 0.0;
+
+      if (currentBalance < totalCharge) {
+        throw new Error(`Insufficient wallet balance (GH₵${currentBalance.toFixed(2)}). Total charge is GH₵${totalCharge.toFixed(2)}. Please add funds.`);
       }
-    } else {
-      throw new Error('Wallet not found. Please contact support.');
+
+      // ATOMIC balance deduction FIRST (before provider order)
+      newBalance = roundMoney(currentBalance - totalCharge);
+      if (wallet && wallet.id) {
+        const { data: updatedWallet, error: wErr } = await supabaseAdmin
+          .from('wallets')
+          .update({
+            balance: newBalance,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+          .gte('balance', totalCharge)
+          .select('balance')
+          .maybeSingle();
+
+        if (wErr || !updatedWallet) {
+          throw new Error('Insufficient balance. Your balance may have changed due to another transaction. Please try again.');
+        }
+      } else {
+        throw new Error('Wallet not found. Please contact support.');
+      }
     }
 
     // Send order to SMMGen API provider AFTER wallet deduction
@@ -267,17 +272,19 @@ class OrderService {
         if (smmRes && smmRes.order) {
           providerOrderId = String(smmRes.order);
         } else if (smmRes && smmRes.error) {
-          // Provider rejected — refund wallet atomically
-          console.error('SMMGen order error, refunding wallet:', smmRes.error);
-          try {
-            await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
-          } catch (refundErr) {
-            console.error('CRITICAL: Provider refund failed:', refundErr.message);
+          // Provider rejected — refund wallet atomically if deducted
+          console.error('SMMGen order error:', smmRes.error);
+          if (!skipWalletDeduction) {
+            try {
+              await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
+            } catch (refundErr) {
+              console.error('CRITICAL: Provider refund failed:', refundErr.message);
+            }
           }
           throw new Error(`SMMGen Provider Error: ${smmRes.error}`);
         }
       } catch (providerErr) {
-        if (!providerErr.message.includes('SMMGen Provider Error')) {
+        if (!providerErr.message.includes('SMMGen Provider Error') && !skipWalletDeduction) {
           // Network/unexpected error — refund wallet
           try {
             await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
@@ -300,7 +307,7 @@ class OrderService {
           batch_id: batchId || null,
           link: link,
           quantity: qty,
-          total_price: totalCharge,
+          charge: totalCharge,
           status: 'Processing',
           start_count: 0,
           remains: qty,
@@ -316,10 +323,12 @@ class OrderService {
     } catch (insertErr) {
       // ROLLBACK: Refund the wallet deduction since order insert failed
       console.error('Error inserting order, rolling back wallet deduction:', insertErr.message || insertErr);
-      try {
-        await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
-      } catch (rollbackErr) {
-        console.error('CRITICAL: Wallet rollback also failed:', rollbackErr.message);
+      if (!skipWalletDeduction) {
+        try {
+          await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
+        } catch (rollbackErr) {
+          console.error('CRITICAL: Wallet rollback also failed:', rollbackErr.message);
+        }
       }
       throw new Error(`Failed to save order in database: ${insertErr.message || insertErr}`);
     }
@@ -423,7 +432,7 @@ class OrderService {
         }
 
         const ratePer1k = parseFloat(service.rate_per_1k || service.rate_per_1000 || service.our_price_per_1000 || service.rate || 0);
-        const charge = (qty / 1000) * ratePer1k;
+        const charge = roundMoney((qty / 1000) * ratePer1k);
 
         validOrdersToPlace.push({
           serviceId,
@@ -432,7 +441,7 @@ class OrderService {
           charge,
           line
         });
-        totalChargeOfValid += charge;
+        totalChargeOfValid = roundMoney(totalChargeOfValid + charge);
         totalQuantityOfValid += qty;
       } catch (err) {
         results.push({ line, success: false, error: err.message });
@@ -443,9 +452,15 @@ class OrderService {
       return results;
     }
 
-    // Check if total charge exceeds balance
-    if (currentBalance < totalChargeOfValid) {
-      throw new Error(`Insufficient wallet balance. Total charge for all valid orders is GH₵${totalChargeOfValid.toFixed(2)}, but your balance is GH₵${currentBalance.toFixed(2)}.`);
+    // Atomically deduct total charge upfront
+    try {
+      const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('debit_wallet', {
+        p_user_id: userId,
+        p_amount: totalChargeOfValid
+      });
+      if (rpcErr) throw rpcErr;
+    } catch (debitErr) {
+      throw new Error(`Insufficient wallet balance. Total charge for all valid orders is GH₵${totalChargeOfValid.toFixed(2)}. ${debitErr.message || ''}`);
     }
 
     // Create the batch record in database
@@ -463,11 +478,13 @@ class OrderService {
       .single();
 
     if (bErr || !newBatch) {
+      // Refund upfront deduction if batch creation failed
+      await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalChargeOfValid }).catch(() => {});
       console.error('Error creating batch:', bErr?.message);
       throw new Error(`Failed to create batch record: ${bErr?.message || 'Unknown error'}`);
     }
 
-    // Now insert each valid order referencing the batch ID
+    // Now insert each valid order referencing the batch ID with skipWalletDeduction=true
     for (const item of validOrdersToPlace) {
       try {
         const res = await OrderService.createOrder({
@@ -475,10 +492,17 @@ class OrderService {
           serviceId: item.serviceId,
           link: item.link,
           quantity: item.quantity,
-          batchId: newBatch.id
+          batchId: newBatch.id,
+          skipWalletDeduction: true
         });
         results.push({ line: item.line, success: true, order_id: res.order_id });
       } catch (err) {
+        // Refund individual failed order amount
+        try {
+          await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: item.charge });
+        } catch (rErr) {
+          console.error('[BulkOrders] Failed to refund failed order item:', rErr.message);
+        }
         results.push({ line: item.line, success: false, error: err.message });
       }
     }
@@ -666,6 +690,7 @@ class OrderService {
     }
     // Fetch the order first to validate ownership and status
     const order = await OrderService.getOrderById(orderId, userId, isAdmin);
+    const refundUserId = order.user_id || userId; // Always refund to order owner, not admin
 
     const nonCancellableStatuses = ['Completed', 'Canceled', 'Refunded', 'Partial'];
     if (nonCancellableStatuses.includes(order.status)) {
@@ -683,37 +708,30 @@ class OrderService {
       throw new Error('Failed to cancel order. Please contact support.');
     }
 
-    // Refund the charge to the user's wallet
-    const chargeAmount = parseFloat(order.charge || 0);
+    // Refund the charge to the order owner's wallet
+    const chargeAmount = roundMoney(order.charge || 0);
     let newBalance = null;
-    if (chargeAmount > 0 && userId) {
+    if (chargeAmount > 0 && refundUserId) {
       try {
         const { data: rpcBalance, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
-          p_user_id: userId,
+          p_user_id: refundUserId,
           p_amount: chargeAmount
         });
         if (rpcErr) throw rpcErr;
         newBalance = parseFloat(rpcBalance);
       } catch (rpcError) {
         console.error('[cancelOrder] credit_wallet RPC failed:', rpcError.message);
-        const { data: wallet } = await supabaseAdmin
-          .from('wallets').select('balance').eq('user_id', userId).maybeSingle();
-        const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-        newBalance = currentBalance + chargeAmount;
-        await supabaseAdmin
-          .from('wallets')
-          .update({ balance: newBalance, updated_at: new Date().toISOString() })
-          .eq('user_id', userId);
+        throw new Error('Failed to credit refund to user wallet. Order status updated to Canceled.');
       }
 
-      // Record refund transaction
+      // Record refund transaction for order owner
       const { error: txErr } = await supabaseAdmin.from('transactions').insert({
-        user_id: userId,
+        user_id: refundUserId,
         amount: chargeAmount,
         currency: 'GHS',
         gateway: 'Wallet Balance',
         payment_ref: 'refund_' + orderId,
-        reference: 'refund_' + orderId,
+        reference: 'refund_' + orderId + '_' + Date.now(),
         type: 'refund',
         status: 'completed'
       });
@@ -723,11 +741,11 @@ class OrderService {
       }
     }
 
-    const updatedOrder = await OrderService.getOrderById(orderId, userId);
+    const updatedOrder = await OrderService.getOrderById(orderId, refundUserId, true);
 
     return {
       success: true,
-      message: chargeAmount > 0 ? `Order canceled and GH₵${chargeAmount.toFixed(2)} has been refunded to your wallet.` : 'Order has been canceled successfully.',
+      message: chargeAmount > 0 ? `Order canceled and GH₵${chargeAmount.toFixed(2)} has been refunded to customer wallet.` : 'Order has been canceled successfully.',
       new_balance: newBalance,
       order: updatedOrder
     };

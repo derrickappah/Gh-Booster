@@ -419,35 +419,23 @@ class MoolreService {
   static async handleWebhook(payload, signatureHeader) {
     // Verify webhook authenticity
     const creds = await MoolreService.getCredentials();
-    if (creds.environment !== 'sandbox') {
-      if (!signatureHeader) {
-        console.warn('[Moolre Webhook] Rejected: No signature header in production');
-        throw new Error('Webhook signature required in production');
-      }
-      if (!creds.apiKey) {
-        throw new Error('Webhook validation failed: API key not configured');
-      }
-      const crypto = require('crypto');
-      const expectedSig = crypto
-        .createHmac('sha256', creds.apiKey)
-        .update(JSON.stringify(payload))
-        .digest('hex');
-      const sigBuffer = Buffer.from(signatureHeader, 'utf8');
-      const expectedBuffer = Buffer.from(expectedSig, 'utf8');
-      if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-        console.warn('[Moolre Webhook] Invalid signature received');
-        throw new Error('Invalid webhook signature');
-      }
-    } else if (creds.apiKey && signatureHeader) {
-      // Sandbox: validate signature if provided, but don't require it
-      const crypto = require('crypto');
-      const expectedSig = crypto
-        .createHmac('sha256', creds.apiKey)
-        .update(JSON.stringify(payload))
-        .digest('hex');
-      if (signatureHeader !== expectedSig) {
-        console.warn('[Moolre Webhook] Invalid signature in sandbox');
-      }
+    if (!creds.apiKey) {
+      throw new Error('Webhook validation failed: API key not configured');
+    }
+    if (!signatureHeader) {
+      console.warn('[Moolre Webhook] Rejected: Missing signature header');
+      throw new Error('Webhook signature required');
+    }
+    const crypto = require('crypto');
+    const expectedSig = crypto
+      .createHmac('sha256', creds.apiKey)
+      .update(JSON.stringify(payload))
+      .digest('hex');
+    const sigBuffer = Buffer.from(signatureHeader, 'utf8');
+    const expectedBuffer = Buffer.from(expectedSig, 'utf8');
+    if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+      console.warn('[Moolre Webhook] Invalid signature received');
+      throw new Error('Invalid webhook signature');
     }
 
     const reference = payload?.reference || payload?.data?.reference;
@@ -544,29 +532,29 @@ class MoolreService {
       if (rpcErr) throw rpcErr;
       newBalance = parseFloat(rpcBalance);
     } catch (rpcError) {
-      console.error('[_creditUserWallet] credit_wallet RPC failed, using fallback:', rpcError.message);
-      // Fallback: read-then-write with CAS guard (no retry without guard)
-      const { data: wallet } = await supabaseAdmin
-        .from('wallets').select('id, balance').eq('user_id', userId).maybeSingle();
-      if (wallet && wallet.id) {
-        const currentBalance = parseFloat(wallet.balance) || 0;
-        newBalance = currentBalance + depositAmount;
-        const { error: wErr } = await supabaseAdmin
-          .from('wallets')
-          .update({ balance: newBalance, currency: 'GHS', updated_at: new Date().toISOString() })
-          .eq('user_id', userId)
-          .eq('balance', wallet.balance);
-        if (wErr) throw new Error('Failed to credit wallet balance: ' + wErr.message);
-      } else {
-        newBalance = depositAmount;
-        const { error: iErr } = await supabaseAdmin
-          .from('wallets')
-          .insert({ user_id: userId, balance: newBalance, currency: 'GHS', updated_at: new Date().toISOString() });
-        if (iErr) throw new Error('Failed to create wallet: ' + iErr.message);
+      console.error('[_creditUserWallet] credit_wallet RPC failed:', rpcError.message);
+      // Revert transaction claim so it can be safely retried
+      if (reference) {
+        let { data: targetTxn } = await supabaseAdmin
+          .from('transactions')
+          .select('id, metadata')
+          .eq('reference', reference)
+          .maybeSingle();
+        if (!targetTxn) {
+          const fb = await supabaseAdmin.from('transactions').select('id, metadata').eq('payment_ref', reference).maybeSingle();
+          targetTxn = fb.data;
+        }
+        if (targetTxn && targetTxn.id) {
+          await supabaseAdmin
+            .from('transactions')
+            .update({ status: 'pending', updated_at: new Date().toISOString() })
+            .eq('id', targetTxn.id);
+        }
       }
+      throw new Error('Wallet credit operation failed. Please retry or contact support.');
     }
 
-    // Mark transaction completed safely without SQL OR type mismatch
+    // Mark transaction completed safely
     if (reference) {
       let { data: targetTxn } = await supabaseAdmin
         .from('transactions')
@@ -663,11 +651,12 @@ class MoolreService {
         const ref = txn.reference || txn.payment_ref;
         if (!ref) continue;
 
-        // Check if audit log records that this deposit was credited
+        // Check if audit log specifically records that this deposit was credited
         const { data: logs } = await supabaseAdmin
           .from('audit_logs')
           .select('id')
           .eq('user_id', txn.user_id)
+          .eq('action', 'MOOLRE_DEPOSIT_COMPLETED')
           .like('details', `%${ref}%`);
 
         if (logs && logs.length > 0) {
@@ -718,6 +707,7 @@ class MoolreService {
             .from('audit_logs')
             .select('id')
             .eq('user_id', txn.user_id)
+            .eq('action', 'MOOLRE_DEPOSIT_COMPLETED')
             .like('details', `%${ref}%`);
 
           if (logs && logs.length > 0) {

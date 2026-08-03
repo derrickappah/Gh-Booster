@@ -216,7 +216,17 @@ class AdminController {
   static async updateDepositStatus(req, res, next) {
     try {
       const { id, status } = req.body;
-      const deposit = await AdminService.updateDepositStatus({ id, status });
+      const allowedStatuses = ['pending', 'completed', 'failed', 'expired', 'refunded'];
+      if (!id || !status || !allowedStatuses.includes(String(status).toLowerCase())) {
+        return res.status(400).json({ success: false, error: 'Valid transaction ID and allowed status required.' });
+      }
+      const deposit = await AdminService.updateDepositStatus({ id, status: String(status).toLowerCase() });
+      const { supabaseAdmin } = require('../config/supabase');
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: req.user.id,
+        action: 'ADMIN_UPDATE_DEPOSIT_STATUS',
+        details: `Admin ${req.user.email || req.user.id} updated deposit #${id} status to ${status}`
+      }).catch(() => {});
       res.json({ success: true, deposit });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });

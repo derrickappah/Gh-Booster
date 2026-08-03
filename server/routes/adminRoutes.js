@@ -19,23 +19,26 @@ router.post('/orders/status', AdminController.updateOrderStatus);
 router.put('/orders/:orderId/status', AdminController.updateOrderStatus);
 router.post('/orders/batch-refill', AdminController.batchRefillOrders);
 
+const { validate } = require('../middleware/validator');
+const { adminCreateServiceSchema, adminCreateProviderSchema, adminUpdateDepositStatusSchema } = require('../validators/schemas');
+
 // Services & Categories
 router.get('/services', AdminController.getServices);
-router.post('/services', AdminController.createService);
+router.post('/services', validate(adminCreateServiceSchema), AdminController.createService);
 router.put('/services/:id', AdminController.updateService);
 router.delete('/services/:id', AdminController.deleteService);
 router.post('/categories', AdminController.createCategory);
 
 // Providers
 router.get('/providers', AdminController.getProviders);
-router.post('/providers', AdminController.createProvider);
+router.post('/providers', validate(adminCreateProviderSchema), AdminController.createProvider);
 router.put('/providers/:id', AdminController.updateProvider);
 router.post('/providers/sync-all', AdminController.syncAllProviders);
 router.post('/providers/:id/sync', AdminController.syncProvider);
 
 // Deposits & Transactions
 router.get('/deposits', AdminController.getDeposits);
-router.post('/deposits/status', AdminController.updateDepositStatus);
+router.post('/deposits/status', validate(adminUpdateDepositStatusSchema), AdminController.updateDepositStatus);
 router.get('/transactions', AdminController.getTransactions);
 
 

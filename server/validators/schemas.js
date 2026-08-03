@@ -22,16 +22,41 @@ const loginSchema = z.object({
 const createOrderSchema = z.object({
   service_id: z.string().min(1, 'Service ID is required'),
   link: z.string().url('Link must be a valid URL').or(z.string().min(5, 'Valid link required')),
-  quantity: z.number().int().positive('Quantity must be greater than 0').or(z.string().transform(v => parseInt(v, 10)))
+  quantity: z.number().int().positive('Quantity must be greater than 0').max(10000000, 'Quantity too large')
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive('Quantity must be greater than 0').max(10000000, 'Quantity too large')))
 });
 
 const depositSchema = z.object({
-  amount_usd: z.number().positive('Deposit amount must be positive').or(z.string().transform(v => parseFloat(v)))
+  amount_usd: z.number().positive('Deposit amount must be positive').max(50000, 'Deposit exceeds maximum limit')
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().positive('Deposit amount must be positive').max(50000, 'Deposit exceeds maximum limit')))
 });
 
 const ticketSchema = z.object({
-  subject: z.string().min(3, 'Subject must be at least 3 characters'),
-  message: z.string().min(5, 'Message content must be at least 5 characters')
+  subject: z.string().min(3, 'Subject must be at least 3 characters').max(200, 'Subject must not exceed 200 characters'),
+  message: z.string().min(5, 'Message content must be at least 5 characters').max(5000, 'Message must not exceed 5000 characters')
+});
+
+const adminCreateServiceSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(200),
+  category_id: z.string().min(1, 'Category ID is required'),
+  rate_per_1k: z.number().nonnegative('Rate must not be negative')
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().nonnegative('Rate must not be negative'))),
+  min_quantity: z.number().int().positive().optional(),
+  max_quantity: z.number().int().positive().optional(),
+  description: z.string().max(1000).optional(),
+  status: z.enum(['active', 'disabled']).optional()
+});
+
+const adminCreateProviderSchema = z.object({
+  name: z.string().min(1, 'Provider name is required').max(200),
+  api_url: z.string().url('API URL must be valid'),
+  api_key: z.string().min(1, 'API key is required'),
+  status: z.enum(['active', 'disabled']).optional()
+});
+
+const adminUpdateDepositStatusSchema = z.object({
+  id: z.string().min(1, 'Transaction ID is required'),
+  status: z.enum(['pending', 'completed', 'failed', 'expired', 'refunded'])
 });
 
 module.exports = {
@@ -39,5 +64,8 @@ module.exports = {
   loginSchema,
   createOrderSchema,
   depositSchema,
-  ticketSchema
+  ticketSchema,
+  adminCreateServiceSchema,
+  adminCreateProviderSchema,
+  adminUpdateDepositStatusSchema
 };

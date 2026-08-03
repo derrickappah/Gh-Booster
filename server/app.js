@@ -26,7 +26,8 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 
 const app = express();
-app.set('trust proxy', 1);
+// Trust proxy configuration for Vercel/reverse proxies. Override with TRUST_PROXY env var if needed.
+app.set('trust proxy', parseInt(process.env.TRUST_PROXY || '1', 10));
 
 // Security Hardening & Compression
 app.use(helmet({
@@ -180,11 +181,14 @@ const pageRoutesMap = {
 const jwt = require('jsonwebtoken');
 const env = require('./config/env');
 const adminPageMiddleware = (req, res, next) => {
-  const token = req.cookies?.ghb_token || (req.headers['authorization'] || '').split(' ')[1];
+  const token = (req.headers['authorization'] || '').split(' ')[1] || req.cookies?.ghb_token;
   if (!token) return res.redirect('/login');
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
     if (!decoded || !decoded.id) return res.redirect('/login');
+    if (decoded.role !== 'admin' && decoded.role !== 'super_admin') {
+      return res.redirect('/dashboard');
+    }
     next();
   } catch (_) {
     return res.redirect('/login');

@@ -38,18 +38,32 @@ class ApiV2Controller {
         }
 
         case 'add': {
-          const { service, link, quantity } = req.body.service ? req.body : req.query;
+          if (req.method !== 'POST') {
+            return res.status(405).json({ error: 'POST method required for order creation' });
+          }
+          const { service, link, quantity } = req.body || {};
+          const qty = parseInt(quantity, 10);
+          if (!service || typeof service !== 'string' || service.trim().length === 0) {
+            return res.status(400).json({ error: 'Service ID is required' });
+          }
+          if (!link || typeof link !== 'string' || link.trim().length < 5) {
+            return res.status(400).json({ error: 'Valid link is required' });
+          }
+          if (isNaN(qty) || qty <= 0) {
+            return res.status(400).json({ error: 'Quantity must be a positive integer' });
+          }
           const result = await OrderService.createOrder({
             userId,
-            serviceId: service,
-            link,
-            quantity
+            serviceId: service.trim(),
+            link: link.trim(),
+            quantity: qty
           });
           return res.json({ order: result.order_id });
         }
 
         case 'status': {
           const { order } = req.query.order ? req.query : req.body;
+          if (!order) return res.status(400).json({ error: 'Order ID is required' });
           const { data: orderData } = await supabaseAdmin.from('orders').select('*').eq('id', order).maybeSingle();
           if (!orderData) return res.status(404).json({ error: 'Order not found' });
           
@@ -57,7 +71,7 @@ class ApiV2Controller {
             return res.status(403).json({ error: 'Access denied: You do not have permission to view this order' });
           }
 
-          const chargeVal = parseFloat(orderData.total_price || orderData.charge || 0).toFixed(4);
+          const chargeVal = parseFloat(orderData.charge || orderData.total_price || 0).toFixed(4);
 
           return res.json({
             charge: chargeVal,

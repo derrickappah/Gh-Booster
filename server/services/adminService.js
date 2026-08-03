@@ -240,6 +240,8 @@ class AdminService {
       .eq('user_id', userId)
       .maybeSingle();
 
+    const oldBal = wallet ? parseFloat(wallet.balance || 0) : 0.0;
+
     if (wallet && wallet.id) {
       const { error } = await supabaseAdmin
         .from('wallets')
@@ -259,7 +261,7 @@ class AdminService {
       await supabaseAdmin.from('audit_logs').insert({
         user_id: userId,
         action: 'UPDATE_BALANCE',
-        details: `Admin set user balance to GH₵${balance.toFixed(2)}${note}`
+        details: `Admin changed user balance from GH₵${oldBal.toFixed(2)} to GH₵${balance.toFixed(2)}${note}`
       });
     } catch (_) {}
 

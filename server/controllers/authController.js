@@ -52,13 +52,27 @@ class AuthController {
 
   static async updatePassword(req, res, next) {
     try {
-      const { newPassword } = req.body;
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword) {
+        return res.status(400).json({ success: false, error: 'Current password is required to set a new password.' });
+      }
       if (!newPassword || newPassword.length < 8) {
         return res.status(400).json({ success: false, error: 'New password must be at least 8 characters and contain uppercase, lowercase, and a number.' });
       }
       if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
         return res.status(400).json({ success: false, error: 'Password must contain at least one uppercase letter, one lowercase letter, and one number.' });
       }
+
+      // Verify current password with Supabase Auth
+      const { supabase } = require('../config/supabase');
+      const { error: authErr } = await supabase.auth.signInWithPassword({
+        email: req.user.email,
+        password: currentPassword
+      });
+      if (authErr) {
+        return res.status(401).json({ success: false, error: 'Current password is incorrect.' });
+      }
+
       const result = await AuthService.updatePassword(req.user.id, newPassword);
       res.json({ success: true, ...result });
     } catch (err) {

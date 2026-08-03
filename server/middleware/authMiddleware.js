@@ -15,9 +15,13 @@ async function authenticateToken(req, res, next) {
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET);
       if (decoded && decoded.id) {
-        const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', decoded.id).maybeSingle();
-        const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', decoded.id).maybeSingle();
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('*, wallets(balance, currency)')
+          .eq('id', decoded.id)
+          .maybeSingle();
 
+        const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
         const dbRole = profile?.role || 'user';
         const userRole = (dbRole !== 'user') ? dbRole : 'user';
 
@@ -42,9 +46,13 @@ async function authenticateToken(req, res, next) {
 
     if (!error && supabaseUser) {
       // Fetch profile & wallet from Supabase DB using supabaseAdmin (bypasses RLS)
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', supabaseUser.id).maybeSingle();
-      const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', supabaseUser.id).maybeSingle();
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('*, wallets(balance, currency)')
+        .eq('id', supabaseUser.id)
+        .maybeSingle();
 
+      const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
       const dbRole = profile?.role || 'user';
       const userRole = (dbRole !== 'user') ? dbRole : 'user';
 

@@ -88,9 +88,10 @@ class PaymentController {
       const result = await MoolreService.handleWebhook(req.body, signatureHeader);
       res.json({ received: true, ...result });
     } catch (err) {
-      // Always respond 200 to webhook to avoid retries
       console.error('[Moolre Webhook Error]', err.message);
-      res.json({ received: true, error: err.message });
+      const isAuthError = err.message.includes('signature') || err.message.includes('API key');
+      const statusCode = isAuthError ? 401 : 400;
+      res.status(statusCode).json({ received: false, error: err.message });
     }
   }
 
