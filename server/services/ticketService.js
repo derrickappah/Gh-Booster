@@ -2,7 +2,7 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class TicketService {
   static async getUserTickets(userId) {
-    const { data: tickets, error } = await supabase
+    const { data: tickets, error } = await supabaseAdmin
       .from('tickets')
       .select('*, ticket_messages(*)')
       .eq('user_id', userId)
@@ -21,7 +21,7 @@ class TicketService {
       throw new Error('Subject and message content are required');
     }
 
-    const { data: ticket, error: tErr } = await supabase
+    const { data: ticket, error: tErr } = await supabaseAdmin
       .from('tickets')
       .insert({ user_id: userId, subject, status: 'Open' })
       .select()
@@ -29,7 +29,7 @@ class TicketService {
 
     if (tErr) throw new Error(tErr.message);
 
-    await supabase.from('ticket_messages').insert({
+    await supabaseAdmin.from('ticket_messages').insert({
       ticket_id: ticket.id,
       sender_id: userId,
       sender_role: 'user',

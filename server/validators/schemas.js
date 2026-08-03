@@ -1,9 +1,14 @@
 const { z } = require('zod');
 
 const registerSchema = z.object({
-  fullname: z.string().min(1, 'Full name is required').optional(),
+  fullname: z.string().min(1, 'Full name is required'),
+  username: z.string().min(2, 'Username must be at least 2 characters').optional(),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
   phone: z.string().refine(val => (val || '').replace(/[^0-9]/g, '').length >= 10, {
     message: 'Phone number must contain at least 10 digits'
   })

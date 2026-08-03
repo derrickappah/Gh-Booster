@@ -32,7 +32,7 @@ class SmmgenService {
         })
       });
       const data = await response.json();
-      console.log('SMMGen API Place Order Result:', data);
+      console.log('[SMMGen] Order placed, ID:', data?.order || 'unknown');
       return data;
     } catch (err) {
       console.error('SMMGen placeOrder error:', err.message);

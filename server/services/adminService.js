@@ -186,7 +186,8 @@ class AdminService {
     const { data: profiles, error } = await supabaseAdmin
       .from('profiles')
       .select('id, username, email, phone, phone_number, role, created_at, wallets(balance, currency)')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500);
 
     if (error) throw new Error(error.message);
 
@@ -231,6 +232,7 @@ class AdminService {
   static async updateUserBalance({ userId, newBalance, reason }) {
     const balance = parseFloat(newBalance);
     if (isNaN(balance)) throw new Error('Valid numeric balance is required');
+    if (balance < 0) throw new Error('Balance cannot be set to a negative value');
 
     const { data: wallet } = await supabaseAdmin
       .from('wallets')
@@ -268,10 +270,11 @@ class AdminService {
     let { data: orders, error } = await supabaseAdmin
       .from('orders')
       .select('*, profiles(username, email), services(name)')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error || !orders || orders.length === 0) {
-      const fallback = await supabaseAdmin.from('orders').select('*').order('created_at', { ascending: false });
+      const fallback = await supabaseAdmin.from('orders').select('*').order('created_at', { ascending: false }).limit(1000);
       orders = fallback.data || [];
     }
     return orders || [];
@@ -496,7 +499,8 @@ class AdminService {
     const { data, error } = await supabaseAdmin
       .from('transactions')
       .select('*, profiles(username, email)')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) throw new Error(error.message);
     return data || [];
@@ -506,7 +510,8 @@ class AdminService {
     const { data, error } = await supabaseAdmin
       .from('transactions')
       .select('*, profiles(username, email)')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) throw new Error(error.message);
     return data || [];
@@ -637,7 +642,22 @@ class AdminService {
   }
 
   static async updateSettings(settingsData) {
+    const ALLOWED_SETTINGS = [
+      'site_name', 'site_url', 'site_description', 'site_logo',
+      'whatsapp_number', 'whatsapp_enabled',
+      'moolre_api_user', 'moolre_api_key', 'moolre_api_pubkey',
+      'moolre_account_number', 'moolre_environment', 'moolre_enabled',
+      'moolre_min_deposit',
+      'referral_commission_rate', 'referral_enabled',
+      'maintenance_mode', 'registration_enabled',
+      'default_currency', 'min_order_amount'
+    ];
+
     for (const [key, value] of Object.entries(settingsData)) {
+      if (!ALLOWED_SETTINGS.includes(key)) {
+        console.warn(`[AdminService] Blocked attempt to set unknown setting key: ${key}`);
+        continue;
+      }
       await supabaseAdmin.from('settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
     }
     return { success: true, message: 'Settings saved successfully' };

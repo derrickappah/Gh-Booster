@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/authMiddleware');
-const { supabase } = require('../config/supabase');
+const { supabaseAdmin } = require('../config/supabase');
 
 router.get('/stats', authenticateToken, async (req, res) => {
   try {
-    const { data: payouts } = await supabase.from('referral_payouts').select('*').eq('user_id', req.user.id);
+    const { data: payouts } = await supabaseAdmin.from('referral_payouts').select('*').eq('user_id', req.user.id);
     const totalEarned = (payouts || []).reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
     res.json({
       success: true,

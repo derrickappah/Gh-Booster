@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const ApiV2Controller = require('../controllers/apiV2Controller');
-const { globalLimiter } = require('../middleware/rateLimiter');
+const { paymentLimiter } = require('../middleware/rateLimiter');
 
-router.all('/', globalLimiter, ApiV2Controller.handleV2Request);
+router.all('/', paymentLimiter, ApiV2Controller.handleV2Request);
 
 module.exports = router;

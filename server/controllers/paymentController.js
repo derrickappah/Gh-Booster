@@ -84,7 +84,8 @@ class PaymentController {
    */
   static async handleWebhook(req, res, next) {
     try {
-      const result = await MoolreService.handleWebhook(req.body);
+      const signatureHeader = req.headers['x-moolre-signature'] || req.headers['x-webhook-signature'] || '';
+      const result = await MoolreService.handleWebhook(req.body, signatureHeader);
       res.json({ received: true, ...result });
     } catch (err) {
       // Always respond 200 to webhook to avoid retries

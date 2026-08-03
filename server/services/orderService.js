@@ -272,26 +272,44 @@ class OrderService {
     }
 
     // Save order in database with correct 'charge' column (matches schema.sql)
-    const { data: newOrder, error: oErr } = await supabaseAdmin
-      .from('orders')
-      .insert({
-        user_id: userId,
-        service_id: serviceId,
-        batch_id: batchId || null,
-        link: link,
-        quantity: qty,
-        total_price: totalCharge,
-        status: 'Processing',
-        start_count: 0,
-        remains: qty,
-        provider_order_id: providerOrderId
-      })
-      .select()
-      .single();
+    let newOrder;
+    try {
+      const { data: orderData, error: oErr } = await supabaseAdmin
+        .from('orders')
+        .insert({
+          user_id: userId,
+          service_id: serviceId,
+          batch_id: batchId || null,
+          link: link,
+          quantity: qty,
+          total_price: totalCharge,
+          status: 'Processing',
+          start_count: 0,
+          remains: qty,
+          provider_order_id: providerOrderId
+        })
+        .select()
+        .single();
 
-    if (oErr) {
-      console.error('Error inserting order into database:', oErr.message);
-      throw new Error(`Failed to save order in database: ${oErr.message}`);
+      if (oErr) {
+        throw oErr;
+      }
+      newOrder = orderData;
+    } catch (insertErr) {
+      // ROLLBACK: Refund the wallet deduction since order insert failed
+      console.error('Error inserting order, rolling back wallet deduction:', insertErr.message || insertErr);
+      try {
+        await supabaseAdmin
+          .from('wallets')
+          .update({
+            balance: currentBalance,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+      } catch (rollbackErr) {
+        console.error('CRITICAL: Wallet rollback also failed:', rollbackErr.message);
+      }
+      throw new Error(`Failed to save order in database: ${insertErr.message || insertErr}`);
     }
 
     // Record transaction entry
@@ -321,7 +339,14 @@ class OrderService {
   }
 
   static async createBulkOrders({ userId, bulkText, defaultServiceId }) {
+    const MAX_BULK_LINES = 100;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length > MAX_BULK_LINES) {
+      throw new Error(`Bulk orders limited to ${MAX_BULK_LINES} lines per request. You submitted ${lines.length}.`);
+    }
+    if (lines.length === 0) {
+      throw new Error('No valid order lines found in bulk text.');
+    }
     const results = [];
     const validOrdersToPlace = [];
     let totalChargeOfValid = 0;
@@ -360,8 +385,9 @@ class OrderService {
         continue;
       }
 
-      if (!link) {
-        results.push({ line, success: false, error: 'Link is required' });
+      // Validate link format
+      if (!link || link.length < 5 || (!link.startsWith('http://') && !link.startsWith('https://'))) {
+        results.push({ line, success: false, error: 'Link must be a valid URL starting with http:// or https://' });
         continue;
       }
 
@@ -714,7 +740,7 @@ class OrderService {
       .select('amount')
       .eq('user_id', userId)
       .eq('type', 'refund')
-      .ilike('reference', `%${order.id}%`);
+      .or(`reference.like.%refund_${order.id}%,reference.like.%partial_refund_${order.id}%`);
 
     const alreadyRefundedFromTxs = (existingRefundTxs || []).reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
     const existingRefundedOnOrder = parseFloat(order.refunded_amount || 0);
@@ -736,6 +762,23 @@ class OrderService {
 
     // If no additional refund is owed, return existing status
     if (refundableAmount < 0.0001) {
+      return { refunded: false, refundAmount: 0 };
+    }
+
+    // Atomic claim: mark the refund amount on the order first to prevent concurrent refunds
+    const { data: claimedOrder, error: claimErr } = await supabaseAdmin
+      .from('orders')
+      .update({
+        refunded_amount: alreadyRefunded + refundableAmount,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', order.id)
+      .lte('refunded_amount', alreadyRefunded)
+      .select('refunded_amount')
+      .maybeSingle();
+
+    if (claimErr || !claimedOrder) {
+      // Another process already claimed this refund
       return { refunded: false, refundAmount: 0 };
     }
 
@@ -772,16 +815,6 @@ class OrderService {
     });
 
     const newTotalRefunded = alreadyRefunded + refundableAmount;
-
-    try {
-      await supabaseAdmin
-        .from('orders')
-        .update({
-          refunded_amount: newTotalRefunded,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', order.id);
-    } catch (_) {}
 
     console.log(`[OrderRefund] Successfully refunded GH₵${refundableAmount.toFixed(2)} to user ${userId} for Order #${order.id} (${newStatus})`);
 

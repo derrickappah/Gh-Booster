@@ -13,11 +13,7 @@ const env = {
 };
 
 if (!env.JWT_SECRET) {
-  if (env.NODE_ENV === 'production') {
-    throw new Error('FATAL: JWT_SECRET environment variable must be set in production!');
-  } else {
-    env.JWT_SECRET = 'ZkwZlkqvEAVzu7G/20ReBP5Pw0AiERdSAR0rkfIETHEH1y6EeW+99Jvi1iiJMJDKaV5/hN3lDNHUwn5fEsz+Ng==';
-  }
+  throw new Error('FATAL: JWT_SECRET environment variable must be set!');
 }
 
 module.exports = env;

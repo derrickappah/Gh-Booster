@@ -26,17 +26,36 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Security Hardening & Compression
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdnjs.cloudflare.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      connectSrc: ["'self'", "https://jdvzcmexrkkiutbwbxos.supabase.co", "https://api.moolre.com", "https://sandbox.moolre.com"],
+      frameSrc: ["'self'", "https://checkout.moolre.com", "https://sandbox.moolre.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: []
+    }
+  }
+}));
 
-const allowedDomains = ['ghbooster.com', 'localhost', '127.0.0.1'];
+const allowedOrigins = [
+  'https://ghbooster.com',
+  'https://www.ghbooster.com',
+  'http://localhost:5000',
+  'http://localhost:3000',
+  'http://127.0.0.1:5000'
+];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    const lowerOrigin = origin.toLowerCase();
-    const isAllowed = allowedDomains.some(domain => lowerOrigin.includes(domain) || lowerOrigin.endsWith('.vercel.app'));
-    if (isAllowed) {
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
@@ -45,9 +64,9 @@ app.use(cors({
 }));
 app.use(compression());
 app.use(cookieParser());
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(express.json({ limit: '50kb' }));
+app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // Apply Rate Limiting to /api
 app.use('/api', globalLimiter);
@@ -170,10 +189,21 @@ app.get(['/dashboard/orders/:id', '/order-detail'], (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'order-detail.html'));
 });
 
+// Block access to sensitive files/directories
+app.use((req, res, next) => {
+  const blockedPaths = ['/server/', '/node_modules/', '/.env', '/.git', '/package.json', '/package-lock.json', '/gulpfile.js', '/build.js', '/tailwind.config.js', '/scripts/'];
+  const lowerPath = req.path.toLowerCase();
+  if (blockedPaths.some(b => lowerPath.startsWith(b) || lowerPath === b)) {
+    return res.status(403).json({ success: false, error: 'Access denied' });
+  }
+  next();
+});
+
 // 4. Serve static assets (js, css, images, etc.)
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
   etag: true,
+  dotfiles: 'deny',
   setHeaders: (res, filepath) => {
     if (filepath.endsWith('.html') || filepath.endsWith('.js') || filepath.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/)) {
       res.setHeader('Cache-Control', 'no-cache, must-revalidate');

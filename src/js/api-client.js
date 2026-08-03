@@ -437,7 +437,7 @@ function initLoginPage() {
       const urlParams = new URLSearchParams(window.location.search);
       const redirectUrl = urlParams.get('redirect');
 
-      if (redirectUrl && (redirectUrl.startsWith('/') || redirectUrl.startsWith('dashboard') || redirectUrl.startsWith('order-detail'))) {
+      if (redirectUrl && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
         window.location.href = redirectUrl;
       } else if (isAdminUser(res.user)) {
         window.location.href = '/admin-dashboard';
@@ -707,7 +707,7 @@ async function initDashboardPage() {
     }
 
     if (list.length === 0) {
-      serviceDropdownMenu.innerHTML = `<div class="p-4 text-center text-xs text-gray-400 font-medium">No matching services found for "${query}"</div>`;
+      serviceDropdownMenu.innerHTML = `<div class="p-4 text-center text-xs text-gray-400 font-medium">No matching services found for "${escapeHtml(query)}"</div>`;
       return;
     }
 
@@ -2317,7 +2317,7 @@ async function initBulkOrderPage() {
     }
 
     if (list.length === 0) {
-      bulkServiceDropdownMenu.innerHTML = `<div class="p-4 text-center text-xs text-gray-400 font-medium">No matching services found for "${query}"</div>`;
+      bulkServiceDropdownMenu.innerHTML = `<div class="p-4 text-center text-xs text-gray-400 font-medium">No matching services found for "${escapeHtml(query)}"</div>`;
       return;
     }
 

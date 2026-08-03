@@ -60,7 +60,7 @@ class AuthService {
     }
 
     const apiKey = generateApiKey();
-    const referralCode = 'ref_' + Math.random().toString(36).substring(2, 8);
+    const referralCode = 'ref_' + require('crypto').randomBytes(6).toString('hex');
 
     // 2. Create or Upsert Profile in Supabase PostgreSQL
     const { error: profileErr } = await supabaseAdmin.from('profiles').upsert({
@@ -116,6 +116,8 @@ class AuthService {
   }
 
   static async login({ username, password }) {
+    // Rate-limited at route level (authLimiter), additional account-level protection:
+    // Log failed login attempt for audit trail
     const inputStr = (username || '').trim();
     let emailToUse = inputStr.toLowerCase();
 
@@ -148,6 +150,13 @@ class AuthService {
     });
 
     if (authErr || !authData?.session || !authData?.user) {
+      try {
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: null,
+          action: 'FAILED_LOGIN',
+          details: `Failed login attempt for ${emailToUse}`
+        });
+      } catch (_) {}
       throw new Error(authErr ? authErr.message : 'Invalid credentials. Please check your username/email and password.');
     }
 
@@ -157,11 +166,7 @@ class AuthService {
     const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', userId).maybeSingle();
     const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', userId).maybeSingle();
 
-    const userRole = (profile?.role && profile.role !== 'user' ? profile.role : null)
-      || (profile?.is_admin === true ? 'admin' : null)
-      || authData.user?.user_metadata?.role
-      || authData.user?.app_metadata?.role
-      || (emailToUse.toLowerCase().includes('admin') || (profile?.username && profile.username.toLowerCase() === 'admin') ? 'admin' : 'user');
+    const userRole = profile?.role || 'user';
 
     const user = {
       id: userId,
@@ -171,11 +176,20 @@ class AuthService {
       balance: wallet ? parseFloat(wallet.balance) : 0.0,
       currency: wallet?.currency || 'GHS',
       role: userRole,
-      is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
+      is_admin: userRole === 'admin' || userRole === 'super_admin',
       api_key: profile?.api_key || null
     };
 
     const token = generateToken(user);
+
+    // Log successful login
+    try {
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: userId,
+        action: userRole === 'admin' || userRole === 'super_admin' ? 'ADMIN_LOGIN' : 'USER_LOGIN',
+        details: `User ${emailToUse} logged in successfully`
+      });
+    } catch (_) {}
 
     return {
       token,
