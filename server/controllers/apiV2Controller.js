@@ -69,7 +69,7 @@ class ApiV2Controller {
         }
 
         case 'balance': {
-          const { data: wallet } = await supabase.from('wallets').select('balance, currency').eq('user_id', userId).maybeSingle();
+          const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', userId).maybeSingle();
           return res.json({
             balance: wallet ? parseFloat(wallet.balance).toFixed(4) : '0.0000',
             currency: wallet?.currency || 'GHS'

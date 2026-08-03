@@ -11,24 +11,22 @@ async function authenticateToken(req, res, next) {
   }
 
   try {
-    // 1. Try Custom JWT verification (100-year persistent token signed with JWT_SECRET)
+    // 1. Try Custom JWT verification signed with JWT_SECRET
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET);
       if (decoded && decoded.id) {
         const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', decoded.id).maybeSingle();
         const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', decoded.id).maybeSingle();
 
-        const userRole = (decoded.role && decoded.role !== 'user' ? decoded.role : null)
-          || (profile?.role && profile.role !== 'user' ? profile.role : null)
-          || (profile?.is_admin === true ? 'admin' : null)
-          || ((decoded.email && decoded.email.toLowerCase().includes('admin')) || (profile?.username && profile.username.toLowerCase() === 'admin') ? 'admin' : 'user');
+        const dbRole = profile?.role || 'user';
+        const userRole = (dbRole !== 'user') ? dbRole : 'user';
 
         req.user = {
           id: decoded.id,
-          email: decoded.email || profile?.email || '',
-          username: decoded.username || profile?.username || 'User',
+          email: profile?.email || decoded.email || '',
+          username: profile?.username || decoded.username || 'User',
           role: userRole,
-          is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
+          is_admin: userRole === 'admin' || userRole === 'super_admin',
           balance: wallet ? parseFloat(wallet.balance) : 0.0,
           currency: wallet?.currency || 'GHS',
           api_key: profile?.api_key || null
@@ -47,48 +45,20 @@ async function authenticateToken(req, res, next) {
       const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', supabaseUser.id).maybeSingle();
       const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', supabaseUser.id).maybeSingle();
 
-      const userRole = (profile?.role && profile.role !== 'user' ? profile.role : null)
-        || (profile?.is_admin === true ? 'admin' : null)
-        || supabaseUser?.user_metadata?.role
-        || supabaseUser?.app_metadata?.role
-        || (supabaseUser.email && (supabaseUser.email.toLowerCase().includes('admin') || (profile?.username && profile.username.toLowerCase() === 'admin')) ? 'admin' : 'user');
+      const dbRole = profile?.role || 'user';
+      const userRole = (dbRole !== 'user') ? dbRole : 'user';
 
       req.user = {
         id: supabaseUser.id,
         email: supabaseUser.email,
         username: profile?.username || profile?.full_name || supabaseUser.email.split('@')[0],
         role: userRole,
-        is_admin: userRole === 'admin' || userRole === 'super_admin' || profile?.is_admin === true,
+        is_admin: userRole === 'admin' || userRole === 'super_admin',
         balance: wallet ? parseFloat(wallet.balance) : 0.0,
         currency: wallet?.currency || 'GHS',
         api_key: profile?.api_key || null
       };
       return next();
-    }
-
-    // 3. Graceful Token Recovery: Decode token payload to check if user profile exists in database
-    const decodedAny = jwt.decode(token);
-    const userIdCandidate = decodedAny?.id || decodedAny?.sub;
-    if (userIdCandidate) {
-      const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', userIdCandidate).maybeSingle();
-      if (profile) {
-        const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', profile.id).maybeSingle();
-        const userRole = (profile.role && profile.role !== 'user' ? profile.role : null)
-          || (profile.is_admin === true ? 'admin' : null)
-          || ((profile.email && profile.email.toLowerCase().includes('admin')) || (profile.username && profile.username.toLowerCase() === 'admin') ? 'admin' : 'user');
-
-        req.user = {
-          id: profile.id,
-          email: profile.email || '',
-          username: profile.username || profile.full_name || 'User',
-          role: userRole,
-          is_admin: userRole === 'admin' || userRole === 'super_admin' || profile.is_admin === true,
-          balance: wallet ? parseFloat(wallet.balance) : 0.0,
-          currency: wallet?.currency || 'GHS',
-          api_key: profile.api_key || null
-        };
-        return next();
-      }
     }
 
     return res.status(401).json({ success: false, error: 'Invalid or expired session. Please login again.' });
@@ -112,3 +82,4 @@ function requireRole(allowedRoles = []) {
 }
 
 module.exports = { authenticateToken, requireRole };
+

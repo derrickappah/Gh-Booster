@@ -46,11 +46,14 @@ router.post('/order', authenticateToken, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Insufficient balance. Your balance may have changed. Please try again.' });
     }
 
+    const { hashPassword } = require('../auth');
+    const hashedPassword = hashPassword(admin_password);
+
     const { data: panel, error } = await supabaseAdmin.from('child_panels').insert([{
       user_id: req.user.id,
       domain,
       admin_username,
-      admin_password,
+      admin_password: hashedPassword,
       price,
       status: 'Pending'
     }]).select();

@@ -1,5 +1,5 @@
 const SMMGEN_URL = process.env.SMMGEN_URL || 'https://my.smmgen.com/api/v2';
-const SMMGEN_KEY = process.env.SMMGEN_KEY || '8cd0cb8c20e3d65e85280a858ad36964';
+const SMMGEN_KEY = process.env.SMMGEN_KEY || '';
 
 class SmmgenService {
   static async getBalance() {

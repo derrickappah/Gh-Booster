@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const PaymentController = require('../controllers/paymentController');
 const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+const { paymentLimiter } = require('../middleware/rateLimiter');
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
 // Moolre webhook — must be public (called by Moolre servers)
@@ -11,13 +12,13 @@ router.post('/moolre/webhook', PaymentController.handleWebhook);
 router.use(authenticateToken);
 
 // Initiate a Moolre mobile money or card payment
-router.post('/moolre/initiate', PaymentController.initiatePayment);
+router.post('/moolre/initiate', paymentLimiter, PaymentController.initiatePayment);
 
 // Verify / check status of a payment by reference
-router.get('/moolre/verify/:reference', PaymentController.verifyPayment);
+router.get('/moolre/verify/:reference', paymentLimiter, PaymentController.verifyPayment);
 
 // Complete payment on return from Moolre hosted page (credits wallet)
-router.post('/moolre/complete', PaymentController.completePayment);
+router.post('/moolre/complete', paymentLimiter, PaymentController.completePayment);
 
 // ─── Admin-Only Routes ────────────────────────────────────────────────────────
 // Get all gateway configs (for admin-payments.html)

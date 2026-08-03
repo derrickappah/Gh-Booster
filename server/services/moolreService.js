@@ -386,32 +386,18 @@ class MoolreService {
       return { success: true, already_completed: true, balance: wallet?.balance ?? 0, amount: txn.amount };
     }
 
-    // Check if audit log already records that this transaction was credited
-    const { data: auditLog } = await supabaseAdmin
-      .from('audit_logs')
-      .select('id')
-      .eq('user_id', userId)
-      .ilike('details', `%${reference}%`)
-      .maybeSingle();
-
-    if (auditLog) {
-      // Wallet was credited previously, but status was stuck in pending. Mark completed now!
-      await supabaseAdmin
-        .from('transactions')
-        .update({ status: 'completed', updated_at: new Date().toISOString() })
-        .eq('id', txn.id);
-
-      const { data: wallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
-      return { success: true, already_completed: true, balance: wallet?.balance ?? 0, amount: txn.amount };
+    // Verify status with gateway first before crediting
+    const verification = await MoolreService.verifyPayment({ reference, userId });
+    if (verification.status !== 'completed') {
+      throw new Error('Payment status has not been confirmed as completed by gateway yet.');
     }
 
-    // Credit the wallet
-    const result = await MoolreService._creditUserWallet(txn.user_id, txn.amount, reference);
+    const { data: wallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
     return {
       success: true,
       credited: true,
       amount: txn.amount,
-      balance: result.newBalance
+      balance: wallet?.balance ?? 0
     };
   }
 
@@ -446,12 +432,11 @@ class MoolreService {
 
     if (isSuccess) {
       await MoolreService._creditUserWallet(txn.user_id, txn.amount, reference);
-      await supabaseAdmin.from('transactions').update({ status: 'completed', updated_at: new Date().toISOString() }).eq('id', txn.id);
       return { received: true, credited: true, amount: txn.amount, user_id: txn.user_id };
     }
 
     if (isFailed) {
-      await supabaseAdmin.from('transactions').update({ status: 'failed' }).eq('reference', reference);
+      await supabaseAdmin.from('transactions').update({ status: 'failed' }).eq('id', txn.id);
       return { received: true, failed: true };
     }
 
@@ -463,6 +448,46 @@ class MoolreService {
    */
   static async _creditUserWallet(userId, amount, reference) {
     const depositAmount = parseFloat(amount);
+
+    // Atomically check transaction status and mark completed first to prevent race condition
+    if (reference) {
+      let { data: targetTxn } = await supabaseAdmin
+        .from('transactions')
+        .select('id, status, metadata')
+        .eq('reference', reference)
+        .maybeSingle();
+
+      if (!targetTxn) {
+        const fb = await supabaseAdmin.from('transactions').select('id, status, metadata').eq('payment_ref', reference).maybeSingle();
+        targetTxn = fb.data;
+      }
+
+      if (targetTxn) {
+        if (targetTxn.status === 'completed') {
+          const { data: currentWallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+          return { newBalance: currentWallet ? parseFloat(currentWallet.balance) : 0, depositAmount };
+        }
+
+        // Conditional atomic status update to claim this transaction credit
+        const { data: claimedTxn, error: claimErr } = await supabaseAdmin
+          .from('transactions')
+          .update({
+            status: 'completed',
+            updated_at: new Date().toISOString(),
+            metadata: { ...(targetTxn.metadata || {}), credited_at: new Date().toISOString() }
+          })
+          .eq('id', targetTxn.id)
+          .eq('status', targetTxn.status)
+          .select('id')
+          .maybeSingle();
+
+        if (claimErr || !claimedTxn) {
+          // Another concurrent request claimed it first
+          const { data: currentWallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+          return { newBalance: currentWallet ? parseFloat(currentWallet.balance) : 0, depositAmount };
+        }
+      }
+    }
 
     // Get current wallet balance
     const { data: wallet } = await supabaseAdmin
@@ -498,6 +523,12 @@ class MoolreService {
           currency: 'GHS',
           updated_at: new Date().toISOString()
         });
+
+      if (iErr) {
+        console.error('Wallet insert error in _creditUserWallet:', iErr.message);
+        throw new Error('Failed to create wallet balance: ' + iErr.message);
+      }
+    }
 
       if (iErr) {
         console.error('Wallet insert error in _creditUserWallet:', iErr.message);

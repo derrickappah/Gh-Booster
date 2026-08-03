@@ -22,4 +22,16 @@ const authLimiter = rateLimit({
   }
 });
 
-module.exports = { globalLimiter, authLimiter };
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // Limit payment operations to 15 per 15 minutes per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many payment requests. Please wait a few minutes before trying again.'
+  }
+});
+
+module.exports = { globalLimiter, authLimiter, paymentLimiter };
+

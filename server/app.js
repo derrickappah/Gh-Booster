@@ -28,18 +28,18 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const app = express();
 
 // Security Hardening & Compression
+app.use(helmet({ contentSecurityPolicy: false }));
+
+const allowedDomains = ['ghbooster.com', 'localhost', '127.0.0.1'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (
-      origin.includes('ghbooster') ||
-      origin.endsWith('.vercel.app') ||
-      origin.includes('localhost') ||
-      origin.includes('127.0.0.1')
-    ) {
+    const lowerOrigin = origin.toLowerCase();
+    const isAllowed = allowedDomains.some(domain => lowerOrigin.includes(domain) || lowerOrigin.endsWith('.vercel.app'));
+    if (isAllowed) {
       return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));

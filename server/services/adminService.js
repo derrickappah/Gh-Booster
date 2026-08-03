@@ -2,13 +2,13 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class AdminService {
   static async getStats() {
-    const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('*', { count: 'exact' });
-    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('*', { count: 'exact' });
-    const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('*', { count: 'exact' });
-    const { data: providers, count: providerCount } = await supabaseAdmin.from('providers').select('*', { count: 'exact' });
+    const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('created_at', { count: 'exact' });
+    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('charge, total_price, price, amount, cost, status, created_at', { count: 'exact' });
+    const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('status, mode', { count: 'exact' });
+    const { data: providers, count: providerCount } = await supabaseAdmin.from('providers').select('id', { count: 'exact' });
     const { data: wallets } = await supabaseAdmin.from('wallets').select('balance');
-    const { data: tickets } = await supabaseAdmin.from('tickets').select('*');
-    const { data: transactions } = await supabaseAdmin.from('transactions').select('*');
+    const { data: tickets } = await supabaseAdmin.from('tickets').select('status');
+    const { data: transactions } = await supabaseAdmin.from('transactions').select('amount, charge, value, status, type, created_at');
     const { data: logs } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
 
     let referrals = [];
