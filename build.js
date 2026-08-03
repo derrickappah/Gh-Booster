@@ -16,14 +16,22 @@ try {
   console.warn('Minification step warning:', e.message);
 }
 
+// Generate static RSS feed for Pinterest
+try {
+  console.log('Generating RSS Feed XML...');
+  require('./scripts/generate-rss');
+} catch (e) {
+  console.warn('RSS Feed generation warning:', e.message);
+}
+
 [dist, publicDir].forEach(targetDir => {
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
   }
 
-  // Copy all .html files, robots.txt, sitemap.xml, llms.txt, manifest.json, and service-worker.js
+  // Copy all .html files, robots.txt, sitemap.xml, rss.xml, llms.txt, manifest.json, and service-worker.js
   fs.readdirSync(root).forEach(file => {
-    if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'llms.txt' || file === 'manifest.json' || file === 'service-worker.js') {
+    if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'rss.xml' || file === 'llms.txt' || file === 'manifest.json' || file === 'service-worker.js') {
       fs.copyFileSync(path.join(root, file), path.join(targetDir, file));
     }
   });

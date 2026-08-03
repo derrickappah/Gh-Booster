@@ -24,6 +24,7 @@ const childPanelRoutes = require('./routes/childPanelRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const rssRoutes = require('./routes/rssRoutes');
 
 const app = express();
 // Trust proxy configuration for Vercel/reverse proxies. Override with TRUST_PROXY env var if needed.
@@ -268,6 +269,9 @@ app.get(['/llms.txt', '/.well-known/llms.txt'], (req, res) => {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.sendFile(path.join(__dirname, '..', 'llms.txt'));
 });
+
+// RSS Feed Endpoints (Pinterest compatible)
+app.use(['/rss.xml', '/rss', '/feed.xml', '/feed', '/api/rss'], rssRoutes);
 
 // Handling 404 & Errors
 app.use(notFoundHandler);
