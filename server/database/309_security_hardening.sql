@@ -1,6 +1,6 @@
 -- ========================================================
--- GhBooster Security Hardening Migration
--- MED-09: Enable RLS policies on all tables
+-- GhBooster Security Hardening Migration (Safe Execution)
+-- MED-09: Enable RLS policies on existing tables safely
 -- CRIT-04: Add atomic wallet credit/debit functions
 -- ========================================================
 
@@ -58,144 +58,85 @@ BEGIN
 END;
 $$;
 
--- =============================================
--- 2. ENABLE ROW LEVEL SECURITY (MED-09 fix)
--- =============================================
+-- Helper block to safely enable RLS and create policies if tables exist
+DO $$ 
+DECLARE
+  t TEXT;
+BEGIN
+  -- List of user tables to enable RLS on if they exist
+  FOR t IN SELECT unnest(ARRAY[
+    'profiles', 'wallets', 'transactions', 'orders', 'batches', 
+    'tickets', 'ticket_messages', 'notifications', 'child_panels', 
+    'referral_payouts', 'audit_logs', 'categories', 'services', 
+    'providers', 'settings', 'announcements', 'promotions', 
+    'deposit_bonuses', 'payment_methods'
+  ]) LOOP
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = t) THEN
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY;', t);
+    END IF;
+  END LOOP;
+END $$;
 
--- Enable RLS on all tables
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.wallets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.batches ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.tickets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ticket_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.child_panels ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.referral_payouts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+-- Helper macro function to safely recreate policy
+CREATE OR REPLACE FUNCTION public.create_policy_if_table_exists(
+  p_policy_name TEXT,
+  p_table_name TEXT,
+  p_cmd TEXT,
+  p_using TEXT,
+  p_with_check TEXT DEFAULT NULL
+) RETURNS VOID AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = p_table_name) THEN
+    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I;', p_policy_name, p_table_name);
+    IF p_with_check IS NOT NULL THEN
+      EXECUTE format('CREATE POLICY %I ON public.%I FOR %s USING (%s) WITH CHECK (%s);', p_policy_name, p_table_name, p_cmd, p_using, p_with_check);
+    ELSE
+      EXECUTE format('CREATE POLICY %I ON public.%I FOR %s USING (%s);', p_policy_name, p_table_name, p_cmd, p_using);
+    END IF;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
 
--- Note: categories, services, providers, settings, announcements,
--- promotions, deposit_bonuses, payment_methods are public-readable
--- so we enable RLS with permissive read policies
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.providers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.promotions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.deposit_bonuses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payment_methods ENABLE ROW LEVEL SECURITY;
+-- Apply user policies safely
+SELECT public.create_policy_if_table_exists('profiles_select_own', 'profiles', 'SELECT', 'auth.uid() = id');
+SELECT public.create_policy_if_table_exists('profiles_update_own', 'profiles', 'UPDATE', 'auth.uid() = id');
+SELECT public.create_policy_if_table_exists('wallets_select_own', 'wallets', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('transactions_select_own', 'transactions', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('orders_select_own', 'orders', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('batches_select_own', 'batches', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('tickets_select_own', 'tickets', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('tickets_insert_own', 'tickets', 'INSERT', 'true', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('ticket_messages_select_own', 'ticket_messages', 'SELECT', 'EXISTS (SELECT 1 FROM public.tickets t WHERE t.id = ticket_id AND t.user_id = auth.uid())');
+SELECT public.create_policy_if_table_exists('ticket_messages_insert_own', 'ticket_messages', 'INSERT', 'true', 'auth.uid() = sender_id');
+SELECT public.create_policy_if_table_exists('notifications_select_own', 'notifications', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('child_panels_select_own', 'child_panels', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('referral_payouts_select_own', 'referral_payouts', 'SELECT', 'auth.uid() = user_id');
+SELECT public.create_policy_if_table_exists('audit_logs_select_own', 'audit_logs', 'SELECT', 'auth.uid() = user_id');
 
--- =============================================
--- 3. RLS POLICIES — User-owned tables
--- =============================================
+-- Apply public policies safely
+SELECT public.create_policy_if_table_exists('categories_select_all', 'categories', 'SELECT', 'true');
+SELECT public.create_policy_if_table_exists('services_select_active', 'services', 'SELECT', 'status = ''active''');
+SELECT public.create_policy_if_table_exists('announcements_select_all', 'announcements', 'SELECT', 'true');
+SELECT public.create_policy_if_table_exists('promotions_select_active', 'promotions', 'SELECT', 'status = ''active''');
+SELECT public.create_policy_if_table_exists('deposit_bonuses_select_active', 'deposit_bonuses', 'SELECT', 'status = ''active''');
+SELECT public.create_policy_if_table_exists('payment_methods_select_active', 'payment_methods', 'SELECT', 'status = ''active''');
+SELECT public.create_policy_if_table_exists('settings_select_all', 'settings', 'SELECT', 'true');
 
--- PROFILES: Users can read their own profile
-CREATE POLICY profiles_select_own ON public.profiles
-  FOR SELECT USING (auth.uid() = id);
-
-CREATE POLICY profiles_update_own ON public.profiles
-  FOR UPDATE USING (auth.uid() = id);
-
--- WALLETS: Users can read their own wallet
-CREATE POLICY wallets_select_own ON public.wallets
-  FOR SELECT USING (auth.uid() = user_id);
-
--- TRANSACTIONS: Users can read their own transactions
-CREATE POLICY transactions_select_own ON public.transactions
-  FOR SELECT USING (auth.uid() = user_id);
-
--- ORDERS: Users can read their own orders
-CREATE POLICY orders_select_own ON public.orders
-  FOR SELECT USING (auth.uid() = user_id);
-
--- BATCHES: Users can read their own batches
-CREATE POLICY batches_select_own ON public.batches
-  FOR SELECT USING (auth.uid() = user_id);
-
--- TICKETS: Users can read and create their own tickets
-CREATE POLICY tickets_select_own ON public.tickets
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY tickets_insert_own ON public.tickets
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- TICKET MESSAGES: Users can read messages for their own tickets
-CREATE POLICY ticket_messages_select_own ON public.ticket_messages
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.tickets t
-      WHERE t.id = ticket_id AND t.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY ticket_messages_insert_own ON public.ticket_messages
-  FOR INSERT WITH CHECK (auth.uid() = sender_id);
-
--- NOTIFICATIONS: Users can read their own notifications
-CREATE POLICY notifications_select_own ON public.notifications
-  FOR SELECT USING (auth.uid() = user_id);
-
--- CHILD PANELS: Users can read their own child panels
-CREATE POLICY child_panels_select_own ON public.child_panels
-  FOR SELECT USING (auth.uid() = user_id);
-
--- REFERRAL PAYOUTS: Users can read their own referral payouts
-CREATE POLICY referral_payouts_select_own ON public.referral_payouts
-  FOR SELECT USING (auth.uid() = user_id);
-
--- AUDIT LOGS: Users can read their own audit logs
-CREATE POLICY audit_logs_select_own ON public.audit_logs
-  FOR SELECT USING (auth.uid() = user_id);
-
--- =============================================
--- 4. RLS POLICIES — Public-readable tables
--- =============================================
-
--- CATEGORIES: Anyone can read categories
-CREATE POLICY categories_select_all ON public.categories
-  FOR SELECT USING (true);
-
--- SERVICES: Anyone can read active services
-CREATE POLICY services_select_active ON public.services
-  FOR SELECT USING (status = 'active');
-
--- ANNOUNCEMENTS: Anyone can read announcements
-CREATE POLICY announcements_select_all ON public.announcements
-  FOR SELECT USING (true);
-
--- PROMOTIONS: Anyone can read active promotions
-CREATE POLICY promotions_select_active ON public.promotions
-  FOR SELECT USING (status = 'active');
-
--- DEPOSIT BONUSES: Anyone can read active bonuses
-CREATE POLICY deposit_bonuses_select_active ON public.deposit_bonuses
-  FOR SELECT USING (status = 'active');
-
--- PAYMENT METHODS: Anyone can read active payment methods
-CREATE POLICY payment_methods_select_active ON public.payment_methods
-  FOR SELECT USING (status = 'active');
-
--- SETTINGS: Public read access (filtered by app logic)
-CREATE POLICY settings_select_all ON public.settings
-  FOR SELECT USING (true);
-
--- PROVIDERS: No public access (admin only via service role)
--- No anon policy needed as providers are only accessed via supabaseAdmin
+-- Clean up helper function
+DROP FUNCTION IF EXISTS public.create_policy_if_table_exists(TEXT, TEXT, TEXT, TEXT, TEXT);
 
 -- =============================================
 -- 5. Additional indexes for security queries
 -- =============================================
 
--- Index for faster refund idempotency checks
-CREATE INDEX IF NOT EXISTS idx_transactions_type_reference
-  ON public.transactions(type, reference);
-
--- Index for faster wallet lookups
-CREATE INDEX IF NOT EXISTS idx_wallets_user_id_balance
-  ON public.wallets(user_id, balance);
-
--- Index for transaction status checks
-CREATE INDEX IF NOT EXISTS idx_transactions_user_status
-  ON public.transactions(user_id, status);
+DO $$ 
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'transactions') THEN
+    CREATE INDEX IF NOT EXISTS idx_transactions_type_reference ON public.transactions(type, reference);
+    CREATE INDEX IF NOT EXISTS idx_transactions_user_status ON public.transactions(user_id, status);
+  END IF;
+  
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'wallets') THEN
+    CREATE INDEX IF NOT EXISTS idx_wallets_user_id_balance ON public.wallets(user_id, balance);
+  END IF;
+END $$;
