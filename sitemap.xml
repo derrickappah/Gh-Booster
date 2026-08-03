@@ -1,9 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://ghbooster.com/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://ghbooster.com/gallery.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-1.png</image:loc>
+      <image:title>GhBooster Grow Faster Social Growth Analytics Banner (Dark Theme)</image:title>
+      <image:caption>Official dark promo poster detailing 128.3k followers growth, 7.8M likes, and 24.6M views metrics.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-light-1.png</image:loc>
+      <image:title>GhBooster Grow Faster Today Promo Graphic (Light Theme)</image:title>
+      <image:caption>Vibrant light-mode banner featuring creator celebrating fast engagement results across platforms.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-2.png</image:loc>
+      <image:title>GhBooster Social Media Analytics &amp; Engagement Poster (Dark Edition)</image:title>
+      <image:caption>Dark aesthetic promo graphic detailing ultra-fast real engagement metrics and global reach options.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-light-2.png</image:loc>
+      <image:title>GhBooster Instant Social Boost Showcase (Light Edition)</image:title>
+      <image:caption>Bright modern SMM panel graphic displaying automated follower counters and 24/7 delivery highlights.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-3.png</image:loc>
+      <image:title>GhBooster SMM Growth Stats Visualizer (Dark)</image:title>
+      <image:caption>Dark theme graphic showing mobile growth visualizer and active metric counters for creator accounts.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-light-3.png</image:loc>
+      <image:title>GhBooster Creator Dashboard Growth Graphic (Light)</image:title>
+      <image:caption>Light poster showcasing creator channel growth metrics, safe boosting, and global audience expansion.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-4.png</image:loc>
+      <image:title>GhBooster Global Audience Reach Graphic (Dark)</image:title>
+      <image:caption>Dark mode artwork depicting rapid follower velocity, verified service delivery, and cross-platform growth.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-light-4.png</image:loc>
+      <image:title>GhBooster Multi-Platform Growth Light Banner</image:title>
+      <image:caption>Clean white and green promotional banner illustrating instant order execution and 24/7 delivery speed.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-5.png</image:loc>
+      <image:title>GhBooster Ultra-Fast Social Engagement Banner (Dark Variant)</image:title>
+      <image:caption>Premium dark artwork detailing account safety features, instant delivery speed, and engagement stats.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-light-5.png</image:loc>
+      <image:title>GhBooster High Speed Social Marketing Graphic (Light Variant)</image:title>
+      <image:caption>High resolution light promotional graphic with bold call-to-action, growth trajectory charts, and icons.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-6.png</image:loc>
+      <image:title>GhBooster Full Spectrum Growth Infographic (Dark)</image:title>
+      <image:caption>Full spectrum dark graphic highlighting 128.3k growth milestones, 256k total followers, and 7.8M total likes metrics.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-light-6.png</image:loc>
+      <image:title>GhBooster Creator Success Poster (Light)</image:title>
+      <image:caption>Modern light theme poster demonstrating digital creator engagement success with GhBooster automated services.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ghbooster.com/src/img/gallery/ghbooster-social-media-growth-dark-7.png</image:loc>
+      <image:title>GhBooster Master Social Media Marketing Artwork (Dark)</image:title>
+      <image:caption>Master dark promotional image displaying full social media integration for Instagram, TikTok, YouTube, and Telegram.</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://ghbooster.com/services.html</loc>
