@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ghbooster-cache-v4';
+const CACHE_NAME = 'ghbooster-cache-v5';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -6,9 +6,9 @@ const ASSETS_TO_CACHE = [
   'register.html',
   'src/css/style.min.css',
   'src/js/theme.min.js',
-  '/src/img/favicon.png?v=3',
-  '/src/img/logo.png?v=2',
-  '/src/img/logo.webp?v=2'
+  '/src/img/favicon.png?v=4',
+  '/src/img/logo.png?v=4',
+  '/src/img/logo.webp?v=4'
 ];
 
 self.addEventListener('install', (event) => {
