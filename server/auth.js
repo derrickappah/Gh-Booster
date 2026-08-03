@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const env = require('./config/env');
 const { authenticateToken, requireRole } = require('./middleware/authMiddleware');
+
+// bcrypt used only for child panel password hashing
+const bcrypt = require('bcryptjs');
 
 function hashPassword(password) {
   return bcrypt.hashSync(password, 10);

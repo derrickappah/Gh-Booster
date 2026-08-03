@@ -33,5 +33,21 @@ const paymentLimiter = rateLimit({
   }
 });
 
-module.exports = { globalLimiter, authLimiter, paymentLimiter };
+const apiKeyLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30, // 30 requests per minute per API key
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Rate limit by API key if present, otherwise by IP
+    const apiKey = req.query.key || req.body?.key;
+    return apiKey || req.ip;
+  },
+  message: {
+    success: false,
+    error: 'API rate limit exceeded. Maximum 30 requests per minute.'
+  }
+});
+
+module.exports = { globalLimiter, authLimiter, paymentLimiter, apiKeyLimiter };
 

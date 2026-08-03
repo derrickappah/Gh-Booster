@@ -28,11 +28,9 @@ class AuthController {
   }
 
   static async me(req, res) {
-    const { generateToken } = require('../auth');
-    const freshToken = generateToken(req.user);
+    // Return current user data without issuing a fresh token (MED-03 fix)
     res.json({
       success: true,
-      token: freshToken,
       user: req.user
     });
   }
@@ -55,8 +53,11 @@ class AuthController {
   static async updatePassword(req, res, next) {
     try {
       const { newPassword } = req.body;
-      if (!newPassword || newPassword.length < 6) {
-        return res.status(400).json({ success: false, error: 'New password must be at least 6 characters.' });
+      if (!newPassword || newPassword.length < 8) {
+        return res.status(400).json({ success: false, error: 'New password must be at least 8 characters and contain uppercase, lowercase, and a number.' });
+      }
+      if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+        return res.status(400).json({ success: false, error: 'Password must contain at least one uppercase letter, one lowercase letter, and one number.' });
       }
       const result = await AuthService.updatePassword(req.user.id, newPassword);
       res.json({ success: true, ...result });

@@ -2,13 +2,13 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class AdminService {
   static async getStats() {
-    const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('created_at', { count: 'exact' });
-    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('charge, total_price, price, amount, cost, status, created_at', { count: 'exact' });
+    const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('created_at', { count: 'exact' }).limit(10000);
+    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('charge, total_price, price, amount, cost, status, created_at', { count: 'exact' }).limit(10000);
     const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('status, mode', { count: 'exact' });
     const { data: providers, count: providerCount } = await supabaseAdmin.from('providers').select('id', { count: 'exact' });
-    const { data: wallets } = await supabaseAdmin.from('wallets').select('balance');
+    const { data: wallets } = await supabaseAdmin.from('wallets').select('balance').limit(10000);
     const { data: tickets } = await supabaseAdmin.from('tickets').select('status');
-    const { data: transactions } = await supabaseAdmin.from('transactions').select('amount, charge, value, status, type, created_at');
+    const { data: transactions } = await supabaseAdmin.from('transactions').select('amount, charge, value, status, type, created_at').limit(10000);
     const { data: logs } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
 
     let referrals = [];
@@ -355,9 +355,16 @@ class AdminService {
       ...serviceData
     };
 
+    if (!cleanData.name || typeof cleanData.name !== 'string' || cleanData.name.trim().length === 0) {
+      throw new Error('Service name is required');
+    }
+    if (rateVal < 0) {
+      throw new Error('Service rate cannot be negative');
+    }
+
     let { data, error } = await supabaseAdmin.from('services').insert([cleanData]).select();
     
-    while (error && error.message && error.message.includes("Could not find the '")) {
+    let retryCount = 0; while (retryCount < 5 && error && error.message && error.message.includes("Could not find the '")) { retryCount++;
       const match = error.message.match(/Could not find the '([^']+)' column/);
       if (match && match[1]) {
         delete cleanData[match[1]];
@@ -384,7 +391,7 @@ class AdminService {
 
     let { data, error } = await supabaseAdmin.from('services').update(cleanData).eq('id', id).select();
 
-    while (error && error.message && error.message.includes("Could not find the '")) {
+    let retryCount = 0; while (retryCount < 5 && error && error.message && error.message.includes("Could not find the '")) { retryCount++;
       const match = error.message.match(/Could not find the '([^']+)' column/);
       if (match && match[1]) {
         delete cleanData[match[1]];
@@ -444,6 +451,20 @@ class AdminService {
     let syncDetails = '';
 
     if (provider.api_url && provider.api_key) {
+      // Validate URL to prevent SSRF attacks
+      try {
+        const parsedUrl = new URL(provider.api_url);
+        const blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '169.254.169.254', '[::1]'];
+        if (blockedHosts.includes(parsedUrl.hostname) || parsedUrl.hostname.startsWith('10.') || parsedUrl.hostname.startsWith('192.168.') || parsedUrl.hostname.startsWith('172.')) {
+          throw new Error('Internal/private URLs are not allowed for provider API endpoints');
+        }
+        if (parsedUrl.protocol !== 'https:') {
+          console.warn(`[AdminService] Provider ${provider.name} uses non-HTTPS URL`);
+        }
+      } catch (urlErr) {
+        if (urlErr.message.includes('not allowed')) throw urlErr;
+        throw new Error('Invalid provider API URL format');
+      }
       try {
         const httpFetch = globalThis.fetch || require('node-fetch');
         const res = await httpFetch(provider.api_url, {

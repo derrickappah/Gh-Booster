@@ -217,8 +217,17 @@ class AuthService {
     if (!userId) {
       throw new Error('User ID is required to update password.');
     }
-    if (!newPassword || newPassword.length < 6) {
-      throw new Error('New password must be at least 6 characters.');
+    if (!newPassword || newPassword.length < 8) {
+      throw new Error('New password must be at least 8 characters.');
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      throw new Error('New password must contain at least one uppercase letter.');
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      throw new Error('New password must contain at least one lowercase letter.');
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      throw new Error('New password must contain at least one number.');
     }
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword });
     if (error) throw new Error(error.message);

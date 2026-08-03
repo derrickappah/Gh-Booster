@@ -190,9 +190,13 @@ class MoolreService {
     if (amountGHS < minDeposit) {
       throw new Error(`Minimum deposit amount is GH₵${minDeposit.toFixed(2)}.`);
     }
+    const maxDeposit = 10000; // GH₵10,000 maximum single deposit
+    if (amountGHS > maxDeposit) {
+      throw new Error(`Maximum single deposit amount is GH₵${maxDeposit.toFixed(2)}.`);
+    }
 
     // Unique reference for this transaction
-    const reference = 'GHB-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+    const reference = 'GHB-' + require('crypto').randomUUID().replace(/-/g, '').substring(0, 16).toUpperCase();
 
     // Log transaction as pending BEFORE API call
     const { data: txn, error: txnErr } = await supabaseAdmin.from('transactions').insert({
@@ -415,19 +419,35 @@ class MoolreService {
   static async handleWebhook(payload, signatureHeader) {
     // Verify webhook authenticity
     const creds = await MoolreService.getCredentials();
-    if (creds.apiKey && signatureHeader) {
+    if (creds.environment !== 'sandbox') {
+      if (!signatureHeader) {
+        console.warn('[Moolre Webhook] Rejected: No signature header in production');
+        throw new Error('Webhook signature required in production');
+      }
+      if (!creds.apiKey) {
+        throw new Error('Webhook validation failed: API key not configured');
+      }
+      const crypto = require('crypto');
+      const expectedSig = crypto
+        .createHmac('sha256', creds.apiKey)
+        .update(JSON.stringify(payload))
+        .digest('hex');
+      const sigBuffer = Buffer.from(signatureHeader, 'utf8');
+      const expectedBuffer = Buffer.from(expectedSig, 'utf8');
+      if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+        console.warn('[Moolre Webhook] Invalid signature received');
+        throw new Error('Invalid webhook signature');
+      }
+    } else if (creds.apiKey && signatureHeader) {
+      // Sandbox: validate signature if provided, but don't require it
       const crypto = require('crypto');
       const expectedSig = crypto
         .createHmac('sha256', creds.apiKey)
         .update(JSON.stringify(payload))
         .digest('hex');
       if (signatureHeader !== expectedSig) {
-        console.warn('[Moolre Webhook] Invalid signature received');
-        throw new Error('Invalid webhook signature');
+        console.warn('[Moolre Webhook] Invalid signature in sandbox');
       }
-    } else if (creds.environment !== 'sandbox') {
-      // In production, require signature verification
-      console.warn('[Moolre Webhook] No signature header present in non-sandbox environment');
     }
 
     const reference = payload?.reference || payload?.data?.reference;
@@ -514,61 +534,35 @@ class MoolreService {
       }
     }
 
-    // Atomic wallet credit using conditional update
-    const { data: wallet } = await supabaseAdmin
-      .from('wallets')
-      .select('id, balance')
-      .eq('user_id', userId)
-      .maybeSingle();
-
+    // Atomic wallet credit via PostgreSQL function (prevents race conditions)
     let newBalance;
-    if (wallet && wallet.id) {
-      const currentBalance = parseFloat(wallet.balance) || 0;
-      newBalance = currentBalance + depositAmount;
-      // Use conditional update to prevent lost-update race condition
-      const { data: updatedWallet, error: wErr } = await supabaseAdmin
-        .from('wallets')
-        .update({
-          balance: newBalance,
-          currency: 'GHS',
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .eq('balance', wallet.balance)
-        .select('balance')
-        .maybeSingle();
-
-      if (wErr || !updatedWallet) {
-        // Balance changed between read and write — retry once
-        const { data: freshWallet } = await supabaseAdmin
-          .from('wallets').select('balance').eq('user_id', userId).maybeSingle();
-        const freshBalance = freshWallet ? parseFloat(freshWallet.balance) : 0;
-        newBalance = freshBalance + depositAmount;
-        const { error: retryErr } = await supabaseAdmin
+    try {
+      const { data: rpcBalance, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
+        p_user_id: userId,
+        p_amount: depositAmount
+      });
+      if (rpcErr) throw rpcErr;
+      newBalance = parseFloat(rpcBalance);
+    } catch (rpcError) {
+      console.error('[_creditUserWallet] credit_wallet RPC failed, using fallback:', rpcError.message);
+      // Fallback: read-then-write with CAS guard (no retry without guard)
+      const { data: wallet } = await supabaseAdmin
+        .from('wallets').select('id, balance').eq('user_id', userId).maybeSingle();
+      if (wallet && wallet.id) {
+        const currentBalance = parseFloat(wallet.balance) || 0;
+        newBalance = currentBalance + depositAmount;
+        const { error: wErr } = await supabaseAdmin
           .from('wallets')
           .update({ balance: newBalance, currency: 'GHS', updated_at: new Date().toISOString() })
-          .eq('user_id', userId);
-        if (retryErr) {
-          console.error('Wallet update error in _creditUserWallet (retry):', retryErr.message);
-          throw new Error('Failed to credit wallet balance: ' + retryErr.message);
-        }
+          .eq('user_id', userId)
+          .eq('balance', wallet.balance);
+        if (wErr) throw new Error('Failed to credit wallet balance: ' + wErr.message);
       } else {
-        newBalance = parseFloat(updatedWallet.balance);
-      }
-    } else {
-      newBalance = depositAmount;
-      const { error: iErr } = await supabaseAdmin
-        .from('wallets')
-        .insert({
-          user_id: userId,
-          balance: newBalance,
-          currency: 'GHS',
-          updated_at: new Date().toISOString()
-        });
-
-      if (iErr) {
-        console.error('Wallet insert error in _creditUserWallet:', iErr.message);
-        throw new Error('Failed to create wallet balance: ' + iErr.message);
+        newBalance = depositAmount;
+        const { error: iErr } = await supabaseAdmin
+          .from('wallets')
+          .insert({ user_id: userId, balance: newBalance, currency: 'GHS', updated_at: new Date().toISOString() });
+        if (iErr) throw new Error('Failed to create wallet: ' + iErr.message);
       }
     }
 
@@ -674,7 +668,7 @@ class MoolreService {
           .from('audit_logs')
           .select('id')
           .eq('user_id', txn.user_id)
-          .ilike('details', `%${ref}%`);
+          .like('details', `%${ref}%`);
 
         if (logs && logs.length > 0) {
           await supabaseAdmin
@@ -724,7 +718,7 @@ class MoolreService {
             .from('audit_logs')
             .select('id')
             .eq('user_id', txn.user_id)
-            .ilike('details', `%${ref}%`);
+            .like('details', `%${ref}%`);
 
           if (logs && logs.length > 0) {
             // Was actually credited, mark completed

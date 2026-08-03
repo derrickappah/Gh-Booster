@@ -243,11 +243,6 @@ function isAdminUser(user) {
   if (role === 'admin' || role === 'super_admin' || role === 'superadmin' || role.includes('admin')) {
     return true;
   }
-  const email = String(user.email || '').toLowerCase().trim();
-  const username = String(user.username || '').toLowerCase().trim();
-  if (email.startsWith('admin@') || email.includes('admin') || username === 'admin') {
-    return true;
-  }
   return false;
 }
 

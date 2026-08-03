@@ -59,6 +59,10 @@ class AdminController {
         }
       }
 
+      if (targetBalance < 0) {
+        return res.status(400).json({ success: false, error: 'User balance cannot be reduced below zero.' });
+      }
+
       const result = await AdminService.updateUserBalance({ userId, newBalance: targetBalance, reason });
       res.json({ success: true, new_balance: targetBalance, ...result });
     } catch (err) {

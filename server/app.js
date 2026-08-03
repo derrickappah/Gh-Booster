@@ -33,7 +33,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdnjs.cloudflare.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
@@ -48,6 +48,7 @@ app.use(helmet({
 const allowedOrigins = [
   'https://ghbooster.com',
   'https://www.ghbooster.com',
+  'https://ghbooster.vercel.app',
   'http://localhost:5000',
   'http://localhost:3000',
   'http://127.0.0.1:5000'
@@ -55,7 +56,7 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
@@ -70,6 +71,13 @@ app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // Apply Rate Limiting to /api
 app.use('/api', globalLimiter);
+
+// Prevent caching of sensitive API responses
+app.use('/api', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  next();
+});
 
 // Function to register API endpoints under a prefix
 const registerAppRoutes = (prefix) => {
@@ -168,13 +176,33 @@ const pageRoutesMap = {
   '/review-ghbooster-smm': 'review-ghbooster-smm.html'
 };
 
+// Server-side protection for admin pages — redirect unauthenticated users
+const jwt = require('jsonwebtoken');
+const env = require('./config/env');
+const adminPageMiddleware = (req, res, next) => {
+  const token = req.cookies?.ghb_token || (req.headers['authorization'] || '').split(' ')[1];
+  if (!token) return res.redirect('/login');
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET);
+    if (!decoded || !decoded.id) return res.redirect('/login');
+    next();
+  } catch (_) {
+    return res.redirect('/login');
+  }
+};
+
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {
-  app.get(routePath, (req, res) => {
+  const handlers = [];
+  if (routePath.startsWith('/admin-')) {
+    handlers.push(adminPageMiddleware);
+  }
+  handlers.push((req, res) => {
     if (routePath.startsWith('/dashboard') || routePath.startsWith('/admin-')) {
       res.setHeader('X-Robots-Tag', 'noindex, nofollow');
     }
     return res.sendFile(path.join(__dirname, '..', htmlFileName));
   });
+  app.get(routePath, ...handlers);
 });
 
 // Middleware for defense-in-depth SEO protection on private dashboard routes
@@ -200,7 +228,7 @@ app.use((req, res, next) => {
 });
 
 // 4. Serve static assets (js, css, images, etc.)
-app.use(express.static(path.join(__dirname, '..'), {
+const staticOptions = {
   maxAge: 0,
   etag: true,
   dotfiles: 'deny',
@@ -211,7 +239,12 @@ app.use(express.static(path.join(__dirname, '..'), {
       res.setHeader('Cache-Control', 'public, max-age=86400');
     }
   }
-}));
+};
+app.use('/src', express.static(path.join(__dirname, '..', 'src'), staticOptions));
+app.use('/dist', express.static(path.join(__dirname, '..', 'dist'), staticOptions));
+app.use('/favicon.ico', express.static(path.join(__dirname, '..', 'favicon.ico')));
+app.use('/manifest.json', express.static(path.join(__dirname, '..', 'manifest.json')));
+app.use('/service-worker.js', express.static(path.join(__dirname, '..', 'service-worker.js')));
 
 // 5. Root level API routes fallback
 registerAppRoutes('');

@@ -5,6 +5,7 @@ class ServiceService {
     let { data: services, error: sErr } = await supabaseAdmin
       .from('services')
       .select('*, categories(name, icon)')
+      .eq('status', 'active')
       .order('name', { ascending: true });
 
     if (sErr) console.error('Error fetching services:', sErr.message);

@@ -1,10 +1,12 @@
 const CACHE_NAME = 'ghbooster-cache-v4';
 const ASSETS_TO_CACHE = [
-  '/',
+  './',
   'index.html',
+  'login.html',
+  'register.html',
   'src/css/style.min.css',
   'src/js/theme.min.js',
-  '/src/img/favicon.png?v=2',
+  '/src/img/favicon.png?v=3',
   '/src/img/logo.png?v=2',
   '/src/img/logo.webp?v=2'
 ];

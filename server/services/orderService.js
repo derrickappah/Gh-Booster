@@ -233,24 +233,7 @@ class OrderService {
       throw new Error(`Insufficient wallet balance (GH₵${currentBalance.toFixed(2)}). Total charge is GH₵${totalCharge.toFixed(2)}. Please add funds.`);
     }
 
-    // Send order to SMMGen API provider if provider_service_id is configured
-    let providerOrderId = null;
-    if (service.provider_service_id) {
-      const smmRes = await SmmgenService.placeOrder({
-        providerServiceId: service.provider_service_id,
-        link: link,
-        quantity: qty
-      });
-
-      if (smmRes && smmRes.order) {
-        providerOrderId = String(smmRes.order);
-      } else if (smmRes && smmRes.error) {
-        console.error('SMMGen order error:', smmRes.error);
-        throw new Error(`SMMGen Provider Error: ${smmRes.error}`);
-      }
-    }
-
-    // ATOMIC balance deduction: Use conditional update to prevent double-spend race condition.
+    // ATOMIC balance deduction FIRST (before provider order)
     const newBalance = currentBalance - totalCharge;
     if (wallet && wallet.id) {
       const { data: updatedWallet, error: wErr } = await supabaseAdmin
@@ -269,6 +252,41 @@ class OrderService {
       }
     } else {
       throw new Error('Wallet not found. Please contact support.');
+    }
+
+    // Send order to SMMGen API provider AFTER wallet deduction
+    let providerOrderId = null;
+    if (service.provider_service_id) {
+      try {
+        const smmRes = await SmmgenService.placeOrder({
+          providerServiceId: service.provider_service_id,
+          link: link,
+          quantity: qty
+        });
+
+        if (smmRes && smmRes.order) {
+          providerOrderId = String(smmRes.order);
+        } else if (smmRes && smmRes.error) {
+          // Provider rejected — refund wallet atomically
+          console.error('SMMGen order error, refunding wallet:', smmRes.error);
+          try {
+            await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
+          } catch (refundErr) {
+            console.error('CRITICAL: Provider refund failed:', refundErr.message);
+          }
+          throw new Error(`SMMGen Provider Error: ${smmRes.error}`);
+        }
+      } catch (providerErr) {
+        if (!providerErr.message.includes('SMMGen Provider Error')) {
+          // Network/unexpected error — refund wallet
+          try {
+            await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
+          } catch (refundErr) {
+            console.error('CRITICAL: Provider error refund failed:', refundErr.message);
+          }
+        }
+        throw providerErr;
+      }
     }
 
     // Save order in database with correct 'charge' column (matches schema.sql)
@@ -299,13 +317,7 @@ class OrderService {
       // ROLLBACK: Refund the wallet deduction since order insert failed
       console.error('Error inserting order, rolling back wallet deduction:', insertErr.message || insertErr);
       try {
-        await supabaseAdmin
-          .from('wallets')
-          .update({
-            balance: currentBalance,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', userId);
+        await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
       } catch (rollbackErr) {
         console.error('CRITICAL: Wallet rollback also failed:', rollbackErr.message);
       }
@@ -675,19 +687,24 @@ class OrderService {
     const chargeAmount = parseFloat(order.charge || 0);
     let newBalance = null;
     if (chargeAmount > 0 && userId) {
-      const { data: wallet } = await supabaseAdmin
-        .from('wallets')
-        .select('balance')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-      newBalance = currentBalance + chargeAmount;
-
-      await supabaseAdmin
-        .from('wallets')
-        .update({ balance: newBalance, updated_at: new Date().toISOString() })
-        .eq('user_id', userId);
+      try {
+        const { data: rpcBalance, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
+          p_user_id: userId,
+          p_amount: chargeAmount
+        });
+        if (rpcErr) throw rpcErr;
+        newBalance = parseFloat(rpcBalance);
+      } catch (rpcError) {
+        console.error('[cancelOrder] credit_wallet RPC failed:', rpcError.message);
+        const { data: wallet } = await supabaseAdmin
+          .from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+        const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
+        newBalance = currentBalance + chargeAmount;
+        await supabaseAdmin
+          .from('wallets')
+          .update({ balance: newBalance, updated_at: new Date().toISOString() })
+          .eq('user_id', userId);
+      }
 
       // Record refund transaction
       const { error: txErr } = await supabaseAdmin.from('transactions').insert({
@@ -782,20 +799,28 @@ class OrderService {
       return { refunded: false, refundAmount: 0 };
     }
 
-    // Atomically credit user's wallet balance
-    const { data: wallet } = await supabaseAdmin
-      .from('wallets')
-      .select('balance')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-    const newBalance = currentBalance + refundableAmount;
-
-    await supabaseAdmin
-      .from('wallets')
-      .update({ balance: newBalance, updated_at: new Date().toISOString() })
-      .eq('user_id', userId);
+    // Atomically credit user's wallet balance via PostgreSQL function
+    let newBalance;
+    try {
+      const { data: rpcBalance, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
+        p_user_id: userId,
+        p_amount: refundableAmount
+      });
+      if (rpcErr) throw rpcErr;
+      newBalance = parseFloat(rpcBalance);
+    } catch (rpcError) {
+      console.error('[processOrderRefund] credit_wallet RPC failed:', rpcError.message);
+      // Fallback with CAS guard
+      const { data: wallet } = await supabaseAdmin
+        .from('wallets').select('balance').eq('user_id', userId).maybeSingle();
+      const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
+      newBalance = currentBalance + refundableAmount;
+      await supabaseAdmin
+        .from('wallets')
+        .update({ balance: newBalance, updated_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('balance', wallet ? wallet.balance : 0);
+    }
 
     const refPrefix = isPartial ? 'partial_refund_' : 'refund_';
     const txRef = `${refPrefix}${order.id}_${Date.now().toString(36)}`;
