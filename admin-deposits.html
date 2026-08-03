@@ -208,19 +208,19 @@
       </div>
 
       <!-- Search & Filter Toolbar -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div class="relative flex-grow w-full md:w-auto">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input type="text" id="dep-search" placeholder="Search by user, reference, or payment method..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 transition">
         </div>
-        <div class="flex items-center space-x-2 text-xs font-semibold w-full md:w-auto justify-between md:justify-end" id="dep-tabs">
-          <button class="dep-tab px-3.5 py-2 bg-pink-600 text-white rounded-lg shadow-sm font-bold" data-tab="all">All</button>
-          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold" data-tab="pending">Pending</button>
-          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold" data-tab="completed">Approved</button>
-          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold" data-tab="failed">Rejected</button>
-          <button onclick="alert('Exporting deposits CSV...')" class="bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow transition flex items-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-            Export
+        <div class="flex items-center space-x-2 text-xs font-semibold w-full md:w-auto justify-start md:justify-end overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5" id="dep-tabs">
+          <button class="dep-tab px-3.5 py-2 bg-pink-600 text-white rounded-lg shadow-sm font-bold flex-shrink-0" data-tab="all">All</button>
+          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold flex-shrink-0" data-tab="pending">Pending</button>
+          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold flex-shrink-0" data-tab="completed">Approved</button>
+          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold flex-shrink-0" data-tab="failed">Rejected</button>
+          <button onclick="alert('Exporting deposits CSV...')" class="bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow transition flex items-center shrink-0 flex-shrink-0 whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Export CSV
           </button>
         </div>
       </div>
