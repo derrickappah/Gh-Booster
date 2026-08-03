@@ -4308,8 +4308,9 @@ async function initAdminProvidersPage() {
       // 1. Compute KPIs
       const activeCount = providers.filter(p => (p.status || '').toLowerCase() === 'active').length;
       if (activeElem) activeElem.textContent = activeCount.toLocaleString();
-      if (servicesElem) servicesElem.textContent = (providers.reduce((acc, p) => acc + (p.services_count || 0), 0) || providers.length * 100).toLocaleString();
-      if (lastSyncElem) lastSyncElem.textContent = 'Just now';
+      const totalServices = providers.reduce((acc, p) => acc + (parseInt(p.services_count || 0, 10)), 0);
+      if (servicesElem) servicesElem.textContent = totalServices.toLocaleString();
+      if (lastSyncElem) lastSyncElem.textContent = providers.length > 0 ? 'Just now' : 'N/A';
 
       // 2. Render Table
       function renderTable(list) {
