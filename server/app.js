@@ -188,21 +188,40 @@ const adminPageMiddleware = async (req, res, next) => {
     ? authHeader.substring(7)
     : (req.cookies?.token || req.cookies?.jwt || req.cookies?.sb_access_token || null);
   if (!token) return res.redirect('/login');
+
+  const { supabase, supabaseAdmin } = require('./config/supabase');
+
+  // 1. Try Custom JWT verification signed with JWT_SECRET
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
-    if (!decoded || !decoded.id) return res.redirect('/login');
-
-    const { supabaseAdmin } = require('./config/supabase');
-    const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', decoded.id).maybeSingle();
-    const role = profile?.role;
-
-    if (role !== 'admin' && role !== 'super_admin') {
-      return res.redirect('/dashboard');
+    if (decoded && decoded.id) {
+      const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', decoded.id).maybeSingle();
+      const role = profile?.role;
+      if (role !== 'admin' && role !== 'super_admin') {
+        return res.redirect('/dashboard');
+      }
+      return next();
     }
-    next();
   } catch (_) {
-    return res.redirect('/login');
+    // Custom JWT failed, try Supabase session token check below
   }
+
+  // 2. Try Supabase Auth API verification
+  try {
+    const { data: { user: supabaseUser }, error } = await supabase.auth.getUser(token);
+    if (!error && supabaseUser) {
+      const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', supabaseUser.id).maybeSingle();
+      const role = profile?.role;
+      if (role !== 'admin' && role !== 'super_admin') {
+        return res.redirect('/dashboard');
+      }
+      return next();
+    }
+  } catch (_) {
+    // Fallthrough to redirect
+  }
+
+  return res.redirect('/login');
 };
 
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {

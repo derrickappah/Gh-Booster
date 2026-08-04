@@ -314,22 +314,31 @@ class MoolreService {
   }
 
   /**
+   * Helper to resolve transaction record by reference or payment_ref.
+   */
+  static async _findTransactionByRef(ref, select = '*') {
+    if (!ref) return null;
+    let { data: txn } = await supabaseAdmin
+      .from('transactions')
+      .select(select)
+      .eq('reference', ref)
+      .maybeSingle();
+
+    if (!txn) {
+      const fb = await supabaseAdmin.from('transactions').select(select).eq('payment_ref', ref).maybeSingle();
+      txn = fb.data;
+    }
+    return txn;
+  }
+
+  /**
    * Verify payment status by reference from Moolre.
    */
   static async verifyPayment({ reference, userId }) {
     const creds = await MoolreService.getCredentials();
 
-    // Look up our local transaction (try reference first, fallback to payment_ref)
-    let { data: txn } = await supabaseAdmin
-      .from('transactions')
-      .select('*')
-      .eq('reference', reference)
-      .maybeSingle();
-
-    if (!txn) {
-      const fallback = await supabaseAdmin.from('transactions').select('*').eq('payment_ref', reference).maybeSingle();
-      txn = fallback.data;
-    }
+    // Look up our local transaction using helper
+    const txn = await MoolreService._findTransactionByRef(reference);
 
     if (!txn) throw new Error('Transaction not found: ' + reference);
 
@@ -353,7 +362,7 @@ class MoolreService {
         apiPubkey: creds.apiPubkey
       });
 
-      const gatewayStatus = response.body?.data?.status || response.body?.status;
+      const gatewayStatus = (response.body?.data?.status || response.body?.status || '').toLowerCase();
       const isCompleted = gatewayStatus === 'completed' || gatewayStatus === 'successful' || gatewayStatus === 'success';
 
       if (isCompleted) {
@@ -361,19 +370,15 @@ class MoolreService {
         return { success: true, status: 'completed', reference, transaction: txn };
       }
 
-      const is30MinOld = txn.created_at && (Date.now() - new Date(txn.created_at).getTime() > 30 * 60 * 1000);
-      if (is30MinOld) {
-        await supabaseAdmin.from('transactions').update({ status: 'expired' }).eq('id', txn.id);
-        return { success: true, status: 'expired', reference, transaction: { ...txn, status: 'expired' } };
+      const isFailed = gatewayStatus === 'failed' || gatewayStatus === 'expired' || gatewayStatus === 'cancelled';
+      if (isFailed) {
+        await supabaseAdmin.from('transactions').update({ status: gatewayStatus }).eq('id', txn.id);
+        return { success: true, status: gatewayStatus, reference, transaction: { ...txn, status: gatewayStatus } };
       }
 
       return { success: true, status: gatewayStatus || 'pending', reference, transaction: txn };
     } catch {
-      const is30MinOld = txn.created_at && (Date.now() - new Date(txn.created_at).getTime() > 30 * 60 * 1000);
-      if (is30MinOld) {
-        await supabaseAdmin.from('transactions').update({ status: 'expired' }).eq('id', txn.id);
-        return { success: true, status: 'expired', reference, transaction: { ...txn, status: 'expired' } };
-      }
+      // Network/gateway error: return existing local status without marking expired prematurely
       return { success: true, status: txn.status, reference, transaction: txn };
     }
   }

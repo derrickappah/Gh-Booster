@@ -24,8 +24,7 @@ async function authenticateToken(req, res, next) {
           .maybeSingle();
 
         const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
-        const dbRole = profile?.role || 'user';
-        const userRole = (dbRole !== 'user') ? dbRole : 'user';
+        const userRole = profile?.role || 'user';
 
         req.user = {
           id: decoded.id,
@@ -55,8 +54,7 @@ async function authenticateToken(req, res, next) {
         .maybeSingle();
 
       const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
-      const dbRole = profile?.role || 'user';
-      const userRole = (dbRole !== 'user') ? dbRole : 'user';
+      const userRole = profile?.role || 'user';
 
       req.user = {
         id: supabaseUser.id,

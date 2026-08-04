@@ -67,16 +67,21 @@ class AdminController {
 
         // Record audit transaction
         try {
-          await supabaseAdmin.from('transactions').insert({
+          const txRef = `adm_adj_${Date.now().toString(36)}`;
+          const { error: txErr } = await supabaseAdmin.from('transactions').insert({
             user_id: userId,
             amount: action === 'deduct' ? -numAmount : numAmount,
             currency: 'GHS',
             gateway: 'Admin Manual Adjustment',
-            reference: `adm_adj_${Date.now().toString(36)}`,
+            reference: txRef,
+            payment_ref: txRef,
             type: action === 'deduct' ? 'withdrawal' : 'bonus',
             status: 'completed',
             description: reason || `Admin manual balance ${action}`
           });
+          if (txErr) {
+            console.error('[AdminController] Failed to record transaction audit for balance adjustment:', txErr.message);
+          }
         } catch (txErr) {
           console.error('[AdminController] Failed to record transaction audit for balance adjustment:', txErr.message);
         }
