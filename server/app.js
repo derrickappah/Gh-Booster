@@ -254,7 +254,12 @@ app.use('/service-worker.js', express.static(path.join(__dirname, '..', 'service
 // 5. Root level API routes fallback
 registerAppRoutes('');
 
-// Serve robots.txt, sitemap.xml & llms.txt
+// Serve favicon.ico, robots.txt, sitemap.xml & llms.txt
+app.get('/favicon.ico', (req, res) => {
+  res.type('image/x-icon');
+  res.sendFile(path.join(__dirname, '..', 'favicon.ico'));
+});
+
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
   res.sendFile(path.join(__dirname, '..', 'robots.txt'));
