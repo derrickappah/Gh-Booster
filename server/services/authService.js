@@ -77,6 +77,8 @@ class AuthService {
 
     if (profileErr) {
       console.error('[AuthService] Profile creation error:', profileErr.message);
+      // Clean up orphaned auth.users record to allow retry
+      await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
       const pMsg = (profileErr.message || '').toLowerCase();
       if (pMsg.includes('profiles_pkey') || pMsg.includes('profiles_email_key') || pMsg.includes('duplicate key')) {
         throw new Error('An account with this email address already exists. Please log in.');
