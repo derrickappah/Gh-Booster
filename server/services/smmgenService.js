@@ -6,12 +6,25 @@ class SmmgenService {
     };
   }
 
+  static async _fetchWithTimeout(url, options, timeoutMs = 10000) {
+    const httpFetch = globalThis.fetch || require('node-fetch');
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await httpFetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      return response;
+    } catch (err) {
+      clearTimeout(timer);
+      throw err;
+    }
+  }
+
   static async getBalance() {
     try {
       const { url, key } = SmmgenService._getCredentials();
       if (!key) return { error: 'SMMGen API key not configured' };
-      const httpFetch = globalThis.fetch || require('node-fetch');
-      const response = await httpFetch(url, {
+      const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, action: 'balance' })
@@ -27,8 +40,7 @@ class SmmgenService {
     try {
       const { url, key } = SmmgenService._getCredentials();
       if (!key) return { error: 'SMMGen API key not configured' };
-      const httpFetch = globalThis.fetch || require('node-fetch');
-      const response = await httpFetch(url, {
+      const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,8 +64,7 @@ class SmmgenService {
     try {
       const { url, key } = SmmgenService._getCredentials();
       if (!key) return { error: 'SMMGen API key not configured' };
-      const httpFetch = globalThis.fetch || require('node-fetch');
-      const response = await httpFetch(url, {
+      const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -73,8 +84,7 @@ class SmmgenService {
     try {
       const { url, key } = SmmgenService._getCredentials();
       if (!key) return { error: 'SMMGen API key not configured' };
-      const httpFetch = globalThis.fetch || require('node-fetch');
-      const response = await httpFetch(url, {
+      const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

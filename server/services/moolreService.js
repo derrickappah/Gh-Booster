@@ -579,13 +579,13 @@ class MoolreService {
           return { newBalance: currentWallet ? parseFloat(currentWallet.balance) : 0, depositAmount };
         }
 
-        // Conditional atomic status update to claim this transaction credit
+        // Conditional atomic status claim to prevent concurrent processing
         const { data: claimedTxn, error: claimErr } = await supabaseAdmin
           .from('transactions')
           .update({
-            status: 'completed',
+            status: 'processing',
             updated_at: new Date().toISOString(),
-            metadata: { ...(targetTxn.metadata || {}), credited_at: new Date().toISOString() }
+            metadata: { ...(targetTxn.metadata || {}), processing_at: new Date().toISOString() }
           })
           .eq('id', targetTxn.id)
           .eq('status', targetTxn.status)

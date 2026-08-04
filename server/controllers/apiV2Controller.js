@@ -64,6 +64,8 @@ class ApiV2Controller {
         case 'status': {
           const { order } = req.query.order ? req.query : req.body;
           if (!order) return res.status(400).json({ error: 'Order ID is required' });
+          const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(String(order));
+          if (!isUuid) return res.status(400).json({ error: 'Invalid order ID format' });
           const { data: orderData } = await supabaseAdmin.from('orders').select('*').eq('id', order).maybeSingle();
           if (!orderData) return res.status(404).json({ error: 'Order not found' });
           

@@ -66,16 +66,20 @@ class AdminController {
         }
 
         // Record audit transaction
-        await supabaseAdmin.from('transactions').insert({
-          user_id: userId,
-          amount: action === 'deduct' ? -numAmount : numAmount,
-          currency: 'GHS',
-          gateway: 'Admin Manual Adjustment',
-          reference: `adm_adj_${Date.now().toString(36)}`,
-          type: action === 'deduct' ? 'withdrawal' : 'bonus',
-          status: 'completed',
-          description: reason || `Admin manual balance ${action}`
-        }).catch(() => {});
+        try {
+          await supabaseAdmin.from('transactions').insert({
+            user_id: userId,
+            amount: action === 'deduct' ? -numAmount : numAmount,
+            currency: 'GHS',
+            gateway: 'Admin Manual Adjustment',
+            reference: `adm_adj_${Date.now().toString(36)}`,
+            type: action === 'deduct' ? 'withdrawal' : 'bonus',
+            status: 'completed',
+            description: reason || `Admin manual balance ${action}`
+          });
+        } catch (txErr) {
+          console.error('[AdminController] Failed to record transaction audit for balance adjustment:', txErr.message);
+        }
 
         return res.json({ success: true, new_balance: finalBalance, message: 'User balance updated successfully.' });
       }
@@ -242,7 +246,16 @@ class AdminController {
       if (!id || !status || !allowedStatuses.includes(String(status).toLowerCase())) {
         return res.status(400).json({ success: false, error: 'Valid transaction ID and allowed status required.' });
       }
-      const deposit = await AdminService.updateDepositStatus({ id, status: String(status).toLowerCase() });
+      const targetStatus = String(status).toLowerCase();
+      const deposit = await AdminService.updateDepositStatus({ id, status: targetStatus });
+      if (targetStatus === 'completed' && deposit && deposit.user_id && deposit.amount) {
+        try {
+          const MoolreService = require('../services/moolreService');
+          await MoolreService._creditUserWallet(deposit.user_id, deposit.amount, deposit.reference || deposit.payment_ref);
+        } catch (creditErr) {
+          console.error('[AdminController] Wallet credit failed on deposit status update:', creditErr.message);
+        }
+      }
       const { supabaseAdmin } = require('../config/supabase');
       await supabaseAdmin.from('audit_logs').insert({
         user_id: req.user.id,

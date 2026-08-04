@@ -3,8 +3,10 @@ const env = require('../config/env');
 const { supabase, supabaseAdmin } = require('../config/supabase');
 
 async function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.substring(7)
+    : (req.cookies?.token || req.cookies?.jwt || req.cookies?.sb_access_token || null);
 
   if (!token) {
     return res.status(401).json({ success: false, error: 'Access token required. Please login.' });
