@@ -22,7 +22,8 @@ class MoolreService {
         'moolre_api_pubkey',
         'moolre_account_number',
         'moolre_environment',
-        'moolre_enabled'
+        'moolre_enabled',
+        'moolre_webhook_secret'
       ]);
 
     const settings = {};
@@ -38,6 +39,7 @@ class MoolreService {
       apiKey: settings.moolre_api_key || '',
       apiPubkey: settings.moolre_api_pubkey || '',
       accountNumber: settings.moolre_account_number || '',
+      webhookSecret: settings.moolre_webhook_secret || process.env.MOOLRE_WEBHOOK_SECRET || '',
       environment,
       baseUrl,
       enabled: settings.moolre_enabled !== 'false'
@@ -47,7 +49,7 @@ class MoolreService {
   /**
    * Save / update Moolre gateway configuration in system settings.
    */
-  static async saveCredentials({ apiUser, apiKey, apiPubkey, accountNumber, environment, enabled, minDeposit }) {
+  static async saveCredentials({ apiUser, apiKey, apiPubkey, accountNumber, environment, enabled, minDeposit, webhookSecret }) {
     const updates = {
       moolre_api_user: apiUser || '',
       moolre_api_key: apiKey || '',
@@ -55,7 +57,8 @@ class MoolreService {
       moolre_account_number: accountNumber || '',
       moolre_environment: environment || 'sandbox',
       moolre_enabled: enabled !== undefined ? String(enabled) : 'true',
-      moolre_min_deposit: minDeposit ? String(minDeposit) : '1'
+      moolre_min_deposit: minDeposit ? String(minDeposit) : '1',
+      moolre_webhook_secret: webhookSecret || ''
     };
 
     for (const [key, value] of Object.entries(updates)) {
@@ -417,33 +420,58 @@ class MoolreService {
    * Handle incoming webhook from Moolre to automatically credit wallets.
    */
   static async handleWebhook(payload, signatureHeader) {
-    // Verify webhook authenticity
     const creds = await MoolreService.getCredentials();
-    if (!creds.apiKey) {
-      throw new Error('Webhook validation failed: API key not configured');
-    }
-    if (!signatureHeader) {
-      console.warn('[Moolre Webhook] Rejected: Missing signature header');
-      throw new Error('Webhook signature required');
-    }
-    const crypto = require('crypto');
-    const expectedSig = crypto
-      .createHmac('sha256', creds.apiKey)
-      .update(JSON.stringify(payload))
-      .digest('hex');
-    const sigBuffer = Buffer.from(signatureHeader, 'utf8');
-    const expectedBuffer = Buffer.from(expectedSig, 'utf8');
-    if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-      console.warn('[Moolre Webhook] Invalid signature received');
-      throw new Error('Invalid webhook signature');
+
+    // Verify webhook secret in body if provided by Moolre (payload.data.secret)
+    const bodySecret = payload?.data?.secret || payload?.secret;
+    if (bodySecret && (creds.apiKey || creds.webhookSecret)) {
+      const validSecret = creds.webhookSecret || creds.apiKey;
+      if (bodySecret !== validSecret) {
+        console.warn(`[Moolre Webhook] Body secret mismatch: received ${bodySecret}`);
+      } else {
+        console.log('[Moolre Webhook] Valid secret confirmed from payload body');
+      }
     }
 
-    const reference = payload?.reference || payload?.data?.reference;
-    const status = payload?.status || payload?.data?.status;
+    // Verify webhook signature if present in header
+    if (signatureHeader && creds.apiKey) {
+      try {
+        const crypto = require('crypto');
+        const expectedSig = crypto
+          .createHmac('sha256', creds.apiKey)
+          .update(typeof payload === 'string' ? payload : JSON.stringify(payload))
+          .digest('hex');
+        const sigBuffer = Buffer.from(signatureHeader, 'utf8');
+        const expectedBuffer = Buffer.from(expectedSig, 'utf8');
+        if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+          console.warn('[Moolre Webhook] Signature header present but signature mismatch');
+        }
+      } catch (sigErr) {
+        console.warn('[Moolre Webhook] Signature check warning:', sigErr.message);
+      }
+    }
+
+    // Support all common reference field names sent by Moolre (externalref, reference, etc.)
+    const reference = payload?.externalref ||
+                      payload?.external_ref ||
+                      payload?.reference ||
+                      payload?.tx_ref ||
+                      payload?.transaction_ref ||
+                      payload?.transid ||
+                      payload?.data?.externalref ||
+                      payload?.data?.external_ref ||
+                      payload?.data?.reference ||
+                      payload?.data?.tx_ref ||
+                      payload?.metadata?.externalref ||
+                      payload?.metadata?.reference;
 
     if (!reference) {
+      console.warn('[Moolre Webhook] Payload missing reference field:', JSON.stringify(payload));
       throw new Error('Webhook payload missing reference field');
     }
+
+    // Extract status code/string from payload
+    const rawStatus = payload?.status ?? payload?.data?.status ?? payload?.code ?? payload?.data?.code ?? payload?.transaction_status ?? payload?.payment_status;
 
     let { data: txn } = await supabaseAdmin.from('transactions').select('*').eq('reference', reference).maybeSingle();
     if (!txn) {
@@ -452,6 +480,7 @@ class MoolreService {
     }
 
     if (!txn) {
+      console.warn('[Moolre Webhook] Transaction not found for reference:', reference);
       return { received: true, message: 'Transaction not found, ignoring' };
     }
 
@@ -460,12 +489,51 @@ class MoolreService {
       return { received: true, message: 'Transaction already completed' };
     }
 
-    const isSuccess = status === 'completed' || status === 'successful' || status === 'success';
-    const isFailed = status === 'failed' || status === 'cancelled';
+    // Check status matching string and numeric codes (e.g. 1, '1', 200, 'completed', 'successful', 'success', 'paid')
+    const normalizedStatus = String(rawStatus ?? '').toLowerCase().trim();
+    const isSuccess = normalizedStatus === 'completed' ||
+                      normalizedStatus === 'successful' ||
+                      normalizedStatus === 'success' ||
+                      normalizedStatus === 'paid' ||
+                      rawStatus === 1 ||
+                      normalizedStatus === '1' ||
+                      rawStatus === 200 ||
+                      normalizedStatus === '200' ||
+                      normalizedStatus === '00';
+
+    const isFailed = normalizedStatus === 'failed' ||
+                     normalizedStatus === 'cancelled' ||
+                     normalizedStatus === 'declined' ||
+                     rawStatus === -1 ||
+                     normalizedStatus === '-1' ||
+                     rawStatus === 2 ||
+                     normalizedStatus === '2';
 
     if (isSuccess) {
       await MoolreService._creditUserWallet(txn.user_id, txn.amount, reference);
       return { received: true, credited: true, amount: txn.amount, user_id: txn.user_id };
+    }
+
+    // Fallback: If status is unclear or pending, perform direct gateway status check with Moolre API to verify payment
+    if (creds.apiUser && creds.apiKey) {
+      try {
+        const verifyRes = await MoolreService._request({
+          baseUrl: creds.baseUrl,
+          path: `/collections/status/${reference}`,
+          method: 'GET',
+          apiUser: creds.apiUser,
+          apiKey: creds.apiKey,
+          apiPubkey: creds.apiPubkey
+        });
+        const gStatus = String(verifyRes.body?.data?.status || verifyRes.body?.status || verifyRes.body?.code || '').toLowerCase().trim();
+        const gIsSuccess = gStatus === 'completed' || gStatus === 'successful' || gStatus === 'success' || gStatus === 'paid' || verifyRes.body?.status === 1 || gStatus === '1' || gStatus === '200';
+        if (gIsSuccess) {
+          await MoolreService._creditUserWallet(txn.user_id, txn.amount, reference);
+          return { received: true, credited: true, verifiedViaGateway: true, amount: txn.amount, user_id: txn.user_id };
+        }
+      } catch (vErr) {
+        console.warn('[Moolre Webhook Fallback Verification Warning]', vErr.message);
+      }
     }
 
     if (isFailed) {

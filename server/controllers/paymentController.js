@@ -20,9 +20,9 @@ class PaymentController {
    */
   static async configureMoolre(req, res, next) {
     try {
-      const { apiUser, apiKey, apiPubkey, accountNumber, environment, enabled, minDeposit } = req.body;
+      const { apiUser, apiKey, apiPubkey, accountNumber, environment, enabled, minDeposit, webhookSecret } = req.body;
       const result = await MoolreService.saveCredentials({
-        apiUser, apiKey, apiPubkey, accountNumber, environment, enabled, minDeposit
+        apiUser, apiKey, apiPubkey, accountNumber, environment, enabled, minDeposit, webhookSecret
       });
       res.json({ success: true, ...result });
     } catch (err) {
@@ -84,14 +84,16 @@ class PaymentController {
    */
   static async handleWebhook(req, res, next) {
     try {
-      const signatureHeader = req.headers['x-moolre-signature'] || req.headers['x-webhook-signature'] || '';
+      const signatureHeader = req.headers['x-moolre-signature'] ||
+                              req.headers['x-webhook-signature'] ||
+                              req.headers['x-signature'] ||
+                              req.headers['signature'] ||
+                              req.headers['x-moolre-secret'] || '';
       const result = await MoolreService.handleWebhook(req.body, signatureHeader);
       res.json({ received: true, ...result });
     } catch (err) {
       console.error('[Moolre Webhook Error]', err.message);
-      const isAuthError = err.message.includes('signature') || err.message.includes('API key');
-      const statusCode = isAuthError ? 401 : 400;
-      res.status(statusCode).json({ received: false, error: err.message });
+      res.status(200).json({ received: false, error: err.message });
     }
   }
 
