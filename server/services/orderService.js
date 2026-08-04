@@ -12,7 +12,30 @@ async function processInChunks(items, concurrencyLimit, fn) {
 
 class OrderService {
   static async getUserOrders(userId) {
-    return await OrderService.syncUserOrdersStatus(userId);
+    const { data: rawOrders, error } = await supabaseAdmin
+      .from('orders')
+      .select('*, services(name)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('[OrderService] Error fetching user orders:', error.message);
+      return [];
+    }
+
+    return (rawOrders || []).map(o => ({
+      id: o.id,
+      service_id: o.service_id,
+      service_name: o.services?.name || 'SMM Service',
+      link: o.link,
+      quantity: o.quantity,
+      charge: parseFloat(o.total_price || o.charge || 0),
+      status: o.status || 'Processing',
+      start_count: o.start_count || 0,
+      remains: o.remains || 0,
+      provider_order_id: o.provider_order_id || null,
+      created_at: new Date(o.created_at).toISOString().replace('T', ' ').substring(0, 19)
+    }));
   }
 
   static async syncUserOrdersStatus(userId) {
@@ -117,6 +140,7 @@ class OrderService {
       .from('orders')
       .select('*')
       .not('provider_order_id', 'is', null)
+      .order('created_at', { ascending: false })
       .limit(500);
 
     if (error || !rawOrders) {
@@ -180,7 +204,7 @@ class OrderService {
         } catch (err) {
           console.error(`[OrderCron] Error syncing provider order #${order.provider_order_id}:`, err.message);
         }
-      }));
+      });
     }
 
     // Safety sweep: Also process any Canceled / Refunded / Partial orders whose refunds have not been fully issued yet
@@ -232,6 +256,7 @@ class OrderService {
 
     let newBalance = null;
 
+    // Step 1: Debit wallet balance upfront (unless part of a bulk order that already deducted balance)
     if (!skipWalletDeduction) {
       try {
         const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('debit_wallet', {
@@ -245,7 +270,45 @@ class OrderService {
       }
     }
 
-    // Send order to SMMGen API provider AFTER wallet deduction
+    // Step 2: Insert initial order into database FIRST before calling external provider
+    let newOrder;
+    const initialStatus = service.provider_service_id ? 'Processing' : 'Pending';
+    try {
+      const { data: orderData, error: oErr } = await supabaseAdmin
+        .from('orders')
+        .insert({
+          user_id: userId,
+          service_id: serviceId,
+          batch_id: batchId || null,
+          link: link,
+          quantity: qty,
+          charge: totalCharge,
+          status: initialStatus,
+          start_count: 0,
+          remains: qty,
+          provider_order_id: null
+        })
+        .select()
+        .single();
+
+      if (oErr || !orderData) {
+        throw oErr || new Error('Database insertion failed');
+      }
+      newOrder = orderData;
+    } catch (insertErr) {
+      // Rollback wallet deduction if order database insertion failed
+      console.error('Error inserting order into database, rolling back wallet deduction:', insertErr.message || insertErr);
+      if (!skipWalletDeduction) {
+        try {
+          await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
+        } catch (rollbackErr) {
+          console.error('CRITICAL: Wallet rollback failed after DB insert error:', rollbackErr.message);
+        }
+      }
+      throw new Error(`Failed to save order in database: ${insertErr.message || insertErr}`);
+    }
+
+    // Step 3: Call external SMM Provider if configured
     let providerOrderId = null;
     if (service.provider_service_id) {
       try {
@@ -257,69 +320,51 @@ class OrderService {
 
         if (smmRes && smmRes.order) {
           providerOrderId = String(smmRes.order);
-        } else if (smmRes && smmRes.error) {
-          // Provider rejected — refund wallet atomically if deducted
-          console.error('SMMGen order error:', smmRes.error);
+          // Attach provider_order_id to local order row
+          await supabaseAdmin
+            .from('orders')
+            .update({ provider_order_id: providerOrderId, updated_at: new Date().toISOString() })
+            .eq('id', newOrder.id);
+        } else {
+          const providerErrMsg = smmRes?.error || 'Unknown provider error';
+          console.error(`SMMGen order error for order #${newOrder.id}:`, providerErrMsg);
+          
+          // Mark order as Canceled in DB
+          await supabaseAdmin
+            .from('orders')
+            .update({ status: 'Canceled', updated_at: new Date().toISOString() })
+            .eq('id', newOrder.id);
+
+          // Refund wallet ONLY if skipWalletDeduction is false (bulk orders handle individual refunds in bulk loop)
           if (!skipWalletDeduction) {
             try {
               await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
             } catch (refundErr) {
-              console.error('CRITICAL: Provider refund failed:', refundErr.message);
+              console.error('CRITICAL: Provider error refund failed:', refundErr.message);
             }
           }
-          throw new Error(`SMMGen Provider Error: ${smmRes.error}`);
+          throw new Error(`SMMGen Provider Error: ${providerErrMsg}`);
         }
       } catch (providerErr) {
-        if (!providerErr.message.includes('SMMGen Provider Error') && !skipWalletDeduction) {
-          // Network/unexpected error — refund wallet
+        // Mark order as Canceled in DB on unexpected network/provider error
+        await supabaseAdmin
+          .from('orders')
+          .update({ status: 'Canceled', updated_at: new Date().toISOString() })
+          .eq('id', newOrder.id)
+          .catch(() => {});
+
+        if (!skipWalletDeduction) {
           try {
             await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
           } catch (refundErr) {
-            console.error('CRITICAL: Provider error refund failed:', refundErr.message);
+            console.error('CRITICAL: Unexpected provider error refund failed:', refundErr.message);
           }
         }
         throw providerErr;
       }
     }
 
-    // Save order in database with correct 'charge' column (matches schema.sql)
-    let newOrder;
-    try {
-      const { data: orderData, error: oErr } = await supabaseAdmin
-        .from('orders')
-        .insert({
-          user_id: userId,
-          service_id: serviceId,
-          batch_id: batchId || null,
-          link: link,
-          quantity: qty,
-          charge: totalCharge,
-          status: 'Processing',
-          start_count: 0,
-          remains: qty,
-          provider_order_id: providerOrderId
-        })
-        .select()
-        .single();
-
-      if (oErr) {
-        throw oErr;
-      }
-      newOrder = orderData;
-    } catch (insertErr) {
-      // ROLLBACK: Refund the wallet deduction since order insert failed
-      console.error('Error inserting order, rolling back wallet deduction:', insertErr.message || insertErr);
-      if (!skipWalletDeduction) {
-        try {
-          await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
-        } catch (rollbackErr) {
-          console.error('CRITICAL: Wallet rollback also failed:', rollbackErr.message);
-        }
-      }
-      throw new Error(`Failed to save order in database: ${insertErr.message || insertErr}`);
-    }
-
-    // Record transaction entry
+    // Step 4: Record transaction entry
     const { error: txErr } = await supabaseAdmin.from('transactions').insert({
       user_id: userId,
       amount: -totalCharge,
@@ -341,7 +386,7 @@ class OrderService {
       quantity: qty,
       charge: totalCharge,
       new_balance: newBalance,
-      status: 'Processing'
+      status: initialStatus
     };
   }
 

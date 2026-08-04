@@ -56,7 +56,7 @@ class AuthService {
       .maybeSingle();
 
     if (existingUserCheck) {
-      targetUsername = `${targetUsername}_${Math.floor(100 + Math.random() * 900)}`;
+      targetUsername = `${targetUsername}_${require('crypto').randomBytes(3).toString('hex')}`;
     }
 
     const apiKey = generateApiKey();
@@ -97,6 +97,9 @@ class AuthService {
 
     if (walletErr) {
       console.error('[AuthService] Wallet creation error:', walletErr.message);
+      await supabaseAdmin.from('profiles').delete().eq('id', userId).catch(() => {});
+      await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
+      throw new Error('Could not initialize user wallet: ' + walletErr.message);
     }
 
     const token = generateToken({ id: userId, username: targetUsername, role: 'user', email: cleanEmail });

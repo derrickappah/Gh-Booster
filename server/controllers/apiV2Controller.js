@@ -4,7 +4,8 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 
 class ApiV2Controller {
   static async handleV2Request(req, res, next) {
-    const { key, action } = req.query.key ? req.query : req.body;
+    const params = { ...req.query, ...(req.body || {}) };
+    const { key, action } = params;
 
     if (!key) {
       return res.status(401).json({ error: 'API key is required' });
@@ -41,7 +42,7 @@ class ApiV2Controller {
           if (req.method !== 'POST') {
             return res.status(405).json({ error: 'POST method required for order creation' });
           }
-          const { service, link, quantity } = req.body || {};
+          const { service, link, quantity } = params;
           const qty = parseInt(quantity, 10);
           if (!service || typeof service !== 'string' || service.trim().length === 0) {
             return res.status(400).json({ error: 'Service ID is required' });
@@ -62,7 +63,7 @@ class ApiV2Controller {
         }
 
         case 'status': {
-          const { order } = req.query.order ? req.query : req.body;
+          const { order } = params;
           if (!order) return res.status(400).json({ error: 'Order ID is required' });
           const strOrder = String(order).trim();
           const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(strOrder);
@@ -72,15 +73,13 @@ class ApiV2Controller {
             return res.status(400).json({ error: 'Invalid order ID format' });
           }
 
-          let query = supabaseAdmin.from('orders').select('*');
-          if (isUuid) {
-            query = query.eq('id', strOrder);
-          } else {
-            query = query.eq('provider_order_id', strOrder);
+          let { data: orderData } = await supabaseAdmin.from('orders').select('*').eq('id', strOrder).maybeSingle();
+          if (!orderData) {
+            const fb = await supabaseAdmin.from('orders').select('*').eq('provider_order_id', strOrder).maybeSingle();
+            orderData = fb.data;
           }
 
-          const { data: orderData, error: orderErr } = await query.maybeSingle();
-          if (orderErr || !orderData) return res.status(404).json({ error: 'Order not found' });
+          if (!orderData) return res.status(404).json({ error: 'Order not found' });
           
           if (orderData.user_id !== userId) {
             return res.status(403).json({ error: 'Access denied: You do not have permission to view this order' });

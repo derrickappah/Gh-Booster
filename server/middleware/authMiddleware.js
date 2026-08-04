@@ -4,12 +4,22 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.startsWith('Bearer ')
+  const isCookieAuth = !authHeader.startsWith('Bearer ');
+  const token = !isCookieAuth
     ? authHeader.substring(7)
     : (req.cookies?.token || req.cookies?.jwt || req.cookies?.sb_access_token || null);
 
   if (!token) {
     return res.status(401).json({ success: false, error: 'Access token required. Please login.' });
+  }
+
+  // CSRF Defense: Require custom headers for cookie-authenticated state-changing requests
+  const stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+  if (isCookieAuth && stateChangingMethods.includes(req.method.toUpperCase())) {
+    const customHeader = req.headers['x-requested-with'] || req.headers['x-csrf-token'] || req.headers['sec-fetch-site'];
+    if (!customHeader || customHeader === 'cross-site') {
+      return res.status(403).json({ success: false, error: 'CSRF validation failed for cookie-based request.' });
+    }
   }
 
   try {

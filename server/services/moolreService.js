@@ -454,16 +454,15 @@ class MoolreService {
           throw new Error('Invalid webhook signature — request rejected');
         }
       } catch (sigErr) {
-        if (sigErr.message.includes('request rejected')) throw sigErr;
         console.error('[Moolre Webhook] Signature check error:', sigErr.message);
-        throw new Error('Webhook signature verification failed');
+        throw new Error('Invalid webhook signature — request rejected');
       }
     }
 
     // Mandatory security verification check: If credentials exist, at least one form of secret or signature verification MUST pass
-    if (validSecret && !bodySecret && !signatureHeader) {
-      console.error('[Moolre Webhook] Request rejected: missing webhook secret or signature header');
-      throw new Error('Missing webhook signature or secret verification');
+    if (validSecret && (bodySecret !== validSecret) && !signatureHeader) {
+      console.error('[Moolre Webhook] Request rejected: missing or invalid webhook secret / signature header');
+      throw new Error('Missing or invalid webhook signature or secret verification');
     }
 
     // Support all common reference field names sent by Moolre (externalref, reference, etc.)

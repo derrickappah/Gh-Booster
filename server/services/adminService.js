@@ -385,19 +385,7 @@ class AdminService {
       throw new Error('Service rate cannot be negative');
     }
 
-    let { data, error } = await supabaseAdmin.from('services').insert([cleanData]).select();
-    
-    let retryCount = 0; while (retryCount < 5 && error && error.message && error.message.includes("Could not find the '")) { retryCount++;
-      const match = error.message.match(/Could not find the '([^']+)' column/);
-      if (match && match[1]) {
-        delete cleanData[match[1]];
-        const retry = await supabaseAdmin.from('services').insert([cleanData]).select();
-        data = retry.data;
-        error = retry.error;
-      } else {
-        break;
-      }
-    }
+    const { data, error } = await supabaseAdmin.from('services').insert([cleanData]).select();
     if (error) throw new Error(error.message);
     return data ? data[0] : null;
   }
