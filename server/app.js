@@ -32,6 +32,7 @@ app.set('trust proxy', parseInt(process.env.TRUST_PROXY || '1', 10));
 
 // Security Hardening & Compression
 app.use(helmet({
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
@@ -181,13 +182,18 @@ const pageRoutesMap = {
 // Server-side protection for admin pages — redirect unauthenticated users
 const jwt = require('jsonwebtoken');
 const env = require('./config/env');
-const adminPageMiddleware = (req, res, next) => {
-  const token = (req.headers['authorization'] || '').split(' ')[1] || req.cookies?.ghb_token;
+const adminPageMiddleware = async (req, res, next) => {
+  const token = (req.headers['authorization'] || '').split(' ')[1];
   if (!token) return res.redirect('/login');
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET);
     if (!decoded || !decoded.id) return res.redirect('/login');
-    if (decoded.role !== 'admin' && decoded.role !== 'super_admin') {
+
+    const { supabaseAdmin } = require('./config/supabase');
+    const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', decoded.id).maybeSingle();
+    const role = profile?.role;
+
+    if (role !== 'admin' && role !== 'super_admin') {
       return res.redirect('/dashboard');
     }
     next();
@@ -251,8 +257,8 @@ app.use('/favicon.ico', express.static(path.join(__dirname, '..', 'favicon.ico')
 app.use('/manifest.json', express.static(path.join(__dirname, '..', 'manifest.json')));
 app.use('/service-worker.js', express.static(path.join(__dirname, '..', 'service-worker.js')));
 
-// 5. Root level API routes fallback
-registerAppRoutes('');
+// 5. Root level API routes fallback removed to enforce /api prefix and rate limiting.
+// (registerAppRoutes('') removed to fix HIGH-06)
 
 // Serve favicon.ico, robots.txt, sitemap.xml & llms.txt
 app.get('/favicon.ico', (req, res) => {

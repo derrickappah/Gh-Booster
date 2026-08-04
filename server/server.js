@@ -14,9 +14,12 @@ app.listen(PORT, () => {
     if (count > 0) console.log(`[AutoRepair Startup] Marked ${count} credited deposit transaction(s) as completed.`);
   }).catch(() => {});
 
-  // Start Background Order & Deposit Status Sync Worker (Runs every 15 seconds)
-  const SYNC_INTERVAL_MS = 15000;
+  // Start Background Order & Deposit Status Sync Worker (Runs every 60 seconds with overlap protection)
+  const SYNC_INTERVAL_MS = 60000;
+  let isSyncing = false;
   setInterval(async () => {
+    if (isSyncing) return;
+    isSyncing = true;
     try {
       const updatedCount = await OrderService.syncAllNonFinalizedOrders();
       if (updatedCount > 0) {
@@ -25,6 +28,8 @@ app.listen(PORT, () => {
       await MoolreService.repairPendingCompletedTransactions();
     } catch (err) {
       console.error('[Background Sync Worker Error]:', err.message);
+    } finally {
+      isSyncing = false;
     }
   }, SYNC_INTERVAL_MS);
 });

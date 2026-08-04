@@ -108,7 +108,8 @@ class OrderService {
     const { data: rawOrders, error } = await supabaseAdmin
       .from('orders')
       .select('*')
-      .not('provider_order_id', 'is', null);
+      .not('provider_order_id', 'is', null)
+      .limit(500);
 
     if (error || !rawOrders) {
       if (error) console.error('[OrderCron] Error fetching active orders for background sync:', error.message);
@@ -361,6 +362,7 @@ class OrderService {
 
   static async createBulkOrders({ userId, bulkText, defaultServiceId }) {
     const MAX_BULK_LINES = 100;
+    const MAX_LINK_LENGTH = 2048;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
     if (lines.length > MAX_BULK_LINES) {
       throw new Error(`Bulk orders limited to ${MAX_BULK_LINES} lines per request. You submitted ${lines.length}.`);
@@ -368,6 +370,13 @@ class OrderService {
     if (lines.length === 0) {
       throw new Error('No valid order lines found in bulk text.');
     }
+    lines.forEach((l, idx) => {
+      const parts = l.split('|');
+      const link = (parts.length > 2 ? parts[2] : (parts.length > 1 ? parts[1] : parts[0])) || '';
+      if (link.trim().length > MAX_LINK_LENGTH) {
+        throw new Error(`Line ${idx + 1} link exceeds maximum allowable length of ${MAX_LINK_LENGTH} characters.`);
+      }
+    });
     const results = [];
     const validOrdersToPlace = [];
     let totalChargeOfValid = 0;
@@ -818,27 +827,15 @@ class OrderService {
     }
 
     // Atomically credit user's wallet balance via PostgreSQL function
-    let newBalance;
-    try {
-      const { data: rpcBalance, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
-        p_user_id: userId,
-        p_amount: refundableAmount
-      });
-      if (rpcErr) throw rpcErr;
-      newBalance = parseFloat(rpcBalance);
-    } catch (rpcError) {
-      console.error('[processOrderRefund] credit_wallet RPC failed:', rpcError.message);
-      // Fallback with CAS guard
-      const { data: wallet } = await supabaseAdmin
-        .from('wallets').select('balance').eq('user_id', userId).maybeSingle();
-      const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-      newBalance = currentBalance + refundableAmount;
-      await supabaseAdmin
-        .from('wallets')
-        .update({ balance: newBalance, updated_at: new Date().toISOString() })
-        .eq('user_id', userId)
-        .eq('balance', wallet ? wallet.balance : 0);
+    const { data: rpcBalance, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
+      p_user_id: userId,
+      p_amount: refundableAmount
+    });
+    if (rpcErr) {
+      console.error('[processOrderRefund] credit_wallet RPC failed:', rpcErr.message);
+      throw new Error('Wallet credit operation failed during refund processing');
     }
+    const newBalance = parseFloat(rpcBalance);
 
     const refPrefix = isPartial ? 'partial_refund_' : 'refund_';
     const txRef = `${refPrefix}${order.id}_${Date.now().toString(36)}`;

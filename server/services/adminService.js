@@ -453,18 +453,34 @@ class AdminService {
     let syncDetails = '';
 
     if (provider.api_url && provider.api_key) {
-      // Validate URL to prevent SSRF attacks
+      // Validate URL to prevent SSRF attacks via DNS resolution & private IP validation
       try {
         const parsedUrl = new URL(provider.api_url);
-        const blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '169.254.169.254', '[::1]'];
-        if (blockedHosts.includes(parsedUrl.hostname) || parsedUrl.hostname.startsWith('10.') || parsedUrl.hostname.startsWith('192.168.') || parsedUrl.hostname.startsWith('172.')) {
-          throw new Error('Internal/private URLs are not allowed for provider API endpoints');
+        const dns = require('dns').promises;
+        const net = require('net');
+
+        if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
+          throw new Error('Only HTTP/HTTPS protocols are allowed for provider API endpoints');
         }
-        if (parsedUrl.protocol !== 'https:') {
-          console.warn(`[AdminService] Provider ${provider.name} uses non-HTTPS URL`);
+
+        const addresses = await dns.resolve4(parsedUrl.hostname).catch(() => []);
+        for (const addr of addresses) {
+          if (net.isIP(addr)) {
+            const parts = addr.split('.').map(Number);
+            if (
+              parts[0] === 10 ||
+              parts[0] === 127 ||
+              parts[0] === 0 ||
+              (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+              (parts[0] === 192 && parts[1] === 168) ||
+              (parts[0] === 169 && parts[1] === 254)
+            ) {
+              throw new Error('Internal/private URLs are not allowed for provider API endpoints');
+            }
+          }
         }
       } catch (urlErr) {
-        if (urlErr.message.includes('not allowed')) throw urlErr;
+        if (urlErr.message.includes('not allowed') || urlErr.message.includes('protocols are allowed')) throw urlErr;
         throw new Error('Invalid provider API URL format');
       }
       try {

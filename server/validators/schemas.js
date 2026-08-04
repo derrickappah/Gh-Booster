@@ -59,6 +59,67 @@ const adminUpdateDepositStatusSchema = z.object({
   status: z.enum(['pending', 'completed', 'failed', 'expired', 'refunded'])
 });
 
+const adminUpdateBalanceSchema = z.object({
+  userId: z.string().min(1, 'User ID is required').optional(),
+  amount: z.number().positive('Amount must be positive').optional()
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().positive()).optional()),
+  newBalance: z.number().nonnegative().optional()
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().nonnegative()).optional()),
+  action: z.enum(['add', 'deduct']).optional(),
+  reason: z.string().max(500).optional()
+});
+
+const adminUpdateOrderStatusSchema = z.object({
+  orderId: z.string().min(1, 'Order ID is required').optional(),
+  status: z.enum(['Pending', 'Processing', 'In Progress', 'Completed', 'Partial', 'Canceled', 'Refunded'])
+});
+
+const adminReplyTicketSchema = z.object({
+  ticketId: z.string().min(1, 'Ticket ID is required'),
+  message: z.string().min(1, 'Message is required').max(5000)
+});
+
+const adminCreateBonusSchema = z.object({
+  min_amount: z.number().nonnegative()
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().nonnegative())),
+  bonus_percentage: z.number().min(0).max(100)
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().min(0).max(100))),
+  gateway: z.string().max(100).optional(),
+  status: z.enum(['active', 'disabled']).optional()
+});
+
+const adminCreatePromotionSchema = z.object({
+  code: z.string().min(1, 'Code is required').max(50),
+  discount_percentage: z.number().min(0).max(100)
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().min(0).max(100))),
+  max_uses: z.number().int().positive().optional()
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive()).optional()),
+  status: z.enum(['active', 'expired', 'disabled']).optional()
+});
+
+const adminCreateNewsSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  content: z.string().min(1, 'Content is required').max(10000),
+  category: z.string().max(100).optional(),
+  is_popup: z.boolean().optional()
+});
+
+const adminUpdateServiceSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  category_id: z.string().min(1).optional(),
+  rate_per_1k: z.number().nonnegative().optional()
+    .or(z.string().transform(v => parseFloat(v)).pipe(z.number().nonnegative()).optional()),
+  min_quantity: z.number().int().positive().optional(),
+  max_quantity: z.number().int().positive().optional(),
+  description: z.string().max(1000).optional(),
+  status: z.enum(['active', 'disabled']).optional()
+});
+
+const adminUpdateChildPanelStatusSchema = z.object({
+  id: z.string().min(1, 'Child Panel ID is required'),
+  status: z.enum(['Pending', 'Active', 'Disabled', 'Canceled'])
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -67,5 +128,13 @@ module.exports = {
   ticketSchema,
   adminCreateServiceSchema,
   adminCreateProviderSchema,
-  adminUpdateDepositStatusSchema
+  adminUpdateDepositStatusSchema,
+  adminUpdateBalanceSchema,
+  adminUpdateOrderStatusSchema,
+  adminReplyTicketSchema,
+  adminCreateBonusSchema,
+  adminCreatePromotionSchema,
+  adminCreateNewsSchema,
+  adminUpdateServiceSchema,
+  adminUpdateChildPanelStatusSchema
 };

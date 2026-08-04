@@ -12,7 +12,8 @@ class WalletService {
       .from('transactions')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(200);
 
     return {
       balance: wallet ? parseFloat(wallet.balance) : 0.0,

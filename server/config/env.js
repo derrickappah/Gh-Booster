@@ -12,6 +12,15 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development'
 };
 
+if (!env.SUPABASE_URL) {
+  throw new Error('FATAL: SUPABASE_URL environment variable must be set!');
+}
+if (!env.SUPABASE_ANON_KEY) {
+  throw new Error('FATAL: SUPABASE_ANON_KEY environment variable must be set!');
+}
+if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error('FATAL: SUPABASE_SERVICE_ROLE_KEY environment variable must be set!');
+}
 if (!env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET environment variable must be set!');
 }

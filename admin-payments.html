@@ -596,13 +596,18 @@
           return;
         }
 
+        const escapeHtml = (str) => {
+          if (!str) return '—';
+          return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+
         tbody.innerHTML = txns.map(t => {
           const statusClass = t.status === 'completed' ? 'completed-badge' : t.status === 'failed' ? 'failed-badge' : 'pending-badge';
           const date = t.created_at ? new Date(t.created_at).toLocaleDateString('en-GH', { day:'2-digit', month:'short', year:'numeric' }) : '—';
           const isPending = t.status === 'pending';
           return `<tr class="hover:bg-gray-50 transition">
-            <td class="px-6 py-3 font-mono text-gray-700">${t.reference || '—'}</td>
-            <td class="px-4 py-3 text-gray-600">${t.profiles?.username || t.profiles?.email || '—'}</td>
+            <td class="px-6 py-3 font-mono text-gray-700">${escapeHtml(t.reference)}</td>
+            <td class="px-4 py-3 text-gray-600">${escapeHtml(t.profiles?.username || t.profiles?.email)}</td>
             <td class="px-4 py-3 font-bold text-gray-900">GH₵${parseFloat(t.amount || 0).toFixed(2)}</td>
             <td class="px-4 py-3 text-gray-500">${t.gateway || 'Moolre'}</td>
             <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${statusClass}">${(t.status || 'pending').toUpperCase()}</span></td>

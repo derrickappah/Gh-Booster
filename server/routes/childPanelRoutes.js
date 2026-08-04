@@ -59,9 +59,8 @@ router.post('/order', authenticateToken, async (req, res) => {
     }]).select();
 
     if (error) {
-      // Refund the deducted amount if insertion fails
-      const rollbackBalance = newBalance + price;
-      await supabaseAdmin.from('wallets').update({ balance: rollbackBalance, updated_at: new Date().toISOString() }).eq('user_id', req.user.id);
+      // Refund the deducted amount atomically if insertion fails
+      await supabaseAdmin.rpc('credit_wallet', { p_user_id: req.user.id, p_amount: price }).catch(() => {});
       throw new Error(error.message);
     }
 

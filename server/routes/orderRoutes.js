@@ -11,9 +11,9 @@ router.get('/', authenticateToken, OrderController.getOrders);
 router.get('/batches', authenticateToken, OrderController.getBulkBatches);
 router.get('/sync-status', authenticateToken, OrderController.syncOrderStatus);
 router.get('/:id', authenticateToken, OrderController.getOrderById);
-router.post('/', authenticateToken, validate(createOrderSchema), OrderController.createOrder);
+router.post('/', authenticateToken, paymentLimiter, validate(createOrderSchema), OrderController.createOrder);
 router.post('/bulk', authenticateToken, paymentLimiter, OrderController.createBulkOrders);
-router.post('/:id/refill', authenticateToken, OrderController.refillOrder);
+router.post('/:id/refill', authenticateToken, paymentLimiter, OrderController.refillOrder);
 router.post('/:id/cancel', authenticateToken, OrderController.cancelOrder);
 
 module.exports = router;

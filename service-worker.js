@@ -46,7 +46,12 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   // Ignore non-http/https requests (e.g. chrome-extension://) and API calls
   if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) return;
-  if (event.request.url.includes('/api/')) return;
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('/admin-') || 
+      event.request.url.includes('/dashboard') || 
+      event.request.url.includes('/orders') || 
+      event.request.url.includes('/account') || 
+      event.request.url.includes('/wallet')) return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

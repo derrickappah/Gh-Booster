@@ -6,7 +6,7 @@ const { paymentLimiter } = require('../middleware/rateLimiter');
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
 // Moolre webhook — must be public (called by Moolre servers)
-router.post('/moolre/webhook', PaymentController.handleWebhook);
+router.post('/moolre/webhook', paymentLimiter, PaymentController.handleWebhook);
 
 // ─── Authenticated User Routes ────────────────────────────────────────────────
 router.use(authenticateToken);

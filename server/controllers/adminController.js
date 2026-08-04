@@ -40,26 +40,48 @@ class AdminController {
     try {
       const userId = req.params.userId || req.body.userId;
       const { amount, action, newBalance, reason } = req.body;
-      let targetBalance = newBalance;
+      const { supabaseAdmin } = require('../config/supabase');
+      let finalBalance;
 
-      if ((targetBalance === undefined || targetBalance === null) && amount !== undefined) {
-        const { supabaseAdmin } = require('../config/supabase');
-        const { data: wallet } = await supabaseAdmin
-          .from('wallets')
-          .select('balance')
-          .eq('user_id', userId)
-          .maybeSingle();
-
-        const currentBal = wallet ? parseFloat(wallet.balance || 0) : 0;
-        const numAmount = parseFloat(amount);
-        if (action === 'deduct') {
-          targetBalance = currentBal - Math.abs(numAmount);
-        } else {
-          targetBalance = currentBal + Math.abs(numAmount);
+      if ((newBalance === undefined || newBalance === null) && amount !== undefined) {
+        const numAmount = Math.abs(parseFloat(amount));
+        if (numAmount <= 0) {
+          return res.status(400).json({ success: false, error: 'Amount must be greater than zero.' });
         }
+
+        if (action === 'deduct') {
+          const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('debit_wallet', {
+            p_user_id: userId,
+            p_amount: numAmount
+          });
+          if (rpcErr) throw new Error(rpcErr.message || 'Failed to deduct balance');
+          finalBalance = parseFloat(rpcBal);
+        } else {
+          const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
+            p_user_id: userId,
+            p_amount: numAmount
+          });
+          if (rpcErr) throw new Error(rpcErr.message || 'Failed to credit balance');
+          finalBalance = parseFloat(rpcBal);
+        }
+
+        // Record audit transaction
+        await supabaseAdmin.from('transactions').insert({
+          user_id: userId,
+          amount: action === 'deduct' ? -numAmount : numAmount,
+          currency: 'GHS',
+          gateway: 'Admin Manual Adjustment',
+          reference: `adm_adj_${Date.now().toString(36)}`,
+          type: action === 'deduct' ? 'withdrawal' : 'bonus',
+          status: 'completed',
+          description: reason || `Admin manual balance ${action}`
+        }).catch(() => {});
+
+        return res.json({ success: true, new_balance: finalBalance, message: 'User balance updated successfully.' });
       }
 
-      if (targetBalance < 0) {
+      let targetBalance = parseFloat(newBalance);
+      if (isNaN(targetBalance) || targetBalance < 0) {
         return res.status(400).json({ success: false, error: 'User balance cannot be reduced below zero.' });
       }
 

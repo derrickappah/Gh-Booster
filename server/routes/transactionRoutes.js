@@ -19,7 +19,8 @@ router.get('/', authenticateToken, async (req, res) => {
       .from('transactions')
       .select('*')
       .eq('user_id', req.user.id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500);
 
     if (txErr) console.error('Error fetching transactions:', txErr.message);
 
@@ -42,7 +43,8 @@ router.get('/', authenticateToken, async (req, res) => {
       .from('orders')
       .select('*')
       .eq('user_id', req.user.id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500);
 
     if (orders && orders.length > 0) {
       const existingRefs = new Set(allTxs.map(t => String(t.reference || t.id).toLowerCase()));

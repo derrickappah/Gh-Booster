@@ -422,15 +422,16 @@ class MoolreService {
   static async handleWebhook(payload, signatureHeader) {
     const creds = await MoolreService.getCredentials();
 
-    // Verify webhook secret in body if provided by Moolre (payload.data.secret)
+    const validSecret = creds.webhookSecret || creds.apiKey;
     const bodySecret = payload?.data?.secret || payload?.secret;
-    if (bodySecret && (creds.apiKey || creds.webhookSecret)) {
-      const validSecret = creds.webhookSecret || creds.apiKey;
+
+    // Reject if body secret is supplied but invalid
+    if (bodySecret && validSecret) {
       if (bodySecret !== validSecret) {
-        console.warn(`[Moolre Webhook] Body secret mismatch: received ${bodySecret}`);
-      } else {
-        console.log('[Moolre Webhook] Valid secret confirmed from payload body');
+        console.error(`[Moolre Webhook] Body secret mismatch: received ${bodySecret}`);
+        throw new Error('Invalid webhook secret — request rejected');
       }
+      console.log('[Moolre Webhook] Valid secret confirmed from payload body');
     }
 
     // Verify webhook signature if present in header
@@ -444,11 +445,20 @@ class MoolreService {
         const sigBuffer = Buffer.from(signatureHeader, 'utf8');
         const expectedBuffer = Buffer.from(expectedSig, 'utf8');
         if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-          console.warn('[Moolre Webhook] Signature header present but signature mismatch');
+          console.error('[Moolre Webhook] Signature header present but signature mismatch');
+          throw new Error('Invalid webhook signature — request rejected');
         }
       } catch (sigErr) {
-        console.warn('[Moolre Webhook] Signature check warning:', sigErr.message);
+        if (sigErr.message.includes('request rejected')) throw sigErr;
+        console.error('[Moolre Webhook] Signature check error:', sigErr.message);
+        throw new Error('Webhook signature verification failed');
       }
+    }
+
+    // Mandatory security verification check: If credentials exist, at least one form of secret or signature verification MUST pass
+    if (validSecret && !bodySecret && !signatureHeader) {
+      console.error('[Moolre Webhook] Request rejected: missing webhook secret or signature header');
+      throw new Error('Missing webhook signature or secret verification');
     }
 
     // Support all common reference field names sent by Moolre (externalref, reference, etc.)
@@ -728,12 +738,16 @@ class MoolreService {
           .like('details', `%${ref}%`);
 
         if (logs && logs.length > 0) {
-          await supabaseAdmin
-            .from('transactions')
-            .update({ status: 'completed', updated_at: new Date().toISOString() })
-            .eq('id', txn.id);
-          repairedCount++;
-          console.log(`[AutoRepair] Marked pending deposit #${txn.id} (${ref}) as completed.`);
+          // Double-check wallet balance exists for user before updating status
+          const { data: userWallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', txn.user_id).maybeSingle();
+          if (userWallet) {
+            await supabaseAdmin
+              .from('transactions')
+              .update({ status: 'completed', updated_at: new Date().toISOString() })
+              .eq('id', txn.id);
+            repairedCount++;
+            console.log(`[AutoRepair] Marked pending deposit #${txn.id} (${ref}) as completed.`);
+          }
         }
       }
       return repairedCount;

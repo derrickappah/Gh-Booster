@@ -109,8 +109,7 @@ class AuthService {
         phone: cleanPhone,
         balance: initialBalance,
         currency: 'GHS',
-        role: 'user',
-        api_key: apiKey
+        role: 'user'
       }
     };
   }
@@ -123,20 +122,11 @@ class AuthService {
 
     // Resolve username to email from Supabase profiles table if input is not an email
     if (!inputStr.includes('@')) {
-      let { data: profile } = await supabaseAdmin
+      const { data: profile } = await supabaseAdmin
         .from('profiles')
         .select('email')
-        .ilike('username', inputStr)
+        .eq('username', inputStr.toLowerCase())
         .maybeSingle();
-
-      if (!profile) {
-        const { data: p2 } = await supabaseAdmin
-          .from('profiles')
-          .select('email')
-          .ilike('full_name', inputStr)
-          .maybeSingle();
-        profile = p2;
-      }
 
       if (profile && profile.email) {
         emailToUse = profile.email.toLowerCase();
@@ -151,10 +141,11 @@ class AuthService {
 
     if (authErr || !authData?.session || !authData?.user) {
       try {
+        const maskedEmail = emailToUse.replace(/^(.{2}).*@/, '$1***@');
         await supabaseAdmin.from('audit_logs').insert({
           user_id: null,
           action: 'FAILED_LOGIN',
-          details: `Failed login attempt for ${emailToUse}`
+          details: `Failed login attempt for ${maskedEmail}`
         });
       } catch (_) {}
       throw new Error(authErr ? authErr.message : 'Invalid credentials. Please check your username/email and password.');
@@ -176,18 +167,18 @@ class AuthService {
       balance: wallet ? parseFloat(wallet.balance) : 0.0,
       currency: wallet?.currency || 'GHS',
       role: userRole,
-      is_admin: userRole === 'admin' || userRole === 'super_admin',
-      api_key: profile?.api_key || null
+      is_admin: userRole === 'admin' || userRole === 'super_admin'
     };
 
     const token = generateToken(user);
 
     // Log successful login
     try {
+      const maskedEmail = emailToUse.replace(/^(.{2}).*@/, '$1***@');
       await supabaseAdmin.from('audit_logs').insert({
         user_id: userId,
         action: userRole === 'admin' || userRole === 'super_admin' ? 'ADMIN_LOGIN' : 'USER_LOGIN',
-        details: `User ${emailToUse} logged in successfully`
+        details: `User ${maskedEmail} logged in successfully`
       });
     } catch (_) {}
 
