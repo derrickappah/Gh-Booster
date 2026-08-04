@@ -265,6 +265,27 @@ class AdminService {
       });
     } catch (_) {}
 
+    // Record audit entry in transactions ledger
+    try {
+      const diff = balance - oldBal;
+      if (diff !== 0) {
+        const txRef = `adm_adj_${Date.now().toString(36)}`;
+        await supabaseAdmin.from('transactions').insert({
+          user_id: userId,
+          amount: diff,
+          currency: 'GHS',
+          gateway: 'Admin Manual Adjustment',
+          reference: txRef,
+          payment_ref: txRef,
+          type: diff < 0 ? 'withdrawal' : 'bonus',
+          status: 'completed',
+          description: reason || `Admin manual balance adjustment from GH₵${oldBal.toFixed(2)} to GH₵${balance.toFixed(2)}`
+        });
+      }
+    } catch (txErr) {
+      console.error('[AdminService] Failed to record transaction audit for balance adjustment:', txErr.message);
+    }
+
     return { success: true, new_balance: balance, message: `User balance updated to GH₵${balance.toFixed(2)}` };
   }
 

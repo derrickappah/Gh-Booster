@@ -1,162 +1,135 @@
 # Production Readiness Code Review Report
 
-This report provides a production-readiness review of the codebase. It analyzes architectural, transactional, reliability, performance, edge case, state consistency, and error-handling findings across all backend services, controllers, middleware, and routes.
+**Target Branch:** `main`  
+**Date:** August 4, 2026  
+**Status:** Review Complete — Action Required Before Production Release
 
 ---
 
-## Summary of Findings
+## Executive Summary
 
-| # | File | Function | Category | Impact |
-|---|---|---|---|---|
-| 1 | `server/app.js` | `adminPageMiddleware` | Incorrect Logic / Edge Cases | High |
-| 2 | `server/services/orderService.js` | `createOrder` | Database Transaction / Inconsistent State | High |
-| 3 | `server/services/orderService.js` | `processOrderRefund` | Database Transaction / Inconsistent State | High |
-| 4 | `server/services/orderService.js` | `processOrderRefund` | Edge Cases / Incorrect Logic | High |
-| 5 | `server/services/orderService.js` | `getOrderById` | Performance / Reliability | Medium |
-| 6 | `server/services/moolreService.js` | `_creditUserWallet` | Database Transaction / Reliability | High |
-| 7 | `server/services/adminService.js` | `getStats` | Performance / Scalability | High |
-| 8 | `server/controllers/adminController.js` | `updateUserBalance` | Missing Error Handling | High |
-| 9 | `server/controllers/adminController.js` | `updateDepositStatus` | Incorrect Logic / Inconsistent State | High |
-| 10 | `server/controllers/apiV2Controller.js` | `handleV2Request` | Potential Runtime Exception / Poor Validation | Medium |
-| 11 | `server/services/authService.js` | `register` | Transaction Problem / Edge Cases | Medium |
-| 12 | `server/middleware/authMiddleware.js` | `authenticateToken` | Poor Validation / Maintainability | Low |
-| 13 | `server/services/moolreService.js` | `verifyPayment` | Incorrect Logic / Edge Cases | Medium |
-| 14 | `server/services/smmgenService.js` | `placeOrder`, `getOrderStatus`, `refillOrder` | Missing Error Handling / Reliability | Medium |
-| 15 | `server/services/moolreService.js` | `handleWebhook`, `completePaymentFromRedirect`, `verifyPayment` | Code Duplication / Maintainability | Low |
+A comprehensive code review was performed across the application codebase to evaluate production readiness. The review focused on identifying logic flaws, missing error handling, potential runtime exceptions, state inconsistency, database transaction safety, validation gaps, performance bottlenecks, maintainability issues, and edge cases.
 
 ---
 
-## Detailed Review Findings
+## Detailed Findings
 
-### Finding 1: Browser Navigation Authentication Failure in Admin Middleware
-- **File**: [`server/app.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/app.js#L185-L206)
-- **Function**: `adminPageMiddleware`
-- **Description**: `adminPageMiddleware` checks `req.headers['authorization']` for a JWT token when serving HTML admin page routes (`/admin-*`). When users navigate directly via the browser address bar (GET page request), browsers do not attach an `Authorization` header; authentication tokens are sent via cookies (`req.cookies.token`).
-- **Why it may fail**: Legitimate administrators navigating directly to `/admin-dashboard` or any admin page via URL bar will always be redirected to `/login`, even if they possess a valid session cookie.
-- **Suggested improvement**: Ensure `adminPageMiddleware` checks `req.cookies.token`, `req.cookies.jwt`, or `req.cookies.sb_access_token` in addition to `req.headers['authorization']`.
+### 1. Unhandled Partial Failures in Bulk Order Execution
 
----
-
-### Finding 2: Race Condition in Wallet Balance Deduction During Order Creation
-- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L227-L238)
-- **Function**: `createOrder`
-- **Description**: Wallet balance deduction reads current balance into Node.js memory (`currentBalance`), computes `newBalance = currentBalance - totalCharge`, and issues a Supabase update call: `.update({ balance: newBalance }).gte('balance', totalCharge)`.
-- **Why it may fail**: If a user issues two concurrent order requests (or double-clicks a submit button), both execution contexts read the same initial balance (e.g. GH₵100). Both calculate `newBalance = 70` for GH₵30 orders. Both updates succeed, setting final balance to GH₵70 instead of GH₵40. The user gets GH₵60 worth of orders for GH₵30.
-- **Suggested improvement**: Use an atomic database function (`supabaseAdmin.rpc('debit_wallet', { p_user_id: userId, p_amount: totalCharge })`) or perform single-query arithmetic in SQL (`balance = balance - totalCharge`).
+- **File:** [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L340-L450)
+- **Function:** `createBulkOrders`
+- **Description:** In bulk order processing, total funds for all valid lines are deducted upfront from the user's wallet via `debit_wallet`. If individual order creation or SMMGen provider placement fails mid-loop (e.g., due to API timeout, invalid target link, or database insert failure on a specific line), money deducted for those failed lines is not automatically refunded.
+- **Why it may fail:** A network glitch or provider rejection on line 5 of a 10-line bulk order will result in the user being charged for 10 orders while only receiving 4, causing financial loss and corrupted wallet state.
+- **Suggested improvement:** Track the cumulative charge of successfully placed orders versus failed orders, and issue an atomic refund via `credit_wallet` for all unfulfilled lines at the end of `createBulkOrders`. Alternatively, perform bulk validation and execute order placement within an atomic transaction.
 
 ---
 
-### Finding 3: Non-Atomic Order Refund Processing Causing Partial State Updates
-- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L789-L820)
-- **Function**: `processOrderRefund`
-- **Description**: `processOrderRefund` claims the refund by updating `refunded_amount` on the `orders` record *before* invoking `credit_wallet` RPC to credit the user's balance.
-- **Why it may fail**: If `credit_wallet` RPC fails (e.g. database timeout, connection drop, or lock conflict), the order table remains marked as refunded (`refunded_amount` updated), but the user's wallet receives zero credit. Any subsequent retry will calculate `refundableAmount = 0` because `alreadyRefunded` matches `targetRefundTotal`, leaving customer funds permanently lost.
-- **Suggested improvement**: Wrap order status/refund updates and wallet balance crediting inside a single atomic database function or transaction block, or handle error rollbacks explicitly.
+### 2. Double-Crediting Race Condition in Payment Webhooks and Redirects
+
+- **File:** [moolreService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L355-L425)
+- **Function:** `verifyPayment` & `completePaymentFromRedirect`
+- **Description:** The payment verification and wallet crediting logic (`_creditUserWallet`) lacks database row locking (`FOR UPDATE`) or an atomic status state machine transition. If the payment gateway fires the asynchronous webhook at the exact same moment the user is redirected back to the site, both handlers can read the transaction status as `pending` simultaneously.
+- **Why it may fail:** Concurrent execution of `completePaymentFromRedirect` and `handleWebhook` will invoke `_creditUserWallet` twice for a single transaction, doubling the credited amount in the user's balance.
+- **Suggested improvement:** Implement a conditional SQL update on transaction completion (`UPDATE transactions SET status = 'completed' WHERE id = $1 AND status != 'completed' RETURNING *`). Only proceed with wallet crediting if the SQL update returns a modified row.
 
 ---
 
-### Finding 4: Silent Refund Failure on NULL `refunded_amount` Columns
-- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L790-L804)
-- **Function**: `processOrderRefund`
-- **Description**: The query to claim a refund relies on `.lte('refunded_amount', alreadyRefunded)`. If an order was inserted with a `NULL` value in `refunded_amount`, `alreadyRefunded` evaluates to `0`. In PostgreSQL, `NULL <= 0` evaluates to `NULL` (falsy in SQL `WHERE` clauses).
-- **Why it may fail**: For any order where `refunded_amount` is `NULL`, the update claim query matches zero rows and returns `claimedOrder = null`. The function returns `{ refunded: false }` without issuing a refund or throwing an error.
-- **Suggested improvement**: Ensure the schema defaults `refunded_amount` to `0.00` and modify the claim query to `.or('refunded_amount.is.null,refunded_amount.lte.' + alreadyRefunded)`.
+### 3. Unbounded Parallel Async Requests in Order Status Synchronization
+
+- **File:** [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L30-L88)
+- **Function:** `syncUserOrdersStatus` & `syncAllNonFinalizedOrders`
+- **Description:** Order status synchronization fetches active orders and executes `Promise.all` over every pending order to call `SmmgenService.getOrderStatus(provider_order_id)` concurrently. Up to 500 orders are fetched in `syncAllNonFinalizedOrders`.
+- **Why it may fail:** Making hundreds of simultaneous HTTP requests to the third-party SMMGen API will exceed rate limits (HTTP 429 Too Many Requests), trigger socket hang-ups, or cause node HTTP agent thread pool starvation.
+- **Suggested improvement:** Implement chunked batch processing (e.g., limit concurrency to 10 requests at a time using `p-limit` or chunked loops), or utilize SMMGen’s bulk status API endpoint passing comma-separated order IDs.
 
 ---
 
-### Finding 5: Synchronous Provider API Calls Blocking Order Detail Endpoint
-- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L588-L640)
-- **Function**: `getOrderById`
-- **Description**: `getOrderById` executes an HTTP request to `SmmgenService.getOrderStatus(dbOrder.provider_order_id)` on every invocation for active/non-finalized orders.
-- **Why it may fail**: If the external SMM provider API experiences latency or outage, every request to fetch order details or render dashboard views will block, causing client timeouts and server connection pool exhaustion.
-- **Suggested improvement**: Rely on the asynchronous background sync task (`syncAllNonFinalizedOrders`) or enforce a minimum caching interval (e.g. fetch live status at most once every 60 seconds per order).
+### 4. Non-Atomic Multi-Step User Registration
+
+- **File:** [authService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/authService.js#L5-L117)
+- **Function:** `register`
+- **Description:** Registration creates an auth account via `supabase.auth.signUp`, inserts into `profiles`, and then inserts into `wallets`. If the `wallets` table insert fails (due to DB constraint, connection drop, or timeout), the function logs the error but proceeds to issue a JWT token.
+- **Why it may fail:** The user account will exist in `auth.users` and `profiles` without a corresponding `wallets` record. Any subsequent action requiring balance checks will throw a `TypeError` or `NullPointer` exception on `wallet.balance`.
+- **Suggested improvement:** Wrap profile and wallet creation in a PostgreSQL trigger or RPC function on `auth.users` insertion to ensure atomic user initialization.
 
 ---
 
-### Finding 6: Premature Status Completion Prior to Wallet Credit in Moolre Gateway
-- **File**: [`server/services/moolreService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L583-L633)
-- **Function**: `_creditUserWallet`
-- **Description**: `_creditUserWallet` updates transaction status to `completed` in `transactions` *before* executing the `credit_wallet` RPC.
-- **Why it may fail**: If the server process crashes, encounters an unhandled exception, or loses DB connection immediately after the status update but before `credit_wallet` finishes, the transaction is permanently marked `completed` while the user's wallet was never credited.
-- **Suggested improvement**: Execute transaction status updates and wallet balance increases within a unified database RPC (`credit_deposit_and_complete_tx`).
+### 5. Client-Side In-Memory Aggregation of Large Datasets
+
+- **File:** [adminService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/adminService.js#L4-L184)
+- **Function:** `getStats`
+- **Description:** `getStats` queries up to 10,000 rows from `orders`, `profiles`, `wallets`, and `transactions` tables into Node.js memory, then runs JavaScript `.filter()` and `.reduce()` to compute total revenue, daily counts, and status breakdowns.
+- **Why it may fail:** As table sizes exceed 10,000 rows, dashboard metrics will become truncated and inaccurate due to `.limit(10000)`. Furthermore, pulling large datasets on every admin dashboard render causes high RAM consumption and latency bottlenecks.
+- **Suggested improvement:** Replace client-side array aggregation with database-level SQL aggregate queries (`COUNT(*)`, `SUM(charge)`, `COUNT(*) FILTER (...)`).
 
 ---
 
-### Finding 7: Unscalable In-Memory Data Aggregation in Admin Statistics
-- **File**: [`server/services/adminService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/adminService.js#L5-L129)
-- **Function**: `getStats`
-- **Description**: `getStats` queries up to 10,000 full records from `profiles`, `orders`, `transactions`, `wallets`, and `tickets` into Node.js heap memory and calculates metrics via client-side JavaScript `.reduce()` and `.filter()`.
-- **Why it may fail**: Once total database rows exceed 10,000, `.limit(10000)` truncates financial data, producing incorrect revenue and deposit totals. Additionally, pulling tens of thousands of rows into server RAM on every dashboard refresh causes high CPU/memory pressure.
-- **Suggested improvement**: Use PostgreSQL SQL aggregate queries (`SELECT COUNT(*), SUM(charge) FROM orders WHERE ...`) to calculate statistics directly inside the database engine.
+### 6. Audit Trail Bypass in Balance Adjustment
+
+- **File:** [adminController.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/controllers/adminController.js#L39-L102)
+- **Function:** `updateUserBalance`
+- **Description:** The controller supports two distinct branches for updating balance: specifying `amount` + `action`, or specifying direct `newBalance`. The `amount` branch writes an audit record to the `transactions` table, whereas the `newBalance` branch calls `AdminService.updateUserBalance` which updates the wallet directly without creating a transaction log.
+- **Why it may fail:** Admin adjustments made via the `newBalance` pathway leave no audit trail in the `transactions` ledger, preventing financial auditing and leading to unaccounted balance shifts.
+- **Suggested improvement:** Unify both branches to always record a mandatory audit entry in `transactions` explaining the balance modification and prior/new amounts.
 
 ---
 
-### Finding 8: Suppressed Errors in Manual Balance Adjustment Audit Logging
-- **File**: [`server/controllers/adminController.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/controllers/adminController.js#L68-L82)
-- **Function**: `updateUserBalance`
-- **Description**: Manual balance updates attempt to record an audit transaction using `.from('transactions').insert(...).catch(() => {})`.
-- **Why it may fail**: If transaction insertion fails due to schema mismatches, missing fields, or DB constraint errors, `.catch(() => {})` silently swallows the failure. The admin receives a success response, but no transaction record exists in `transactions`, destroying financial auditability.
-- **Suggested improvement**: Remove `.catch(() => {})` and enforce mandatory error handling for transaction record creation.
+### 7. Code Duplication in Admin Authorization Middleware
+
+- **File:** [app.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/app.js#L185-L225) vs [authMiddleware.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/middleware/authMiddleware.js#L5-L90)
+- **Function:** `adminPageMiddleware`
+- **Description:** `adminPageMiddleware` in `app.js` duplicates the JWT signature verification and Supabase user verification logic already implemented in `authMiddleware.js`.
+- **Why it may fail:** Maintaining two separate implementations of authentication and role checks leads to security drift. Updates or fixes applied to `authMiddleware.js` (e.g. token revocation checks) may not be mirrored in `adminPageMiddleware`, leading to potential security vulnerabilities.
+- **Suggested improvement:** Remove duplicate inline middleware from `app.js` and import `authenticateToken` and `requireRole(['admin', 'super_admin'])` from `authMiddleware.js`.
 
 ---
 
-### Finding 9: Uncredited Wallet Balances on Manual Admin Deposit Approval
-- **File**: [`server/controllers/adminController.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/controllers/adminController.js#L238-L256)
-- **Function**: `updateDepositStatus`
-- **Description**: When an admin updates a deposit status to `completed` in `admin-deposits.html`, `updateDepositStatus` modifies the `audit_logs` table but never calls `_creditUserWallet` or adjusts the customer's wallet balance.
-- **Why it may fail**: Admin approval in the UI marks deposits as `completed`, but customer wallet balances remain unchanged, requiring manual database intervention to fix.
-- **Suggested improvement**: Invoke `MoolreService._creditUserWallet(deposit.user_id, deposit.amount, deposit.reference)` whenever deposit status is changed to `completed`.
+### 8. In-Memory Rate Limiting in Distributed Environment
+
+- **File:** [rateLimiter.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/middleware/rateLimiter.js#L1-L30)
+- **Function:** `globalLimiter` & `paymentLimiter`
+- **Description:** Express rate limiters are configured using the default in-memory store (`MemoryStore`).
+- **Why it may fail:** When deployed across multiple server instances (e.g., Vercel serverless functions, PM2 cluster mode, or Kubernetes pods), rate limits are not shared. Attackers can bypass rate limits by targeting different backend instances.
+- **Suggested improvement:** Configure `rate-limit-redis` or Upstash Redis store to maintain centralized rate-limiting counters across all cluster instances.
 
 ---
 
-### Finding 10: Unhandled Database Exceptions on Invalid API V2 Order Parameter
-- **File**: [`server/controllers/apiV2Controller.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/controllers/apiV2Controller.js#L64-L72)
-- **Function**: `handleV2Request` (action: `status`)
-- **Description**: The API V2 `status` action receives an `order` parameter and directly passes it to `supabaseAdmin.from('orders').select('*').eq('id', order)`.
-- **Why it may fail**: If an external API consumer sends a non-UUID string or numeric provider order ID as `order`, PostgreSQL throws a `22P02: invalid input syntax for type uuid` exception, crashing the request with a 400/500 error instead of a clean API error message.
-- **Suggested improvement**: Validate that `order` is a valid UUID format before querying Supabase.
+### 9. Floating-Point Rounding Errors in Financial Charges
+
+- **File:** [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L223-L224)
+- **Function:** `createOrder`
+- **Description:** Order total charge is calculated using floating-point multiplication: `roundMoney((qty / 1000) * ratePer1k)`.
+- **Why it may fail:** IEEE 754 binary floating-point representation can produce precision anomalies (e.g. `0.1 + 0.2 = 0.30000000000000004`). On high-volume or fractional rate operations, rounding inaccuracies can lead to penny discrepancies between wallet deductions and provider charges.
+- **Suggested improvement:** Perform financial calculations using integer cents/units (scaling rates by 10,000) or utilize a arbitrary-precision library like `bignumber.js` or `decimal.js`.
 
 ---
 
-### Finding 11: Orphaning Auth Users on Failed Profile/Wallet Registration
-- **File**: [`server/services/authService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/authService.js#L23-L98)
-- **Function**: `register`
-- **Description**: Registration calls `supabase.auth.signUp` first, followed by separate database calls to `profiles` and `wallets`.
-- **Why it may fail**: If profile or wallet upsert fails (e.g. database schema conflict or network interruption), a user record exists in `auth.users` without corresponding `profiles` or `wallets` rows. Future login or registration attempts for this email fail or throw null pointer exceptions.
-- **Suggested improvement**: Implement a PostgreSQL trigger (`on_auth_user_created`) to automatically insert profile and wallet rows atomically upon user creation in `auth.users`.
+### 10. Missing Input Validation Schemas on Sensitive Order Routes
+
+- **File:** [orderRoutes.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/routes/orderRoutes.js#L15-L17)
+- **Function:** Router configuration for `/bulk`, `/:id/refill`, `/:id/cancel`
+- **Description:** While `POST /` uses `validate(createOrderSchema)`, endpoints `POST /bulk`, `POST /:id/refill`, and `POST /:id/cancel` do not attach validation middleware.
+- **Why it may fail:** Malformed payloads (e.g., passing invalid JSON types or missing required fields) bypass route validation and reach controller functions, causing unhandled runtime errors or unexpected database queries.
+- **Suggested improvement:** Define and attach explicit Joi / express-validator schemas for all POST routes in `orderRoutes.js`.
 
 ---
 
-### Finding 12: Redundant Role Logic in Auth Middleware
-- **File**: [`server/middleware/authMiddleware.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/middleware/authMiddleware.js#L27-L28)
-- **Function**: `authenticateToken`
-- **Description**: In `authenticateToken`, the user role calculation contains redundant code: `const dbRole = profile?.role || 'user'; const userRole = (dbRole !== 'user') ? dbRole : 'user';`.
-- **Why it may fail**: `(dbRole !== 'user') ? dbRole : 'user'` evaluates to `dbRole` in all branches. While functionally working, it indicates dead logic that can cause confusion or maintenance bugs if modified.
-- **Suggested improvement**: Simplify the assignment to `const userRole = profile?.role || 'user';`.
+### 11. Silent Error Handling in JWT Verification
+
+- **File:** [authMiddleware.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/middleware/authMiddleware.js#L41-L43)
+- **Function:** `authenticateToken`
+- **Description:** Custom JWT verification failure is caught with empty `catch (_)` blocks without logging the error cause (e.g., token expired vs invalid signature).
+- **Why it may fail:** Debugging auth failures in production becomes difficult because token verification exceptions are suppressed without trace or log emission.
+- **Suggested improvement:** Log detailed authentication failures internally at debug level to assist operational monitoring while returning clean generic error responses to clients.
 
 ---
 
-### Finding 13: Premature Deposit Expiration Without External Gateway Verification
-- **File**: [`server/services/moolreService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L364-L378)
-- **Function**: `verifyPayment`
-- **Description**: When checking payment status, if a local transaction is >30 minutes old and API verification fails or returns non-completed, `verifyPayment` updates status to `expired`.
-- **Why it may fail**: Delayed mobile money confirmations or delayed user checkouts completed after 30 minutes get marked `expired` locally without verifying actual status with Moolre gateway, forfeiting valid deposits.
-- **Suggested improvement**: Only update status to `expired` if Moolre gateway explicitly returns a failed/expired status response.
+## Recommendation Summary
 
----
-
-### Finding 14: Unbounded HTTP Requests to External SMM Provider
-- **File**: [`server/services/smmgenService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/smmgenService.js#L13-L89)
-- **Function**: `placeOrder`, `getOrderStatus`, `refillOrder`
-- **Description**: HTTP `fetch` requests to SMMGen API do not configure request timeouts or abort signals.
-- **Why it may fail**: If the provider server hangs or drops packets without closing TCP connections, Node.js worker threads wait indefinitely, consuming server resources and blocking backend tasks.
-- **Suggested improvement**: Attach an `AbortController` timeout signal (e.g., 10-second timeout) to all external `fetch` calls.
-
----
-
-### Finding 15: Duplicated Reference Lookup and Normalization Logic
-- **File**: [`server/services/moolreService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L323-L332)
-- **Function**: `handleWebhook`, `completePaymentFromRedirect`, `verifyPayment`, `_creditUserWallet`
-- **Description**: Transaction reference lookup logic (`eq('reference', ref)` fallback to `eq('payment_ref', ref)`) and status verification routines are duplicated in 4 separate methods across `moolreService.js`.
-- **Why it may fail**: Updating lookup strategies or adding support for new payment gateway reference formats requires modifying multiple places, creating maintenance risk if one method is missed.
-- **Suggested improvement**: Refactor transaction resolution into a centralized private helper `_findTransactionByRef(ref)`.
+| Priority | Area | Recommendation |
+| :--- | :--- | :--- |
+| **High** | Payment Gateway | Add atomic conditional updates on payment webhooks to prevent double-crediting. |
+| **High** | Order Processing | Implement atomic refunds for partial bulk order failures. |
+| **Medium**| Rate Limiting | Migrate rate limit store from in-memory to Redis for multi-instance deployment. |
+| **Medium**| Database / Stats | Refactor `AdminService.getStats` to use native SQL aggregations instead of pulling 10,000 rows. |
+| **Medium**| Auth / Security | Unify admin middleware in `app.js` with central `authMiddleware.js`. |

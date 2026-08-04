@@ -120,6 +120,19 @@ const adminUpdateChildPanelStatusSchema = z.object({
   status: z.enum(['Pending', 'Active', 'Disabled', 'Canceled'])
 });
 
+const bulkOrderSchema = z.object({
+  bulk_text: z.string().min(1, 'Bulk order text is required').max(50000, 'Bulk text exceeds limit'),
+  service_id: z.string().optional()
+});
+
+const refillOrderSchema = z.object({
+  order_id: z.string().optional()
+});
+
+const cancelOrderSchema = z.object({
+  reason: z.string().max(500).optional()
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -136,5 +149,8 @@ module.exports = {
   adminCreatePromotionSchema,
   adminCreateNewsSchema,
   adminUpdateServiceSchema,
-  adminUpdateChildPanelStatusSchema
+  adminUpdateChildPanelStatusSchema,
+  bulkOrderSchema,
+  refillOrderSchema,
+  cancelOrderSchema
 };

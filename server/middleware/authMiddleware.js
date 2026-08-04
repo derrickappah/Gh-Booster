@@ -38,8 +38,11 @@ async function authenticateToken(req, res, next) {
         };
         return next();
       }
-    } catch (_) {
-      // Not a valid custom JWT or signature mismatch; proceed to Supabase Auth check
+    } catch (jwtErr) {
+      // Custom JWT verification failed (e.g. invalid signature/expired); log for debugging and proceed to Supabase Auth check
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[AuthMiddleware] Custom JWT verification check failed:', jwtErr.message);
+      }
     }
 
     // 2. Try Supabase Auth API verification

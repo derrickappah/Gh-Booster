@@ -180,48 +180,13 @@ const pageRoutesMap = {
 };
 
 // Server-side protection for admin pages — redirect unauthenticated users
-const jwt = require('jsonwebtoken');
-const env = require('./config/env');
-const adminPageMiddleware = async (req, res, next) => {
-  const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.startsWith('Bearer ')
-    ? authHeader.substring(7)
-    : (req.cookies?.token || req.cookies?.jwt || req.cookies?.sb_access_token || null);
-  if (!token) return res.redirect('/login');
-
-  const { supabase, supabaseAdmin } = require('./config/supabase');
-
-  // 1. Try Custom JWT verification signed with JWT_SECRET
-  try {
-    const decoded = jwt.verify(token, env.JWT_SECRET);
-    if (decoded && decoded.id) {
-      const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', decoded.id).maybeSingle();
-      const role = profile?.role;
-      if (role !== 'admin' && role !== 'super_admin') {
-        return res.redirect('/dashboard');
-      }
-      return next();
-    }
-  } catch (_) {
-    // Custom JWT failed, try Supabase session token check below
-  }
-
-  // 2. Try Supabase Auth API verification
-  try {
-    const { data: { user: supabaseUser }, error } = await supabase.auth.getUser(token);
-    if (!error && supabaseUser) {
-      const { data: profile } = await supabaseAdmin.from('profiles').select('role').eq('id', supabaseUser.id).maybeSingle();
-      const role = profile?.role;
-      if (role !== 'admin' && role !== 'super_admin') {
-        return res.redirect('/dashboard');
-      }
-      return next();
-    }
-  } catch (_) {
-    // Fallthrough to redirect
-  }
-
-  return res.redirect('/login');
+const { authenticateToken } = require('./middleware/authMiddleware');
+const adminPageMiddleware = (req, res, next) => {
+  authenticateToken(req, res, () => {
+    if (!req.user) return res.redirect('/login');
+    if (!req.user.is_admin) return res.redirect('/dashboard');
+    next();
+  });
 };
 
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {

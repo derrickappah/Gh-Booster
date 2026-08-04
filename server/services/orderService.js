@@ -2,6 +2,14 @@ function roundMoney(val) {
   return Math.round((parseFloat(val) || 0) * 10000) / 10000;
 }
 
+// Helper for chunked async execution with controlled concurrency
+async function processInChunks(items, concurrencyLimit, fn) {
+  for (let i = 0; i < items.length; i += concurrencyLimit) {
+    const chunk = items.slice(i, i + concurrencyLimit);
+    await Promise.all(chunk.map(fn));
+  }
+}
+
 class OrderService {
   static async getUserOrders(userId) {
     return await OrderService.syncUserOrdersStatus(userId);
@@ -28,7 +36,7 @@ class OrderService {
     });
 
     if (ordersToSync.length > 0) {
-      await Promise.all(ordersToSync.map(async (order) => {
+      await processInChunks(ordersToSync, 10, async (order) => {
         try {
           const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
           if (!providerStatusRes || providerStatusRes.error) return;
@@ -84,7 +92,7 @@ class OrderService {
         } catch (err) {
           console.error(`[OrderService] Error syncing provider order #${order.provider_order_id}:`, err.message);
         }
-      }));
+      });
     }
 
     return (rawOrders || []).map(o => ({
@@ -123,7 +131,7 @@ class OrderService {
 
     let updatedCount = 0;
     if (ordersToSync.length > 0) {
-      await Promise.all(ordersToSync.map(async (order) => {
+      await processInChunks(ordersToSync, 10, async (order) => {
         try {
           const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
           if (!providerStatusRes || providerStatusRes.error) return;
