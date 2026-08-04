@@ -596,7 +596,12 @@ class MoolreService {
           .select('id')
           .maybeSingle();
 
-        if (claimErr || !claimedTxn) {
+        if (claimErr) {
+          console.error('[_creditUserWallet] Failed to update transaction status:', claimErr.message);
+          throw new Error(`Database error while claiming transaction: ${claimErr.message}`);
+        }
+
+        if (!claimedTxn) {
           // Another concurrent request claimed it first
           const { data: currentWallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
           return { newBalance: currentWallet ? parseFloat(currentWallet.balance) : 0, depositAmount };
