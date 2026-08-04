@@ -1,7 +1,14 @@
 const { createClient } = require('@supabase/supabase-js');
 const env = require('./env');
 
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+const dummyUrl = 'https://placeholder.supabase.co';
+const dummyKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy';
+
+const supabaseUrl = env.SUPABASE_URL || dummyUrl;
+const supabaseAnonKey = env.SUPABASE_ANON_KEY || dummyKey;
+const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY || dummyKey;
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: false
@@ -10,9 +17,9 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
 
 // Admin client for backend operations requiring elevated permissions
 if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('FATAL: SUPABASE_SERVICE_ROLE_KEY is not set in environment. Backend cannot start safely without service role access.');
+  console.error('[FATAL] SUPABASE_SERVICE_ROLE_KEY is missing from environment variables.');
 }
-const supabaseAdmin = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
@@ -20,3 +27,4 @@ const supabaseAdmin = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_K
 });
 
 module.exports = { supabase, supabaseAdmin };
+

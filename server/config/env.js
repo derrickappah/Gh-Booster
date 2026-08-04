@@ -12,19 +12,17 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development'
 };
 
-if (!env.SUPABASE_URL) {
-  throw new Error('FATAL: SUPABASE_URL environment variable must be set!');
-}
-if (!env.SUPABASE_ANON_KEY) {
-  throw new Error('FATAL: SUPABASE_ANON_KEY environment variable must be set!');
-}
-if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('FATAL: SUPABASE_SERVICE_ROLE_KEY environment variable must be set!');
-}
-if (!env.JWT_SECRET) {
-  throw new Error('FATAL: JWT_SECRET environment variable must be set!');
+const missingVars = [];
+if (!env.SUPABASE_URL) missingVars.push('SUPABASE_URL');
+if (!env.SUPABASE_ANON_KEY) missingVars.push('SUPABASE_ANON_KEY');
+if (!env.SUPABASE_SERVICE_ROLE_KEY) missingVars.push('SUPABASE_SERVICE_ROLE_KEY');
+if (!env.JWT_SECRET) missingVars.push('JWT_SECRET');
+
+if (missingVars.length > 0) {
+  console.error(`[FATAL CONFIG ERROR] Missing required environment variable(s) on server: ${missingVars.join(', ')}. Please configure them in Vercel project Environment Variables.`);
 }
 
 module.exports = env;
+
 
 

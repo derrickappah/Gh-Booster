@@ -105,13 +105,22 @@ registerAppRoutes('/api/v1');
 
 // Health Check Endpoints
 app.get(['/api/health', '/health'], (req, res) => {
-  res.json({
-    success: true,
-    status: 'operational',
-    message: 'GhBooster Express Backend powered by Supabase PostgreSQL & Auth',
+  const missingVars = [];
+  if (!process.env.SUPABASE_URL) missingVars.push('SUPABASE_URL');
+  if (!process.env.SUPABASE_ANON_KEY) missingVars.push('SUPABASE_ANON_KEY');
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) missingVars.push('SUPABASE_SERVICE_ROLE_KEY');
+  if (!process.env.JWT_SECRET) missingVars.push('JWT_SECRET');
+
+  const isHealthy = missingVars.length === 0;
+  res.status(isHealthy ? 200 : 500).json({
+    success: isHealthy,
+    status: isHealthy ? 'operational' : 'degraded',
+    message: isHealthy ? 'GhBooster Express Backend powered by Supabase PostgreSQL & Auth' : 'Missing required environment variables in server environment',
+    missing_env_vars: missingVars,
     timestamp: new Date().toISOString()
   });
 });
+
 
 // 2. 301 Permanent Redirect middleware for legacy .html URLs
 app.use((req, res, next) => {

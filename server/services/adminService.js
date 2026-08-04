@@ -681,13 +681,23 @@ class AdminService {
   }
 
   static async getSettings() {
-    const { data } = await supabaseAdmin.from('settings').select('*');
-    const settingsObj = {};
-    (data || []).forEach(s => {
-      settingsObj[s.key] = s.value;
-    });
-    return settingsObj;
+    try {
+      const { data, error } = await supabaseAdmin.from('settings').select('*');
+      if (error) {
+        console.error('[AdminService] getSettings error:', error.message);
+        return {};
+      }
+      const settingsObj = {};
+      (data || []).forEach(s => {
+        settingsObj[s.key] = s.value;
+      });
+      return settingsObj;
+    } catch (e) {
+      console.error('[AdminService] getSettings exception:', e.message);
+      return {};
+    }
   }
+
 
   static async updateSettings(settingsData) {
     const ALLOWED_SETTINGS = [
