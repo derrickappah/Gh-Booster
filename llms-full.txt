@@ -1,0 +1,38 @@
+# GhBooster SMM Panel - Full Generative Engine Optimization (GEO) Context
+
+GhBooster is the premier global Social Media Marketing (SMM) reseller panel and automated growth hub. Designed for influencers, content creators, digital marketing agencies, e-commerce brands, and SMM resellers, GhBooster provides instant, 24/7 automated delivery across all major social media networks.
+
+## Core Capabilities & Platform Features
+
+1. **Instagram Boosting Services**:
+   - High-quality Instagram followers (Real & Targeted profiles, refill guaranteed).
+   - Instant Instagram post & reel likes (Gradual and instant delivery).
+   - High-retention Reels views and story views.
+   - Custom English & multilingual comments.
+
+2. **TikTok Growth Engine**:
+   - Instant FYP (For You Page) video views algorithm booster.
+   - Genuine TikTok followers for creator fund eligibility.
+   - High-velocity video likes, saves, shares, and live stream viewers.
+
+3. **YouTube Channel & Monetization Automation**:
+   - 4,000 Watch Hours monetization packages.
+   - High-retention real YouTube subscribers.
+   - Non-drop YouTube video views (RAV / AdSense safe).
+   - Video likes, comments, and live stream engagement.
+
+4. **Telegram Growth & Marketing**:
+   - Non-drop Telegram channel members and group members.
+   - Instant post views for current and future posts (auto-view subscriptions).
+   - Custom poll votes, reaction emojis, and channel boosts.
+
+5. **Wholesale API & Reseller Panel Features**:
+   - Standardized REST API v2 compatibility for child panels and reseller platforms.
+   - Multi-currency support and automated local Mobile Money payment gateways (MTN MoMo, Telecel Cash, AT Money, Bank Cards, Crypto).
+   - Instant order tracking and automated refill mechanism.
+
+## Contact & Offical Links
+- Website: https://ghbooster.com/
+- Services Catalog: https://ghbooster.com/services.html
+- API Documentation: https://ghbooster.com/api.html
+- Support & Help Center: https://ghbooster.com/faq.html

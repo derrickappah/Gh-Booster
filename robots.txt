@@ -1,6 +1,6 @@
-# https://www.robotstxt.org/robotstxt.html
+# GhBooster Robots.txt Configuration for Search & AI Indexing
 User-agent: *
-Disallow: /dashboard/
+Disallow: /dashboard
 Disallow: /admin
 Disallow: /api/
 Disallow: /account.html
@@ -13,4 +13,27 @@ Disallow: /orders.html
 Disallow: /tickets.html
 Allow: /
 
+# Googlebot Specific Rules
+User-agent: Googlebot
+Allow: /src/
+Allow: /public/
+Allow: /*.html$
+
+# AI Search Engine Crawlers (Generative Engine Optimization)
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+
+User-agent: Google-Extended
+Allow: /
+
 Sitemap: https://ghbooster.com/sitemap.xml
+

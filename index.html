@@ -42,12 +42,95 @@ License: You must have a valid license from official store to legally use the th
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "GhBooster",
-    "url": "https://ghbooster.com/",
-    "logo": "https://ghbooster.com/src/img/logo.png",
-    "description": "GhBooster is the premier SMM Panel for automated social media growth services.",
-    "sameAs": []
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://ghbooster.com/#organization",
+        "name": "GhBooster",
+        "url": "https://ghbooster.com/",
+        "logo": "https://ghbooster.com/src/img/logo.png",
+        "description": "GhBooster is the premier SMM Panel for automated social media growth services including Instagram, TikTok, YouTube, Telegram, Facebook, and Twitter.",
+        "sameAs": [
+          "https://twitter.com/ghbooster"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "availableLanguage": ["English"]
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://ghbooster.com/#website",
+        "url": "https://ghbooster.com/",
+        "name": "GhBooster SMM Panel",
+        "publisher": {
+          "@id": "https://ghbooster.com/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ghbooster.com/services?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Service",
+        "@id": "https://ghbooster.com/#service",
+        "name": "Social Media Marketing (SMM) Panel Services",
+        "provider": {
+          "@id": "https://ghbooster.com/#organization"
+        },
+        "serviceType": "Social Media Growth & Automation",
+        "areaServed": ["Worldwide", "Ghana", "Africa"],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "SMM Services",
+          "itemListElement": [
+            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Instagram Followers & Likes Boost" } },
+            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "TikTok Views & Followers Automation" } },
+            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "YouTube Subscribers & Watch Time Boost" } },
+            { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Telegram Channel Members & Post Views" } }
+          ]
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "12840",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://ghbooster.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is GhBooster SMM Panel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "GhBooster is the fastest and cheapest SMM (Social Media Marketing) Panel providing instant 24/7 automated boosting for Instagram followers, TikTok views, YouTube subscribers, Telegram members, Facebook likes, and Twitter engagement."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How fast are SMM orders processed on GhBooster?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Orders on GhBooster are processed automatically via automated SMM APIs. Start time ranges from instant to a few seconds after placement."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I resell GhBooster SMM services using an API?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, GhBooster provides full REST API integration for child panels, custom sites, and reseller script software to automate order submission and status tracking."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 
