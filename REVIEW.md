@@ -1,245 +1,211 @@
-# Production Readiness Code Review
-
-> **Date:** 2026-08-05  
-> **Scope:** Full codebase audit — server, services, controllers, routes, middleware, database logic, client-side JS, and scripts  
-> **Target:** Production readiness review for `main` branch  
-
----
+# Production Readiness Code Review Report
 
 ## Executive Summary
 
-This review evaluated the entire codebase for production readiness across reliability, security, database integrity, error handling, state consistency, performance, and maintainability.
+This comprehensive code review evaluates the **GhBooster** codebase (Express.js, Supabase PostgreSQL, Moolre Payment Gateway, SMMGen Integration, and Frontend Client Scripts) for production readiness.
 
-Key critical areas identified:
-- **Asynchronous Hash Unawaited**: `childPanelRoutes.js` passes an unawaited Promise to database insert for password hashes, corrupting stored child panel credentials.
-- **Deposit Approval Double-Check Logic Bug**: `AdminController.updateDepositStatus` updates transaction status to `completed` before calling wallet credit logic, causing `_creditUserWallet` to short-circuit and fail to credit customer wallets.
-- **Insecure Webhook Logic**: Flawed condition in `MoolreService.handleWebhook` allows unauthenticated requests when gateway credentials are unconfigured or partially set.
-- **Transaction Ledger Gaps in Bulk Orders**: Upfront wallet deductions for bulk orders lack transaction ledger entries, and failed bulk item refunds create balance discrepancies without audit records.
-- **DOM Mutation Infinite Loop**: `ImageCache.initMutationObserver` in frontend JavaScript triggers recursive `src` attribute mutations when replacing images with Base64 data URLs.
-- **Destructive Data Imports**: Import scripts execute unconditional `DELETE` operations on services before fetching new data, risking total service loss if API calls fail.
+The codebase implements robust database-level guards (`credit_wallet`, `debit_wallet` RPC functions, financial constraints, and RLS policies). However, several key architectural, state-consistency, security, and performance vulnerabilities must be addressed before deploying to production.
 
 ---
 
-## 1. Financial & Payment Integrity
+## Detailed Findings
 
-### F-01 · Admin Deposit Approval Fails to Credit User Wallet
+### 1. Database Transaction & State Consistency Problems
 
-| Field | Detail |
-|---|---|
-| **File** | [adminController.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/controllers/adminController.js#L247-L274) |
-| **Function** | `AdminController.updateDepositStatus` |
-| **Description** | `AdminController.updateDepositStatus` calls `AdminService.updateDepositStatus` first, which updates the transaction status in the database to `'completed'`. Afterwards, `AdminController` checks `if (targetStatus === 'completed')` and calls `MoolreService._creditUserWallet`. When `_creditUserWallet` runs, it queries the database for the transaction status, sees that it is ALREADY `'completed'`, and returns immediately without adding funds to the user's wallet. |
-| **Why it may fail** | When an administrator manually approves a deposit in the admin panel, the deposit is marked as completed in the database, but the customer's wallet balance is never updated. |
-| **Suggested improvement** | Remove duplicate status updates. Ensure `_creditUserWallet` is the single source of truth for claiming a pending transaction and performing the balance credit. |
-
----
-
-### F-02 · Webhook Secret Verification Bypass Risk
-
-| Field | Detail |
-|---|---|
-| **File** | [moolreService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L427-L466) |
-| **Function** | `MoolreService.handleWebhook` |
-| **Description** | The mandatory secret/signature validation check uses `if (validSecret && (bodySecret !== validSecret) && !signatureHeader)`. If `validSecret` is empty (e.g. unconfigured settings), `validSecret` is falsy and the security verification step is entirely bypassed. |
-| **Why it may fail** | An unauthenticated attacker can send forged HTTP POST requests to `/api/payments/moolre/webhook` and credit arbitrary user accounts when payment settings have not been initialized. |
-| **Suggested improvement** | Reject any webhook request if webhook secret or API key credentials are not configured on the server, and enforce strict HMAC signature verification using `crypto.timingSafeEqual`. |
+#### Finding 1.1: Non-Atomic Order Creation and Provider Rollback Inconsistency
+- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L231-L360)
+- **Function**: `OrderService.createOrder`
+- **Category**: Database transaction problems / Inconsistent state updates
+- **Description**: Order creation spans 4 separate non-atomic steps: (1) `debit_wallet` RPC, (2) DB order row insertion, (3) external SMM provider API call (`placeOrder`), and (4) transaction entry insertion. If Step 2 fails, it attempts to credit the wallet back. If Step 3 fails or times out, it marks the order `Canceled` and credits the wallet back.
+- **Why it may fail**: If the Node process crashes, suffers network failure, or experiences a database connection drop after Step 1 (`debit_wallet`) but before Step 2 or during Step 3 refund, the user's funds remain debited without an order being created or refunded. Furthermore, if SMMGen API times out after 10s, `createOrder` marks the order `Canceled` and refunds the user, but SMMGen may still process the order upstream without saving `provider_order_id`, resulting in loss of funds for the platform and free services for the customer.
+- **Suggested improvement**: Use a multi-phase saga or database transaction table for order creation. Store provider request status before dispatching network calls, and implement a dedicated background reconciliation queue for provider timeouts instead of assuming immediate order failure.
 
 ---
 
-### F-03 · Sandbox Payment Link Dead End
-
-| Field | Detail |
-|---|---|
-| **File** | [moolreService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L278-L307) |
-| **Function** | `MoolreService.generatePaymentLink` |
-| **Description** | In sandbox mode, if the Moolre API call fails or is unreachable, `generatePaymentLink` creates a pending transaction in the database and returns `{ success: true, authorization_url: null, sandbox: true }`. |
-| **Why it may fail** | The frontend attempts to redirect the user to `authorization_url`, which is `null`. The user cannot complete the payment, and the transaction remains pending forever. |
-| **Suggested improvement** | Provide a functional mock endpoint or local redirect URL in sandbox mode so sandbox transactions can be simulated and completed end-to-end. |
+#### Finding 1.2: Bulk Order Partial Refund Failures Left Unhandled
+- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L550-L580)
+- **Function**: `OrderService.createBulkOrders`
+- **Category**: Database transaction problems / Reliability concerns
+- **Description**: Bulk orders debit the total charge upfront across all valid items. During individual order creation loop (`skipWalletDeduction: true`), if an item creation throws an error, a refund for that item's charge is attempted via `credit_wallet` inside a `try...catch` block.
+- **Why it may fail**: If `credit_wallet` fails (e.g. database lock timeout), line 576 logs the error to console, but execution continues without logging to `failed_refunds` or queuing a retry. The customer loses their wallet balance for that bulk item with no record in `failed_refunds`.
+- **Suggested improvement**: Record failed bulk item refunds directly into the `failed_refunds` table (similar to `cancelOrder` and `processOrderRefund`) so admins can audit and resolve unrefunded balances.
 
 ---
 
-### F-04 · String Pattern Matching for Transaction Auto-Repair
-
-| Field | Detail |
-|---|---|
-| **File** | [moolreService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L720-L767) |
-| **Function** | `MoolreService.repairPendingCompletedTransactions` |
-| **Description** | The repair mechanism searches `audit_logs` using `.like('details', '%ref%')` to determine if a pending deposit was credited. |
-| **Why it may fail** | Audit log text descriptions are unstructured strings. If reference numbers overlap or audit logs are purged, matching on text strings can cause false positives or fail to repair valid transactions. |
-| **Suggested improvement** | Track deposit completion using structured database columns (e.g. `credited_at` timestamp or `deposit_id` foreign key) rather than text search on audit log strings. |
-
----
-
-## 2. Order Processing & Business Logic
-
-### F-05 · Unawaited Password Hashing in Child Panel Creation
-
-| Field | Detail |
-|---|---|
-| **File** | [childPanelRoutes.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/routes/childPanelRoutes.js#L49-L60) |
-| **Function** | `POST /child-panels/order` route handler |
-| **Description** | `hashPassword(admin_password)` is an `async` function returning a `Promise`, but it is invoked without `await`. |
-| **Why it may fail** | The `Promise` object is passed directly to the database insert for the `admin_password` column. This either fails database validation or stores `"[object Promise]"`, preventing the user from ever authenticating into their child panel. |
-| **Suggested improvement** | Change line 50 to `const hashedPassword = await hashPassword(admin_password);`. |
+#### Finding 1.3: Non-Atomic Direct Wallet Balance Overwrites by Admin
+- **File**: [`server/services/adminService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/adminService.js#L255-L265)
+- **Function**: `AdminService.updateUserBalance`
+- **Category**: Database transaction problems / Inconsistent state updates
+- **Description**: When an admin updates a user's balance with an absolute value (`newBalance`), `updateUserBalance` directly overwrites `wallets.balance`:
+  ```javascript
+  await supabaseAdmin.from('wallets').update({ balance, updated_at: ... }).eq('user_id', userId);
+  ```
+- **Why it may fail**: Overwriting balance directly bypasses atomic delta arithmetic. If a concurrent transaction (e.g. deposit webhook completion or order debit) occurs simultaneously with the admin update, the user's balance will be overwritten, causing financial loss or unrecorded money.
+- **Suggested improvement**: Calculate the delta (`newBalance - currentBalance`) and apply the balance adjustment using atomic `credit_wallet` or `debit_wallet` RPC functions.
 
 ---
 
-### F-06 · Missing Null Check on Bulk Order Text
-
-| Field | Detail |
-|---|---|
-| **File** | [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L396-L405) |
-| **Function** | `OrderService.createBulkOrders` |
-| **Description** | The method attempts to call `bulkText.split('\n')` without verifying that `bulkText` is defined and non-null. |
-| **Why it may fail** | If a client sends `{ bulk_text: null }` or omits the property, the server throws a `TypeError: Cannot read properties of null (reading 'split')`, returning an unhandled 500 error. |
-| **Suggested improvement** | Add a type check at the start of `createBulkOrders`: `if (!bulkText \|\| typeof bulkText !== 'string') throw new Error('Bulk text is required');`. |
+#### Finding 1.4: Child Panel Ordering Lacks Database Transaction Wrap
+- **File**: [`server/routes/childPanelRoutes.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/routes/childPanelRoutes.js#L34-L66)
+- **Function**: `POST /order`
+- **Category**: Database transaction problems / Inconsistent state updates
+- **Description**: Child panel ordering uses a manual two-step process: (1) update wallet balance with `.gte('balance', price)`, then (2) insert row into `child_panels`. If insertion fails, it credits back balance in a `.catch()` block.
+- **Why it may fail**: If the Node server crashes between step 1 and step 2, or if `credit_wallet` RPC fails during error handling, the GH₵25 charge is deducted without a child panel record or transaction log entry.
+- **Suggested improvement**: Create a PostgreSQL RPC function `order_child_panel(p_user_id, p_domain, p_username, p_password_hash, p_price)` that atomically verifies balance, debits wallet, inserts child panel record, and logs transaction within a single database transaction.
 
 ---
 
-### F-07 · Inconsistent Delimiter Parsing in Bulk Orders
+### 2. Incorrect Logic & Edge Cases
 
-| Field | Detail |
-|---|---|
-| **File** | [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L406-L443) |
-| **Function** | `OrderService.createBulkOrders` |
-| **Description** | Pre-validation splits lines using pipe `l.split('|')` (line 407), while the processing loop splits lines using whitespace `l.split(/\s+/)` (line 427). |
-| **Why it may fail** | Pipe-separated input like `101 | https://example.com | 1000` passes length validation, but in the processing loop, `parts[1]` becomes `'|'`, causing quantity parsing to fail with `NaN` (`Invalid quantity`). |
-| **Suggested improvement** | Use a single, unified parser helper that consistently handles both pipe `|` and space-separated bulk format strings. |
-
----
-
-### F-08 · Missing Transaction Audit Ledger for Bulk Order Upfront Deductions
-
-| Field | Detail |
-|---|---|
-| **File** | [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L498-L550) |
-| **Function** | `OrderService.createBulkOrders` |
-| **Description** | Total charges for valid bulk orders are deducted upfront via `debit_wallet`, but no batch transaction entry is created in `transactions`. When individual items fail, `credit_wallet` is called without inserting a refund transaction entry. |
-| **Why it may fail** | The user's wallet balance changes without corresponding transaction records in `transactions`, leading to audit discrepancies between user balance and transaction history. |
-| **Suggested improvement** | Record an `order_charge` transaction entry for the batch deduction and explicit `refund` transaction entries for any failed bulk item. |
+#### Finding 2.1: Bulk Order Link Parsing Corrupted by Pipe and Space Delimiters
+- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L413-L435)
+- **Function**: `OrderService.createBulkOrders`
+- **Category**: Incorrect logic / Edge cases
+- **Description**: Bulk order line parsing uses:
+  ```javascript
+  const isPipe = line.includes('|');
+  const parts = isPipe ? line.split('|').map(p => p.trim()) : line.split(/\s+/);
+  ```
+- **Why it may fail**: Target URLs often contain query parameters or pipe characters (e.g., `https://example.com/post?id=123|variant=2` or encoded spaces `%20`). If a URL contains pipes or spaces, `split('|')` or `split(/\s+/)` breaks the URL into invalid tokens, corrupting the target link or causing quantity validation failures.
+- **Suggested improvement**: Use a strict regex pattern to match the tailing integer quantity first (e.g., `/\s+(\d+)$/` or `\|(\d+)$`), extracting service ID and target URL cleanly regardless of URL parameter characters.
 
 ---
 
-### F-09 · Code Duplication in Provider Status Normalization
-
-| Field | Detail |
-|---|---|
-| **File** | [orderService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L70-L80) |
-| **Function** | `syncUserOrdersStatus`, `syncAllNonFinalizedOrders`, `getOrderById` |
-| **Description** | The status mapping and casing normalization logic for provider statuses (`Completed`, `Processing`, `In Progress`, `Canceled`, `Partial`, `Refunded`) is duplicated across three separate functions in `orderService.js`. |
-| **Why it may fail** | Maintenance updates or new provider status mappings introduced in one location may be missed in others, causing inconsistent order statuses across sync paths. |
-| **Suggested improvement** | Extract status mapping into a single helper function `OrderService.normalizeProviderStatus(status)`. |
-
----
-
-## 3. Server Architecture, Routing & Auth
-
-### F-10 · Admin Page Middleware Returns JSON 401 for Browser Navigation
-
-| Field | Detail |
-|---|---|
-| **File** | [app.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/app.js#L193-L199) |
-| **Function** | `adminPageMiddleware` |
-| **Description** | `adminPageMiddleware` passes a callback to `authenticateToken(req, res, callback)`. When an unauthenticated user navigates to an admin page URL like `/admin-dashboard`, `authenticateToken` sends `res.status(401).json(...)` directly. The callback is never executed. |
-| **Why it may fail** | Instead of being redirected to `/login`, unauthenticated web browser users receive raw JSON error responses on screen. |
-| **Suggested improvement** | Implement dedicated page authentication middleware that performs `res.redirect('/login')` for HTML page requests. |
+#### Finding 2.2: Side-Effects in GET `/api/transactions` Route
+- **File**: [`server/routes/transactionRoutes.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/routes/transactionRoutes.js#L10-L15)
+- **Function**: `GET /api/transactions`
+- **Category**: Incorrect logic / Performance issues
+- **Description**: The GET `/api/transactions` route executes database state modifications (`repairPendingCompletedTransactions` and `expirePendingDeposits`) on every GET request:
+  ```javascript
+  await MoolreService.repairPendingCompletedTransactions(req.user.id);
+  await MoolreService.expirePendingDeposits();
+  ```
+- **Why it may fail**: HTTP GET operations must be idempotent and side-effect free according to RFC 7231. Performing DB write operations on read requests increases response latency, causes database row lock contention during user navigation, and risks unexpected state mutations during read operations.
+- **Suggested improvement**: Move periodic transaction repairs and deposit expirations entirely to the background cron worker in `server.js` or dedicated scheduled tasks.
 
 ---
 
-### F-11 · Singleton Supabase Client Session Mutation
-
-| Field | Detail |
-|---|---|
-| **File** | [authService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/authService.js#L142-L145) |
-| **Function** | `AuthService.login` |
-| **Description** | `AuthService.login` invokes `supabase.auth.signInWithPassword` on the shared module instance of `supabase`. |
-| **Why it may fail** | Calling `signInWithPassword` mutates the in-memory session state of the singleton Supabase client. Under concurrent requests, auth state can leak between requests. |
-| **Suggested improvement** | Authenticate via JWT verification or create scoped client instances per request context. |
-
----
-
-### F-12 · Strict Service Status Filter Excludes Active Services
-
-| Field | Detail |
-|---|---|
-| **File** | [serviceService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/serviceService.js#L13) |
-| **Function** | `ServiceService.getAllServices` |
-| **Description** | The database query uses `.eq('status', 'active')` with exact lowercase matching. |
-| **Why it may fail** | Services stored with status `'Active'` (capitalized) or numeric status `1` are filtered out, resulting in an empty service list on `/services.html` and in API v2 responses. |
-| **Suggested improvement** | Use case-insensitive status matching or query `.in('status', ['active', 'Active'])`. |
+#### Finding 2.3: Express Response `status` Method Override Pollution in Admin Middleware
+- **File**: [`server/app.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/app.js#L203-L211)
+- **Function**: `adminPageMiddleware`
+- **Category**: Incorrect logic / Potential runtime exceptions
+- **Description**: The middleware dynamically mutates Express `res.status`:
+  ```javascript
+  const originalStatus = res.status.bind(res);
+  res.status = function(code) {
+    if (code === 401 || code === 403) {
+      return { json: () => res.redirect('/login') };
+    }
+    return originalStatus(code);
+  };
+  ```
+- **Why it may fail**: Overriding native Express prototype methods on a per-request response object breaks standard Express response semantics. If downstream code calls `res.status(401).send(...)` or `res.status(401).end()`, `json()` is not present or `res.redirect` is triggered unexpectedly, throwing runtime `TypeError` or `ERR_HTTP_HEADERS_SENT` exceptions.
+- **Suggested improvement**: Handle admin page authorization redirects directly without mutating `res.status`.
 
 ---
 
-### F-13 · API V2 Response Crash on Missing Service Rate
-
-| Field | Detail |
-|---|---|
-| **File** | [apiV2Controller.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/controllers/apiV2Controller.js#L35) |
-| **Function** | `ApiV2Controller.handleV2Request` |
-| **Description** | The `'services'` action calls `s.rate_per_1k.toFixed(2)` without validating that `s.rate_per_1k` is a number. |
-| **Why it may fail** | If a service has `undefined` or `null` for `rate_per_1k`, JavaScript throws `TypeError: Cannot read properties of undefined (reading 'toFixed')`, crashing the API endpoint with HTTP 500. |
-| **Suggested improvement** | Use `(parseFloat(s.rate_per_1k) || 0).toFixed(2)`. |
-
----
-
-## 4. Frontend & Client-Side JavaScript
-
-### F-14 · Recursive DOM Mutation Loop in Image Cache
-
-| Field | Detail |
-|---|---|
-| **File** | [image-cache.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/src/js/image-cache.js#L295-L331) |
-| **Function** | `ImageCache.initMutationObserver` |
-| **Description** | The `MutationObserver` watches `src` attribute changes on `<img>` tags and calls `applyToElement`, which sets `img.src = dataUrl`. |
-| **Why it may fail** | Updating `img.src` triggers a new `src` attribute mutation event, causing the observer callback to fire repeatedly in a loop, resulting in high CPU usage and browser unresponsiveness. |
-| **Suggested improvement** | Ignore attribute mutations where `mutation.target.src` starts with `data:` or matches `data-original-src`. |
+#### Finding 2.4: CORS Callback Throws Error Object Returning HTTP 500
+- **File**: [`server/app.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/app.js#L65-L66)
+- **Function**: `cors` options delegate
+- **Category**: Incorrect logic / Reliability concerns
+- **Description**: When an unallowed origin makes a CORS request, the callback invokes:
+  ```javascript
+  return callback(new Error('Not allowed by CORS'));
+  ```
+- **Why it may fail**: Passing an `Error` to Express CORS middleware causes Express to forward the error to the global error handler (`errorHandler.js`), which outputs an HTTP 500 Internal Server Error stack/response instead of properly handling CORS preflight rejections (HTTP 403 or omitting CORS headers).
+- **Suggested improvement**: Pass `callback(null, false)` to reject CORS requests silently in accordance with standard CORS specifications.
 
 ---
 
-### F-15 · LocalStorage Quota Failure in Image Cache
-
-| Field | Detail |
-|---|---|
-| **File** | [image-cache.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/src/js/image-cache.js#L65-L91) |
-| **Function** | `evictOldCache` |
-| **Description** | When `localStorage` quota is exceeded, `evictOldCache` attempts to parse all items in `localStorage`. If `localStorage` contains unrelated large items, eviction fails to free enough space. |
-| **Why it may fail** | Image caching fails silently and logs console warnings on browsers with low localStorage limits or filled storage. |
-| **Suggested improvement** | Implement IndexDB storage for binary image data instead of `localStorage`. |
+#### Finding 2.5: SSRF Check in `syncProvider` Vulnerable to DNS Rebinding
+- **File**: [`server/services/adminService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/adminService.js#L485-L530)
+- **Function**: `AdminService.syncProvider`
+- **Category**: Security / Incorrect logic
+- **Description**: `syncProvider` resolves DNS for `provider.api_url` to inspect IP addresses for private/internal subnets (127.0.0.1, 10.x, etc.). However, after validation, it passes the original hostname URL `provider.api_url` directly to `fetch(...)`.
+- **Why it may fail**: A malicious provider endpoint can configure DNS rebinding (returning a public IP during `dns.resolve4` validation, but resolving to `127.0.0.1` or `169.254.169.254` when `fetch` executes its own internal DNS lookup), completely bypassing SSRF protection.
+- **Suggested improvement**: Pin the validated IP address in the HTTP agent or fetch request destination to prevent secondary DNS resolution.
 
 ---
 
-## 5. Scripts & Tooling
+### 3. Missing Error Handling & Runtime Exception Risks
 
-### F-16 · Hardcoded Credentials and Destructive Deletion in Import Script
-
-| Field | Detail |
-|---|---|
-| **File** | [import_smmgen.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/scripts/import_smmgen.js#L7-L35) |
-| **Function** | `runImport` |
-| **Description** | SMMGen API key is hardcoded directly in source code (`const SMMGEN_KEY = '8cd0cb8c...'`), and line 35 executes `delete().eq('provider_id', PROVIDER_ID)` before fetching new services. |
-| **Why it may fail** | Hardcoding secrets exposes API keys in source control. Deleting all services upfront means that if the network or API call fails halfway through, all provider services are permanently lost from the database. |
-| **Suggested improvement** | Read `SMMGEN_KEY` from `process.env`. Use upsert logic on `(provider_id, provider_service_id)` instead of truncating/deleting existing database rows. |
-
----
-
-### F-17 · Incomplete SSRF Validation in Provider Endpoint Sync
-
-| Field | Detail |
-|---|---|
-| **File** | [adminService.js](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/adminService.js#L485-L513) |
-| **Function** | `AdminService.syncProvider` |
-| **Description** | SSRF protection resolves IPv4 addresses (`dns.resolve4`) to block private IPs, but does not check IPv6 addresses (`dns.resolve6`). |
-| **Why it may fail** | A user configuring a provider URL pointing to `[::1]` or an IPv6 private network address can bypass the SSRF filter and access internal services. |
-| **Suggested improvement** | Resolve both IPv4 and IPv6 addresses and validate against private ranges for both IP versions. |
+#### Finding 3.1: Moolre Webhook HMAC Verification Fails on Key Re-Ordering
+- **File**: [`server/services/moolreService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/moolreService.js#L450-L464)
+- **Function**: `MoolreService.handleWebhook`
+- **Category**: Missing error handling / Reliability concerns
+- **Description**: Webhook HMAC signature verification computes the hash using:
+  ```javascript
+  crypto.createHmac('sha256', creds.apiKey)
+    .update(typeof payload === 'string' ? payload : JSON.stringify(payload))
+    .digest('hex');
+  ```
+- **Why it may fail**: `express.json()` parses raw body bytes into a JavaScript Object before passing it to `handleWebhook`. Re-stringifying the object with `JSON.stringify(payload)` does not preserve raw whitespace or key ordering sent by Moolre. The calculated HMAC will mismatch the `signatureHeader`, causing legitimate payment webhooks to be rejected.
+- **Suggested improvement**: Preserve the raw request body buffer using `express.json({ verify: (req, res, buf) => req.rawBody = buf })` and compute HMAC against `req.rawBody`.
 
 ---
 
-## Summary of Action Items
+#### Finding 3.2: Unhandled Rejection Risk in Background Sync Interval
+- **File**: [`server/server.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/server.js#L18-L34)
+- **Function**: `server.js` background worker interval
+- **Category**: Reliability concerns / Missing error handling
+- **Description**: Background order and deposit status sync runs every 60 seconds.
+- **Why it may fail**: If an unhandled promise rejection occurs inside `OrderService.syncAllNonFinalizedOrders` or `MoolreService.repairPendingCompletedTransactions` that bypasses inner try/catch blocks (e.g. fatal database connection drop or process out-of-memory), Node.js may terminate or crash without restarting the background sync worker. Additionally, on graceful shutdown (`SIGTERM`/`SIGINT`), `clearInterval` is never called for `SYNC_INTERVAL_MS`, preventing clean process exit until forced timeout.
+- **Suggested improvement**: Store interval timer ID in a module-level variable and call `clearInterval(syncTimer)` inside `shutdown()`.
 
-1. **Fix `childPanelRoutes.js`**: Add `await` to `hashPassword(admin_password)`.
-2. **Fix `adminController.js`**: Remove redundant status update so `_creditUserWallet` can complete wallet funding.
-3. **Fix `moolreService.js`**: Correct webhook secret validation and provide a functional sandbox checkout mock.
-4. **Fix `orderService.js`**: Add null checks for `bulkText`, unify bulk order delimiter parsing, and log bulk transaction entries.
-5. **Fix `app.js`**: Update page auth middleware to redirect browser requests to `/login`.
-6. **Fix `image-cache.js`**: Prevent `MutationObserver` infinite loop on `src` changes.
-7. **Fix `import_smmgen.js`**: Move API keys to `.env` and replace destructive `DELETE` with `upsert`.
+---
+
+#### Finding 3.3: Missing Rate Limiting on API V2 Endpoint
+- **File**: [`server/routes/apiV2Routes.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/routes/apiV2Routes.js#L1-L10)
+- **Function**: `/api/v2` router definition
+- **Category**: Missing error handling / Security
+- **Description**: `apiV2Routes.js` mounts `ApiV2Controller.handleV2Request` directly for `/` without attaching `apiKeyLimiter` or `globalLimiter`.
+- **Why it may fail**: External API resellers or automated bots can issue unlimited concurrent requests per second to `/api/v2`, causing excessive Supabase database query load and CPU exhaustion.
+- **Suggested improvement**: Attach `apiKeyLimiter` middleware explicitly to `apiV2Routes.js`.
+
+---
+
+### 4. Performance & Maintainability Issues
+
+#### Finding 4.1: In-Memory Dashboard Aggregations Cause High CPU & Memory Load
+- **File**: [`server/services/adminService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/adminService.js#L8-L187)
+- **Function**: `AdminService.getStats`
+- **Category**: Performance issues / Maintainability problems
+- **Description**: `getStats` fetches up to 10,000 rows from `profiles`, `orders`, `wallets`, `transactions`, and `audit_logs` into Node.js memory on cache expiration, performing array filtering, reductions, and date parsing in JavaScript.
+- **Why it may fail**: As the database grows past tens of thousands of rows, loading large datasets into Express process memory causes severe event loop blocking, memory spikes, and slow response times for admin dashboard stats.
+- **Suggested improvement**: Use PostgreSQL aggregation queries or RPC functions (e.g., `COUNT(*)`, `SUM(charge)`, `GROUP BY status`) to compute statistics directly in the database.
+
+---
+
+#### Finding 4.2: High Code Duplication Between Order Sync Methods
+- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L44-L229)
+- **Function**: `OrderService.syncUserOrdersStatus` and `OrderService.syncAllNonFinalizedOrders`
+- **Category**: Code duplication / Maintainability problems
+- **Description**: `syncUserOrdersStatus` and `syncAllNonFinalizedOrders` duplicate approximately 90 lines of code for provider status mapping, start_count/remains parsing, order status update, and refund processing.
+- **Why it may fail**: Duplicate status normalization logic creates maintenance divergence if status values or refund conditions change in one function but not the other.
+- **Suggested improvement**: Extract provider status normalization and order update logic into a single helper method, e.g., `_applyProviderStatusUpdate(order, providerStatus)`.
+
+---
+
+#### Finding 4.3: Hardcoded 500-Order Cap in Background Order Sync
+- **File**: [`server/services/orderService.js`](file:///c:/Users/DELL/Desktop/tailone-1.0.0/server/services/orderService.js#L137-L138)
+- **Function**: `OrderService.syncAllNonFinalizedOrders`
+- **Category**: Performance / Reliability concerns
+- **Description**: `syncAllNonFinalizedOrders` limits active order queries to 500 rows:
+  ```javascript
+  .limit(500);
+  ```
+- **Why it may fail**: When active system orders exceed 500, orders beyond the initial 500 will never be synced by the background worker until older orders complete, stranding user order statuses indefinitely.
+- **Suggested improvement**: Implement cursor-based pagination or batch processing to ensure all non-finalized orders are processed across interval cycles.
+
+---
+
+### 5. Summary of Recommended Actions Before Production Deployment
+
+| Priority | Area | Key Action Required |
+| :--- | :--- | :--- |
+| 🔴 **CRITICAL** | Order Processing | Wrap order debit, provider placement, and creation in database transactions or saga queues to eliminate double-spend and lost funds. |
+| 🔴 **CRITICAL** | Webhooks | Preserve raw request body buffers to fix HMAC signature verification for Moolre webhooks. |
+| 🟡 **HIGH** | API Rate Limiting | Attach `apiKeyLimiter` to `/api/v2` routes to prevent DDoS and API abuse. |
+| 🟡 **HIGH** | Admin Operations | Replace direct `wallets.balance` overwrites with atomic delta RPCs (`credit_wallet` / `debit_wallet`). |
+| 🟢 **MEDIUM** | Performance | Replace in-memory `getStats` array aggregations with native PostgreSQL aggregation queries. |
+| 🟢 **MEDIUM** | Code Quality | Deduplicate provider sync logic in `orderService.js` and remove side-effect DB writes from GET `/api/transactions`. |

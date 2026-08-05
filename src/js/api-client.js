@@ -102,10 +102,19 @@ const API = {
     const { api_key, ...safeUser } = user;
     localStorage.setItem('ghb_user', JSON.stringify(safeUser));
   },
-  logout: () => {
+  logout: (preserveRedirect = false) => {
     localStorage.removeItem('ghb_token');
     localStorage.removeItem('ghb_user');
-    window.location.href = '/login';
+    const currentPath = window.location.pathname + window.location.search;
+    let pageName = (window.location.pathname.split('/').filter(Boolean).pop() || 'index').toLowerCase();
+    if (pageName.endsWith('.html')) pageName = pageName.slice(0, -5);
+    const isAuthPage = ['login', 'register'].includes(pageName);
+
+    if (preserveRedirect && !isAuthPage) {
+      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+    } else {
+      window.location.href = '/login';
+    }
   },
 
   async request(endpoint, method = 'GET', data = null) {
@@ -128,6 +137,12 @@ const API = {
         }
       }
       if (!response.ok) {
+        // Automatically redirect to login page when session is invalid or expired (401 status)
+        if (response.status === 401 && !endpoint.startsWith('/auth/login') && !endpoint.startsWith('/auth/register')) {
+          console.warn(`[Auth] Session expired or invalid (401) on request to ${endpoint}. Redirecting to login.`);
+          API.logout(true);
+        }
+
         const error = new Error(result.error || result.message || `Server Error (${response.status})`);
         error.status = response.status;
         throw error;
@@ -175,9 +190,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateUserUI(meRes.user);
       }
     } catch (e) {
-      // Do not auto-logout on transient network or auth errors.
-      // Retain cached session in localStorage so user is never logged out unless pressing signout.
-      console.warn('[Auth] Error refreshing profile, retaining cached user session:', e.message);
+      if (e.status !== 401) {
+        console.warn('[Auth] Error refreshing profile, retaining cached user session:', e.message);
+      }
     }
   }
 
