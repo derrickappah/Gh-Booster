@@ -6266,4 +6266,18 @@ function getStatusBadgeClass(status) {
   }
 }
 
+function sanitizeUrl(input) {
+  if (!input) return '';
+  const trimmed = String(input).trim();
+  if (!trimmed) return '';
+  try {
+    const url = new URL(trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`);
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url.href;
+    }
+  } catch (e) {}
+  return '';
+}
+
 window.API = API;
+
