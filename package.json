@@ -28,5 +28,8 @@
     "start": "node server/server.js",
     "build": "node build.js"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

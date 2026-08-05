@@ -64,8 +64,13 @@ class AuthController {
       }
 
       // Verify current password with Supabase Auth
-      const { supabase } = require('../config/supabase');
-      const { error: authErr } = await supabase.auth.signInWithPassword({
+      // Use a dedicated per-request client to avoid polluting the shared backend auth state (F-91)
+      const { createClient } = require('@supabase/supabase-js');
+      const env = require('../config/env');
+      const tempClient = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      });
+      const { error: authErr } = await tempClient.auth.signInWithPassword({
         email: req.user.email,
         password: currentPassword
       });

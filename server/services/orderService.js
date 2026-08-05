@@ -1,3 +1,6 @@
+const { supabaseAdmin } = require('../config/supabase');
+const SmmgenService = require('./smmgenService');
+
 function roundMoney(val) {
   return Math.round((parseFloat(val) || 0) * 10000) / 10000;
 }
@@ -760,6 +763,17 @@ class OrderService {
         newBalance = parseFloat(rpcBalance);
       } catch (rpcError) {
         console.error('[cancelOrder] credit_wallet RPC failed:', rpcError.message);
+        // Log failed refund for manual resolution (F-09)
+        try {
+          await supabaseAdmin.from('failed_refunds').insert({
+            order_id: orderId,
+            user_id: refundUserId,
+            amount: chargeAmount,
+            error: rpcError.message || 'Wallet credit RPC failed during cancel'
+          });
+        } catch (logErr) {
+          console.error('[cancelOrder] Failed to log failed refund:', logErr.message);
+        }
         throw new Error('Failed to credit refund to user wallet. Order status updated to Canceled.');
       }
 
@@ -868,6 +882,19 @@ class OrderService {
     } catch (rpcErr) {
       console.error('[processOrderRefund] credit_wallet RPC failed, reverting claimed refund:', rpcErr.message);
       await supabaseAdmin.from('orders').update({ refunded_amount: alreadyRefunded }).eq('id', order.id);
+      
+      // Log failed refund for manual resolution (F-09)
+      try {
+        await supabaseAdmin.from('failed_refunds').insert({
+          order_id: order.id,
+          user_id: userId,
+          amount: refundableAmount,
+          error: rpcErr.message || 'Wallet credit RPC failed'
+        });
+      } catch (logErr) {
+        console.error('[processOrderRefund] Failed to log failed refund:', logErr.message);
+      }
+      
       throw new Error('Wallet credit operation failed during refund processing');
     }
     const newBalance = parseFloat(rpcBalance);

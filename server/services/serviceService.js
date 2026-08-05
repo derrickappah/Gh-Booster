@@ -1,7 +1,12 @@
 const { supabaseAdmin } = require('../config/supabase');
 
+let servicesCache = null;
+let servicesCacheTime = 0;
+const SERVICES_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 class ServiceService {
   static async getAllServices() {
+    if (servicesCache && Date.now() - servicesCacheTime < SERVICES_CACHE_TTL) return servicesCache;
     let { data: services, error: sErr } = await supabaseAdmin
       .from('services')
       .select('*, categories(name, icon)')
@@ -30,11 +35,17 @@ class ServiceService {
       status: s.status || 'active'
     }));
 
-    return {
+    const result = {
       categories: categories || [],
       services: formattedServices
     };
+
+    servicesCache = result;
+    servicesCacheTime = Date.now();
+    return result;
   }
+
+  static invalidateCache() { servicesCache = null; }
 }
 
 module.exports = ServiceService;

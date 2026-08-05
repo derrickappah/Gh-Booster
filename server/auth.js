@@ -6,12 +6,12 @@ const { authenticateToken, requireRole } = require('./middleware/authMiddleware'
 // bcrypt used only for child panel password hashing
 const bcrypt = require('bcryptjs');
 
-function hashPassword(password) {
-  return bcrypt.hashSync(password, 10);
+async function hashPassword(password) {
+  return await bcrypt.hash(password, 10);
 }
 
-function comparePassword(password, hash) {
-  return bcrypt.compareSync(password, hash);
+async function comparePassword(password, hash) {
+  return await bcrypt.compare(password, hash);
 }
 
 function generateToken(user) {

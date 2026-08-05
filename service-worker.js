@@ -1,4 +1,5 @@
-const CACHE_NAME = 'ghbooster-cache-v5';
+const CACHE_NAME = 'ghbooster-cache-v6';
+const MAX_CACHE_ENTRIES = 100;
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -51,7 +52,8 @@ self.addEventListener('fetch', (event) => {
       event.request.url.includes('/dashboard') || 
       event.request.url.includes('/orders') || 
       event.request.url.includes('/account') || 
-      event.request.url.includes('/wallet')) return;
+      event.request.url.includes('/wallet') ||
+      event.request.url.includes('.supabase.co')) return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -87,3 +89,20 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
+// Cache eviction: limit number of entries to prevent unbounded growth (F-61)
+async function trimCache(cacheName, maxEntries) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length > maxEntries) {
+    for (let i = 0; i < keys.length - maxEntries; i++) {
+      await cache.delete(keys[i]);
+    }
+  }
+}
+
+// Periodically trim cache after fetch events
+self.addEventListener('message', (event) => {
+  if (event.data === 'trimCache') {
+    trimCache(CACHE_NAME, MAX_CACHE_ENTRIES);
+  }
+});

@@ -29,7 +29,19 @@ class SmmgenService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, action: 'balance' })
       });
-      return await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        const text = await response.text().catch(() => '');
+        console.error('[SMMGen] Non-JSON response:', text.substring(0, 200));
+        return { error: 'Provider returned invalid response' };
+      }
+      if (!response.ok) {
+        console.error('[SMMGen] HTTP Error:', response.status, data);
+        return { error: data?.error || `Provider returned HTTP ${response.status}` };
+      }
+      return data;
     } catch (err) {
       console.error('SMMGen getBalance error:', err.message);
       return { error: err.message };
@@ -51,7 +63,18 @@ class SmmgenService {
           quantity: quantity
         })
       });
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        const text = await response.text().catch(() => '');
+        console.error('[SMMGen] Non-JSON response:', text.substring(0, 200));
+        return { error: 'Provider returned invalid response' };
+      }
+      if (!response.ok) {
+        console.error('[SMMGen] HTTP Error:', response.status, data);
+        return { error: data?.error || `Provider returned HTTP ${response.status}` };
+      }
       console.log('[SMMGen] Order placed, ID:', data?.order || 'unknown');
       return data;
     } catch (err) {
@@ -73,7 +96,19 @@ class SmmgenService {
           order: providerOrderId
         })
       });
-      return await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        const text = await response.text().catch(() => '');
+        console.error('[SMMGen] Non-JSON response:', text.substring(0, 200));
+        return { error: 'Provider returned invalid response' };
+      }
+      if (!response.ok) {
+        console.error('[SMMGen] HTTP Error:', response.status, data);
+        return { error: data?.error || `Provider returned HTTP ${response.status}` };
+      }
+      return data;
     } catch (err) {
       console.error('SMMGen getOrderStatus error:', err.message);
       return { error: err.message };
@@ -93,7 +128,19 @@ class SmmgenService {
           order: providerOrderId
         })
       });
-      return await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        const text = await response.text().catch(() => '');
+        console.error('[SMMGen] Non-JSON response:', text.substring(0, 200));
+        return { error: 'Provider returned invalid response' };
+      }
+      if (!response.ok) {
+        console.error('[SMMGen] HTTP Error:', response.status, data);
+        return { error: data?.error || `Provider returned HTTP ${response.status}` };
+      }
+      return data;
     } catch (err) {
       console.error('SMMGen refillOrder error:', err.message);
       return { error: err.message };

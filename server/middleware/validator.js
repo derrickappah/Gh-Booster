@@ -1,7 +1,7 @@
-function validate(schema) {
+function validate(schema, source = 'body') {
   return (req, res, next) => {
     try {
-      req.body = schema.parse(req.body);
+      req[source] = schema.parse(req[source]);
       next();
     } catch (err) {
       if (err.errors) {

@@ -33,8 +33,13 @@ async function authenticateToken(req, res, next) {
           .eq('id', decoded.id)
           .maybeSingle();
 
+        if (!profile) {
+          return res.status(401).json({ success: false, error: 'User profile not found. Account may have been deleted.' });
+        }
+
         const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
         const userRole = profile?.role || 'user';
+        const rawBalance = wallet ? parseFloat(wallet.balance) : 0.0;
 
         req.user = {
           id: decoded.id,
@@ -42,7 +47,7 @@ async function authenticateToken(req, res, next) {
           username: profile?.username || decoded.username || 'User',
           role: userRole,
           is_admin: userRole === 'admin' || userRole === 'super_admin',
-          balance: wallet ? parseFloat(wallet.balance) : 0.0,
+          balance: isNaN(rawBalance) ? 0.0 : rawBalance,
           currency: wallet?.currency || 'GHS',
           api_key: profile?.api_key || null
         };
@@ -66,8 +71,13 @@ async function authenticateToken(req, res, next) {
         .eq('id', supabaseUser.id)
         .maybeSingle();
 
+      if (!profile) {
+        return res.status(401).json({ success: false, error: 'User profile not found. Account may have been deleted.' });
+      }
+
       const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
       const userRole = profile?.role || 'user';
+      const rawBalance = wallet ? parseFloat(wallet.balance) : 0.0;
 
       req.user = {
         id: supabaseUser.id,
@@ -75,7 +85,7 @@ async function authenticateToken(req, res, next) {
         username: profile?.username || profile?.full_name || supabaseUser.email.split('@')[0],
         role: userRole,
         is_admin: userRole === 'admin' || userRole === 'super_admin',
-        balance: wallet ? parseFloat(wallet.balance) : 0.0,
+        balance: isNaN(rawBalance) ? 0.0 : rawBalance,
         currency: wallet?.currency || 'GHS',
         api_key: profile?.api_key || null
       };

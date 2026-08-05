@@ -1,7 +1,12 @@
 const { supabase, supabaseAdmin } = require('../config/supabase');
 
+let statsCache = null;
+let statsCacheTime = 0;
+const STATS_CACHE_TTL = 5 * 60 * 1000;
+
 class AdminService {
   static async getStats() {
+    if (statsCache && Date.now() - statsCacheTime < STATS_CACHE_TTL) return statsCache;
     const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('created_at', { count: 'exact' }).limit(10000);
     const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('charge, total_price, price, amount, cost, status, created_at', { count: 'exact' }).limit(10000);
     const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('status, mode', { count: 'exact' });
@@ -142,7 +147,7 @@ class AdminService {
       recentOrdersWithDetails = (orders || []).slice(0, 10);
     }
 
-    return {
+    const result = {
       users_today: usersToday,
       total_users: totalUsersCount,
       deposits_today: depositsToday,
@@ -180,14 +185,18 @@ class AdminService {
       audit_logs: logs || [],
       chart_data: dailyChartData
     };
+    statsCache = result;
+    statsCacheTime = Date.now();
+    return result;
   }
 
-  static async getAllUsers() {
+  static async getAllUsers(page = 1, limit = 50) {
+    const offset = (page - 1) * limit;
     const { data: profiles, error } = await supabaseAdmin
       .from('profiles')
       .select('id, username, email, phone, phone_number, role, created_at, wallets(balance, currency)')
-      .order('created_at', { ascending: false })
-      .limit(500);
+      .range(offset, offset + limit - 1)
+      .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
 
@@ -369,6 +378,10 @@ class AdminService {
   }
 
   static async createService(serviceData) {
+    const rate_per_1k = serviceData.rate_per_1k;
+    if (rate_per_1k !== undefined && (isNaN(rate_per_1k) || rate_per_1k < 0)) {
+      throw new Error('Service rate must be a non-negative number');
+    }
     const rateVal = parseFloat(serviceData.rate_per_1k || serviceData.rate_per_1000 || serviceData.our_price_per_1000 || serviceData.rate || 0);
     const cleanData = {
       ...serviceData,
@@ -391,6 +404,10 @@ class AdminService {
   }
 
   static async updateService(id, serviceData) {
+    const rate_per_1k = serviceData.rate_per_1k;
+    if (rate_per_1k !== undefined && (isNaN(rate_per_1k) || rate_per_1k < 0)) {
+      throw new Error('Service rate must be a non-negative number');
+    }
     const hasRate = serviceData.rate_per_1k !== undefined || serviceData.rate_per_1000 !== undefined || serviceData.our_price_per_1000 !== undefined || serviceData.rate !== undefined;
     const cleanData = { ...serviceData };
 

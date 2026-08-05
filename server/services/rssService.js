@@ -88,9 +88,9 @@ const FEED_ITEMS = [
 /**
  * Escapes XML special characters safely
  */
-function escapeXml(unsafe) {
-  if (!unsafe) return '';
-  return unsafe
+function escapeXml(str) {
+  if (!str) return '';
+  return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -107,21 +107,21 @@ function generateRssXml() {
   const itemsXml = FEED_ITEMS.map(item => {
     return `    <item>
       <title>${escapeXml(item.title)}</title>
-      <link>${item.link}</link>
-      <guid isPermaLink="true">${item.guid}</guid>
+      <link>${escapeXml(item.link)}</link>
+      <guid isPermaLink="true">${escapeXml(item.guid)}</guid>
       <dc:creator>${escapeXml(item.author)}</dc:creator>
       <category>${escapeXml(item.category)}</category>
       <pubDate>${item.pubDate}</pubDate>
-      <description><![CDATA[${item.description}]]></description>
+      <description><![CDATA[${escapeXml(item.description)}]]></description>
       <content:encoded><![CDATA[
-        <p><img src="${item.image}" alt="${escapeXml(item.title)}" style="max-width:100%;height:auto;" /></p>
-        <p>${item.content}</p>
-        <p><a href="${item.link}">Read the full strategy guide on GhBooster</a></p>
+        <p><img src="${escapeXml(item.image)}" alt="${escapeXml(item.title)}" style="max-width:100%;height:auto;" /></p>
+        <p>${escapeXml(item.content)}</p>
+        <p><a href="${escapeXml(item.link)}">Read the full strategy guide on GhBooster</a></p>
       ]]></content:encoded>
-      <media:content url="${item.image}" medium="image" type="image/png" />
+      <media:content url="${escapeXml(item.image)}" medium="image" type="image/png" />
       <media:title>${escapeXml(item.title)}</media:title>
       <media:description>${escapeXml(item.description)}</media:description>
-      <enclosure url="${item.image}" length="0" type="image/png" />
+      <enclosure url="${escapeXml(item.image)}" length="0" type="image/png" />
     </item>`;
   }).join('\n');
 

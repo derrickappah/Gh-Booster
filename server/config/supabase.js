@@ -26,5 +26,20 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   }
 });
 
-module.exports = { supabase, supabaseAdmin };
+async function checkConnection() {
+  try {
+    const { error } = await supabaseAdmin.from('profiles').select('id').limit(1);
+    if (error) {
+      console.error('[Supabase] Connection check failed:', error.message);
+      return false;
+    }
+    console.log('[Supabase] Connection verified successfully.');
+    return true;
+  } catch (err) {
+    console.error('[Supabase] Connection check exception:', err.message);
+    return false;
+  }
+}
+
+module.exports = { supabase, supabaseAdmin, checkConnection };
 

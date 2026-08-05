@@ -13,7 +13,7 @@ const globalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit login/register attempts to 20 per 15 minutes
+  max: 10, // Limit login/register attempts to 10 per 15 minutes
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -33,6 +33,17 @@ const paymentLimiter = rateLimit({
   }
 });
 
+const resetPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // 3 reset requests per hour per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many password reset attempts. Please try again later.'
+  }
+});
+
 const apiKeyLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 30, // 30 requests per minute per API key
@@ -49,5 +60,5 @@ const apiKeyLimiter = rateLimit({
   }
 });
 
-module.exports = { globalLimiter, authLimiter, paymentLimiter, apiKeyLimiter };
+module.exports = { globalLimiter, authLimiter, paymentLimiter, apiKeyLimiter, resetPasswordLimiter };
 

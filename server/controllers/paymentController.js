@@ -45,9 +45,7 @@ class PaymentController {
       // Derive the app URL from the incoming request so it works in both
       // development (localhost) and production (Vercel / custom domain)
       // without needing to set APP_URL as an environment variable.
-      const proto = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
-      const host = req.headers['x-forwarded-host'] || req.headers.host;
-      const appUrl = process.env.APP_URL || `${proto}://${host}`;
+      const appUrl = process.env.APP_URL || 'https://ghbooster.com';
 
       const result = await MoolreService.generatePaymentLink({
         userId: req.user.id,
@@ -93,7 +91,7 @@ class PaymentController {
       res.json({ received: true, ...result });
     } catch (err) {
       console.error('[Moolre Webhook Error]', err.message);
-      res.status(200).json({ received: false, error: err.message });
+      res.status(500).json({ received: false, error: 'Webhook processing failed' });
     }
   }
 

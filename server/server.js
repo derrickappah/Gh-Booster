@@ -5,7 +5,7 @@ const MoolreService = require('./services/moolreService');
 
 const PORT = env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📡 Backend connected to Supabase: ${env.SUPABASE_URL}`);
 
@@ -33,3 +33,18 @@ app.listen(PORT, () => {
     }
   }, SYNC_INTERVAL_MS);
 });
+
+// Graceful shutdown
+function shutdown(signal) {
+  console.log(`${signal} received. Shutting down gracefully...`);
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
+  });
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout.');
+    process.exit(1);
+  }, 10000);
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
