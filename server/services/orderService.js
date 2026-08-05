@@ -244,6 +244,16 @@ class OrderService {
       throw new Error('Selected service not found or unavailable');
     }
 
+    const minQty = parseInt(service.min_quantity || service.min || 0, 10);
+    const maxQty = parseInt(service.max_quantity || service.max || 0, 10);
+
+    if (minQty > 0 && qty < minQty) {
+      throw new Error(`Minimum quantity required for this service is ${minQty.toLocaleString()}`);
+    }
+    if (maxQty > 0 && qty > maxQty) {
+      throw new Error(`Maximum quantity allowed for this service is ${maxQty.toLocaleString()}`);
+    }
+
     const ratePer1k = parseFloat(service.rate_per_1k || service.rate_per_1000 || service.our_price_per_1000 || service.rate || 0);
     const serviceName = service.name;
     const totalCharge = roundMoney((qty / 1000) * ratePer1k);
@@ -346,12 +356,14 @@ class OrderService {
     }
 
     // Step 4: Record transaction entry
+    const ref = 'ord_' + newOrder.id;
     const { error: txErr } = await supabaseAdmin.from('transactions').insert({
       user_id: userId,
       amount: -totalCharge,
       currency: 'GHS',
       gateway: 'Wallet Balance',
-      reference: 'ord_' + newOrder.id,
+      payment_ref: ref,
+      reference: ref,
       type: 'order_charge',
       status: 'completed'
     });
