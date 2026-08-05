@@ -4041,7 +4041,7 @@ async function initAdminServicesPage() {
           const shortId = typeof s.id === 'string' && s.id.length > 8 ? s.id.substring(0, 8) : s.id;
           const catName = s.categories?.name || s.category_name || 'General';
           const providerName = s.providers?.name || 'Direct';
-          const rate = parseFloat(s.rate_per_1k || 0).toFixed(2);
+          const rate = parseFloat(s.rate_per_1k || s.rate_per_1000 || s.our_price_per_1000 || 0).toFixed(2);
           const isActive = (s.status || '').toLowerCase() === 'active';
           const statusBadge = isActive
             ? `<span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px]">Active</span>`
@@ -4158,7 +4158,7 @@ async function initAdminServicesPage() {
           if (modalSvcId) modalSvcId.value = svc.id;
           if (modalSvcName) modalSvcName.value = svc.name;
           if (modalSvcCategory) modalSvcCategory.value = svc.category_id || (categories[0]?.id || '');
-          if (modalSvcRate) modalSvcRate.value = svc.rate_per_1k || 0;
+          if (modalSvcRate) modalSvcRate.value = svc.rate_per_1k || svc.rate_per_1000 || svc.our_price_per_1000 || 0;
           if (modalSvcProviderServiceId) modalSvcProviderServiceId.value = svc.provider_service_id || '';
           if (modalSvcProvider) modalSvcProvider.value = svc.provider_id || '';
           if (modalSvcMin) modalSvcMin.value = svc.min_quantity || 100;

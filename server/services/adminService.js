@@ -371,11 +371,11 @@ class AdminService {
   static async createService(serviceData) {
     const rateVal = parseFloat(serviceData.rate_per_1k || serviceData.rate_per_1000 || serviceData.our_price_per_1000 || serviceData.rate || 0);
     const cleanData = {
+      ...serviceData,
       rate_per_1k: rateVal,
       rate_per_1000: rateVal,
       our_price_per_1000: rateVal,
-      original_price_per_1000: rateVal,
-      ...serviceData
+      original_price_per_1000: rateVal
     };
 
     if (!cleanData.name || typeof cleanData.name !== 'string' || cleanData.name.trim().length === 0) {
@@ -391,14 +391,16 @@ class AdminService {
   }
 
   static async updateService(id, serviceData) {
-    const rateVal = parseFloat(serviceData.rate_per_1k || serviceData.rate_per_1000 || serviceData.our_price_per_1000 || serviceData.rate || 0);
-    const cleanData = {
-      rate_per_1k: rateVal,
-      rate_per_1000: rateVal,
-      our_price_per_1000: rateVal,
-      original_price_per_1000: rateVal,
-      ...serviceData
-    };
+    const hasRate = serviceData.rate_per_1k !== undefined || serviceData.rate_per_1000 !== undefined || serviceData.our_price_per_1000 !== undefined || serviceData.rate !== undefined;
+    const cleanData = { ...serviceData };
+
+    if (hasRate) {
+      const rateVal = parseFloat(serviceData.rate_per_1k || serviceData.rate_per_1000 || serviceData.our_price_per_1000 || serviceData.rate || 0);
+      cleanData.rate_per_1k = rateVal;
+      cleanData.rate_per_1000 = rateVal;
+      cleanData.our_price_per_1000 = rateVal;
+      cleanData.original_price_per_1000 = rateVal;
+    }
 
     let { data, error } = await supabaseAdmin.from('services').update(cleanData).eq('id', id).select();
 
