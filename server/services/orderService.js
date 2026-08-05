@@ -323,21 +323,6 @@ class OrderService {
         } else {
           const providerErrMsg = smmRes?.error || 'Unknown provider error';
           console.error(`SMMGen order error for order #${newOrder.id}:`, providerErrMsg);
-          
-          // Mark order as Canceled in DB
-          await supabaseAdmin
-            .from('orders')
-            .update({ status: 'Canceled', updated_at: new Date().toISOString() })
-            .eq('id', newOrder.id);
-
-          // Refund wallet ONLY if skipWalletDeduction is false (bulk orders handle individual refunds in bulk loop)
-          if (!skipWalletDeduction) {
-            try {
-              await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalCharge });
-            } catch (refundErr) {
-              console.error('CRITICAL: Provider error refund failed:', refundErr.message);
-            }
-          }
           throw new Error(`SMMGen Provider Error: ${providerErrMsg}`);
         }
       } catch (providerErr) {
