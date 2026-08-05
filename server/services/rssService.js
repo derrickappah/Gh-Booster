@@ -7,6 +7,94 @@ const SITE_URL = process.env.SITE_URL || 'https://ghbooster.com';
 
 const FEED_ITEMS = [
   {
+    title: 'Master Social Media Panel Growth: Automated Order Execution & High Velocity',
+    link: `${SITE_URL}/gallery#media-12`,
+    guid: `${SITE_URL}/gallery#media-12`,
+    description: 'Discover how automated order routing and high-velocity social media engagement accelerate account reach without algorithmic flags.',
+    content: 'Comprehensive breakdown of high-speed SMM panel infrastructure, automated order execution, zero-password requirements, and non-drop refill guarantees for creators and digital agencies.',
+    pubDate: 'Wed, 05 Aug 2026 21:00:00 GMT',
+    author: 'GhBooster Media Team',
+    category: 'SMM Strategy',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-12.png`
+  },
+  {
+    title: 'Organic Social Proof Blueprint: Scaling Brand Trust Across Channels',
+    link: `${SITE_URL}/gallery#media-13`,
+    guid: `${SITE_URL}/gallery#media-13`,
+    description: 'Learn the exact social proof framework used by top brands to triple customer confidence and boost conversion rates.',
+    content: 'Step-by-step framework detailing how social proof counters, high follower velocity, and authentic post engagement transform brand perception and conversion rates.',
+    pubDate: 'Wed, 05 Aug 2026 20:30:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'Social Proof',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-13.png`
+  },
+  {
+    title: 'Creator Channel Acceleration: Instant Delivery Speed & High-Retention Services',
+    link: `${SITE_URL}/gallery#media-14`,
+    guid: `${SITE_URL}/gallery#media-14`,
+    description: 'Unlock maximum channel authority with instant delivery speed, high retention rates, and 24/7 automated order processing.',
+    content: 'Explore creator growth strategies leveraging real-time engagement counters, instant order startup, and high-retention views for YouTube, TikTok, and Instagram.',
+    pubDate: 'Wed, 05 Aug 2026 20:00:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'Creator Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-14.png`
+  },
+  {
+    title: 'Viral Engagement Engine: Boosting TikTok & Instagram Reach Safely',
+    link: `${SITE_URL}/gallery#media-15`,
+    guid: `${SITE_URL}/gallery#media-15`,
+    description: 'Understand how watch time velocity and targeted social signals trigger algorithmic recommendation engines for viral reach.',
+    content: 'Detailed analysis of algorithmic recommendation triggers across TikTok FYP and Instagram Reels. How strategic view boosts jumpstart organic discovery.',
+    pubDate: 'Wed, 05 Aug 2026 19:30:00 GMT',
+    author: 'GhBooster Analytics',
+    category: 'Viral Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-15.png`
+  },
+  {
+    title: 'Digital Agency Reseller Guide: Integrating High-Speed SMM APIs',
+    link: `${SITE_URL}/gallery#media-16`,
+    guid: `${SITE_URL}/gallery#media-16`,
+    description: 'Automate your SMM panel reselling agency with v2 API integration, dynamic balance checking, and instant status updates.',
+    content: 'Complete developer guide to integrating GhBooster v2 API endpoints into custom dashboards, WordPress panels, and reseller platforms.',
+    pubDate: 'Wed, 05 Aug 2026 19:00:00 GMT',
+    author: 'GhBooster Developer Team',
+    category: 'Reseller API',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-16.png`
+  },
+  {
+    title: 'Multi-Platform Audience Scaling: Instagram, YouTube & Telegram Metrics',
+    link: `${SITE_URL}/gallery#media-17`,
+    guid: `${SITE_URL}/gallery#media-17`,
+    description: 'Build a cohesive cross-platform presence by synchronizing engagement velocity across Instagram, YouTube, TikTok, and Telegram.',
+    content: 'Cross-platform growth tactics for digital marketers looking to build unified multi-channel authority and active community engagement.',
+    pubDate: 'Wed, 05 Aug 2026 18:30:00 GMT',
+    author: 'GhBooster Media Team',
+    category: 'Audience Building',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-17.png`
+  },
+  {
+    title: 'E-Commerce Conversion Booster: How Social Signals Drive Sales',
+    link: `${SITE_URL}/gallery#media-18`,
+    guid: `${SITE_URL}/gallery#media-18`,
+    description: 'Case study insights on how social media presence and verified subscriber proof directly impact e-commerce checkout conversions.',
+    content: 'An analysis of consumer purchasing behavior when interacting with social-proof-verified brands versus unverified competitors.',
+    pubDate: 'Wed, 05 Aug 2026 18:00:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'E-Commerce Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-18.png`
+  },
+  {
+    title: 'SMM Panel Security & Refill Guarantees: Non-Drop Delivery Protocol',
+    link: `${SITE_URL}/gallery#media-19`,
+    guid: `${SITE_URL}/gallery#media-19`,
+    description: 'Learn how automated 30-day refill buttons and strict passwordless security safeguard your social media accounts.',
+    content: 'Security protocols overview for SMM panel users. Zero account access required, passwordless processing, and 30-day automatic refill protection.',
+    pubDate: 'Wed, 05 Aug 2026 17:30:00 GMT',
+    author: 'GhBooster Security Team',
+    category: 'Platform Security',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-19.png`
+  },
+  {
     title: 'How to Get More Instagram Followers in 2026: The Ultimate SMM Strategy',
     link: `${SITE_URL}/blog-instagram-followers`,
     guid: `${SITE_URL}/blog-instagram-followers`,
