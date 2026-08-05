@@ -588,20 +588,20 @@ function renderAnnouncementsBanner(newsList, container) {
     const n = newsList[0];
     const dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString() : '';
     container.innerHTML = `
-      <div class="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white p-4 sm:p-5 rounded-2xl shadow-lg border border-pink-500/20 relative overflow-hidden mb-4">
+      <div class="bg-white dark:bg-gray-800 border-l-4 border-l-pink-600 border-y border-r border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm mb-4">
         <div class="flex items-start space-x-3">
-          <div class="p-2 bg-white/10 backdrop-blur rounded-xl flex-shrink-0 mt-0.5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+          <div class="p-2 bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-lg flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
             </svg>
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2 mb-1">
-              <span class="px-2 py-0.5 text-[10px] font-bold bg-white/20 text-white rounded-full uppercase tracking-wider">Announcement</span>
-              ${dateStr ? `<span class="text-[11px] text-pink-100">${escapeHtml(dateStr)}</span>` : ''}
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 rounded-md uppercase tracking-wider">Announcement</span>
+              ${dateStr ? `<span class="text-[11px] text-gray-400 dark:text-gray-400">${escapeHtml(dateStr)}</span>` : ''}
             </div>
-            <h4 class="font-extrabold text-base sm:text-lg text-white leading-tight">${escapeHtml(n.title)}</h4>
-            <p class="text-xs sm:text-sm text-pink-50/90 mt-1.5 leading-relaxed">${escapeHtml(n.content)}</p>
+            <h4 class="font-bold text-sm md:text-base text-gray-900 dark:text-white leading-snug">${escapeHtml(n.title)}</h4>
+            <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">${escapeHtml(n.content)}</p>
           </div>
         </div>
       </div>
@@ -611,44 +611,46 @@ function renderAnnouncementsBanner(newsList, container) {
 
   // Multiple Announcements -> Carousel Component
   container.innerHTML = `
-    <div id="announcement-carousel" class="relative bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white rounded-2xl shadow-lg border border-pink-500/20 overflow-hidden mb-4 group select-none">
+    <div id="announcement-carousel" class="bg-white dark:bg-gray-800 border-l-4 border-l-pink-600 border-y border-r border-gray-200 dark:border-gray-700 rounded-xl shadow-sm relative overflow-hidden mb-4 group select-none">
+      <!-- Slides Container -->
       <div id="carousel-slides-wrapper" class="flex transition-transform duration-500 ease-in-out w-full">
         ${newsList.map((n, idx) => {
           const dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString() : '';
           return `
-            <div class="w-full flex-shrink-0 p-4 sm:p-5 flex items-start space-x-3">
-              <div class="p-2 bg-white/10 backdrop-blur rounded-xl flex-shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+            <div class="w-full flex-shrink-0 p-4 sm:p-4.5 flex items-start space-x-3">
+              <div class="p-2 bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-lg flex-shrink-0 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                 </svg>
               </div>
-              <div class="flex-1 min-w-0 pr-12">
+              <div class="flex-1 min-w-0 pr-24">
                 <div class="flex items-center space-x-2 mb-1">
-                  <span class="px-2 py-0.5 text-[10px] font-bold bg-white/20 text-white rounded-full uppercase tracking-wider">Announcement ${idx + 1} of ${newsList.length}</span>
-                  ${dateStr ? `<span class="text-[11px] text-pink-100">${escapeHtml(dateStr)}</span>` : ''}
+                  <span class="px-2 py-0.5 text-[10px] font-bold bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 rounded-md uppercase tracking-wider">Announcement ${idx + 1} of ${newsList.length}</span>
+                  ${dateStr ? `<span class="text-[11px] text-gray-400 dark:text-gray-400">${escapeHtml(dateStr)}</span>` : ''}
                 </div>
-                <h4 class="font-extrabold text-base sm:text-lg text-white leading-tight">${escapeHtml(n.title)}</h4>
-                <p class="text-xs sm:text-sm text-pink-50/90 mt-1.5 leading-relaxed">${escapeHtml(n.content)}</p>
+                <h4 class="font-bold text-sm md:text-base text-gray-900 dark:text-white leading-snug">${escapeHtml(n.title)}</h4>
+                <p class="text-xs md:text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">${escapeHtml(n.content)}</p>
               </div>
             </div>
           `;
         }).join('')}
       </div>
 
-      <!-- Navigation Arrows -->
-      <button id="carousel-prev-btn" aria-label="Previous Announcement" class="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-white transition opacity-80 hover:opacity-100 focus:outline-none">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-      </button>
+      <!-- Top-Right Controls Pill (Prev, Dots, Next) -->
+      <div class="absolute top-3 right-3 flex items-center space-x-1 bg-gray-50 dark:bg-gray-900/80 p-1 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
+        <button id="carousel-prev-btn" type="button" aria-label="Previous Announcement" class="p-1 rounded text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-gray-200/60 dark:hover:bg-gray-800 transition focus:outline-none">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        
+        <div class="flex items-center space-x-1 px-1">
+          ${newsList.map((_, idx) => `
+            <button data-slide-index="${idx}" class="carousel-dot w-1.5 h-1.5 rounded-full transition-all ${idx === 0 ? 'bg-pink-600 dark:bg-pink-400 w-3' : 'bg-gray-300 dark:bg-gray-600 hover:bg-pink-400'}" aria-label="Go to slide ${idx + 1}"></button>
+          `).join('')}
+        </div>
 
-      <button id="carousel-next-btn" aria-label="Next Announcement" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-white transition opacity-80 hover:opacity-100 focus:outline-none">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-      </button>
-
-      <!-- Pagination Indicators -->
-      <div class="absolute bottom-2.5 right-4 flex items-center space-x-1.5 z-10">
-        ${newsList.map((_, idx) => `
-          <button data-slide-index="${idx}" class="carousel-dot w-2 h-2 rounded-full transition-all ${idx === 0 ? 'bg-white w-4' : 'bg-white/40 hover:bg-white/70'}" aria-label="Go to slide ${idx + 1}"></button>
-        `).join('')}
+        <button id="carousel-next-btn" type="button" aria-label="Next Announcement" class="p-1 rounded text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-gray-200/60 dark:hover:bg-gray-800 transition focus:outline-none">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
       </div>
     </div>
   `;
@@ -668,9 +670,9 @@ function renderAnnouncementsBanner(newsList, container) {
     slidesWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
     dots.forEach((dot, idx) => {
       if (idx === currentIndex) {
-        dot.className = 'carousel-dot w-4 h-2 rounded-full bg-white transition-all';
+        dot.className = 'carousel-dot w-3 h-1.5 rounded-full bg-pink-600 dark:bg-pink-400 transition-all';
       } else {
-        dot.className = 'carousel-dot w-2 h-2 rounded-full bg-white/40 hover:bg-white/70 transition-all';
+        dot.className = 'carousel-dot w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600 hover:bg-pink-400 transition-all';
       }
     });
   }
@@ -679,7 +681,7 @@ function renderAnnouncementsBanner(newsList, container) {
     stopAutoPlay();
     timer = setInterval(() => {
       updateCarousel(currentIndex + 1);
-    }, 5000);
+    }, 6000);
   }
 
   function stopAutoPlay() {
