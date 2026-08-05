@@ -191,6 +191,25 @@ const pageRoutesMap = {
 // Server-side protection for admin pages — redirect unauthenticated users
 const { authenticateToken } = require('./middleware/authMiddleware');
 const adminPageMiddleware = (req, res, next) => {
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.substring(7)
+    : (req.cookies?.token || req.cookies?.jwt || req.cookies?.sb_access_token || null);
+
+  if (!token) {
+    return res.redirect('/login');
+  }
+
+  const originalStatus = res.status.bind(res);
+  res.status = function(code) {
+    if (code === 401 || code === 403) {
+      return {
+        json: () => res.redirect('/login')
+      };
+    }
+    return originalStatus(code);
+  };
+
   authenticateToken(req, res, () => {
     if (!req.user) return res.redirect('/login');
     if (!req.user.is_admin) return res.redirect('/dashboard');

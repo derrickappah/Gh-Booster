@@ -32,7 +32,7 @@ class ApiV2Controller {
             service: s.id,
             name: s.name,
             category: s.category_name,
-            rate: s.rate_per_1k.toFixed(2),
+            rate: (parseFloat(s.rate_per_1k) || 0).toFixed(2),
             min: s.min_quantity,
             max: s.max_quantity
           })));

@@ -67,16 +67,7 @@ class OrderService {
           const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
           if (!providerStatusRes || providerStatusRes.error) return;
 
-          let newStatus = providerStatusRes.status || order.status;
-          // Normalize common status casing
-          const statusLower = (newStatus || '').toLowerCase();
-          if (statusLower === 'completed') newStatus = 'Completed';
-          else if (statusLower === 'processing') newStatus = 'Processing';
-          else if (statusLower === 'pending') newStatus = 'Pending';
-          else if (statusLower === 'in progress' || statusLower === 'in-progress') newStatus = 'In Progress';
-          else if (statusLower === 'canceled' || statusLower === 'cancelled') newStatus = 'Canceled';
-          else if (statusLower === 'partial') newStatus = 'Partial';
-          else if (statusLower === 'refunded') newStatus = 'Refunded';
+          let newStatus = OrderService.normalizeProviderStatus(providerStatusRes.status || order.status);
 
           const newStartCount = providerStatusRes.start_count !== undefined && providerStatusRes.start_count !== null
             ? parseInt(providerStatusRes.start_count, 10)
@@ -393,7 +384,22 @@ class OrderService {
     };
   }
 
+  static normalizeProviderStatus(status) {
+    const statusLower = (status || '').toLowerCase();
+    if (statusLower === 'completed') return 'Completed';
+    if (statusLower === 'processing') return 'Processing';
+    if (statusLower === 'pending') return 'Pending';
+    if (statusLower === 'in progress' || statusLower === 'in-progress') return 'In Progress';
+    if (statusLower === 'canceled' || statusLower === 'cancelled') return 'Canceled';
+    if (statusLower === 'partial') return 'Partial';
+    if (statusLower === 'refunded') return 'Refunded';
+    return status || 'Processing';
+  }
+
   static async createBulkOrders({ userId, bulkText, defaultServiceId }) {
+    if (!bulkText || typeof bulkText !== 'string') {
+      throw new Error('Bulk order text is required');
+    }
     const MAX_BULK_LINES = 100;
     const MAX_LINK_LENGTH = 2048;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -404,8 +410,9 @@ class OrderService {
       throw new Error('No valid order lines found in bulk text.');
     }
     lines.forEach((l, idx) => {
-      const parts = l.split('|');
-      const link = (parts.length > 2 ? parts[2] : (parts.length > 1 ? parts[1] : parts[0])) || '';
+      const isPipe = l.includes('|');
+      const parts = isPipe ? l.split('|').map(p => p.trim()) : l.split(/\s+/);
+      const link = (parts.length >= 3 ? parts[1] : (parts.length === 2 ? parts[0] : '')) || '';
       if (link.trim().length > MAX_LINK_LENGTH) {
         throw new Error(`Line ${idx + 1} link exceeds maximum allowable length of ${MAX_LINK_LENGTH} characters.`);
       }
@@ -424,7 +431,8 @@ class OrderService {
     const currentBalance = wallet ? parseFloat(wallet.balance) : 0.0;
 
     for (const line of lines) {
-      const parts = line.split(/\s+/);
+      const isPipe = line.includes('|');
+      const parts = isPipe ? line.split('|').map(p => p.trim()) : line.split(/\s+/);
       let serviceId = null;
       let link = null;
       let quantityStr = null;
@@ -526,6 +534,18 @@ class OrderService {
       throw new Error(`Failed to create batch record: ${bErr?.message || 'Unknown error'}`);
     }
 
+    // Record batch transaction entry for auditing
+    await supabaseAdmin.from('transactions').insert({
+      user_id: userId,
+      amount: -totalChargeOfValid,
+      currency: 'GHS',
+      gateway: 'Wallet Balance',
+      reference: 'batch_' + newBatch.id,
+      type: 'order_charge',
+      status: 'completed',
+      description: `Bulk order batch #${newBatch.id} (${validOrdersToPlace.length} orders)`
+    }).catch(txErr => console.error('[BulkOrders] Batch charge transaction insert error:', txErr.message));
+
     // Now insert each valid order referencing the batch ID with skipWalletDeduction=true
     for (const item of validOrdersToPlace) {
       try {
@@ -542,6 +562,16 @@ class OrderService {
         // Refund individual failed order amount
         try {
           await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: item.charge });
+          await supabaseAdmin.from('transactions').insert({
+            user_id: userId,
+            amount: item.charge,
+            currency: 'GHS',
+            gateway: 'Wallet Balance',
+            reference: 'refund_bulk_' + newBatch.id + '_' + Date.now().toString(36),
+            type: 'refund',
+            status: 'completed',
+            description: `Bulk order item refund for Batch #${newBatch.id}`
+          }).catch(() => {});
         } catch (rErr) {
           console.error('[BulkOrders] Failed to refund failed order item:', rErr.message);
         }

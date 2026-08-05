@@ -2,13 +2,19 @@
 
 > GhBooster is the premier Social Media Marketing (SMM) Panel providing automated, fast, and affordable growth services for Instagram, TikTok, YouTube, Telegram, Facebook, and Twitter.
 
-## Core Pages
+## Core Pages & Platform Pillars
 
 - [Home](https://www.ghbooster.com/): Main landing page highlighting GhBooster features, supported platforms, instant 24/7 automated delivery, and pricing overviews.
-- [Services](https://www.ghbooster.com/services): Complete catalog of social media marketing services with live real-time pricing per 1,000 units, minimum/maximum order bounds, and service descriptions.
-- [API Documentation](https://www.ghbooster.com/api-docs): Comprehensive API v2 reference for resellers, developers, and panel owners to automate orders, service lists, and balance checks via HTTP POST requests.
-- [FAQ](https://www.ghbooster.com/faq): Frequently asked questions regarding order processing, automated delivery timelines, refill guarantees, and accepted payment methods.
-- [Terms of Service](https://www.ghbooster.com/terms): Terms and conditions, privacy policies, refund policies, and usage guidelines for GhBooster services.
+- [Ghana SMM Panel](https://www.ghbooster.com/smm-panel-ghana.html): Ghana's #1 localized SMM hub with instant MTN MoMo, Telecel Cash, and AT Money payments.
+- [Instagram SMM Panel](https://www.ghbooster.com/smm-panel-instagram.html): Specialized Instagram boosting hub for organic-looking followers, high-retention likes, reels views, and custom comments.
+- [TikTok SMM Panel](https://www.ghbooster.com/smm-panel-tiktok.html): Automated TikTok growth center providing instant FYP views, organic followers, video likes, and shares.
+- [YouTube SMM Panel](https://www.ghbooster.com/smm-panel-youtube.html): Monetization & growth suite for YouTube watch time hours, real subscribers, high retention views, and video likes.
+- [Telegram SMM Panel](https://www.ghbooster.com/smm-panel-telegram.html): High speed Telegram growth panel for real channel members, group members, post views, and poll votes.
+- [Services Catalog](https://www.ghbooster.com/services.html): Complete catalog of social media marketing services with live real-time pricing per 1,000 units, minimum/maximum order bounds, and refill policies.
+- [API Documentation](https://www.ghbooster.com/api.html): Comprehensive API v2 reference for resellers, developers, and panel owners to automate orders via REST API.
+- [Blog & Guides](https://www.ghbooster.com/blog.html): Comprehensive social media marketing guides, algorithm breakdowns, and boosting strategies.
+- [FAQ](https://www.ghbooster.com/faq.html): Frequently asked questions regarding order processing, automated delivery timelines, refill guarantees, and accepted payment methods.
+- [Terms of Service](https://www.ghbooster.com/terms.html): Terms and conditions, privacy policies, refund policies, and usage guidelines.
 
 ## User Account & Dashboard
 

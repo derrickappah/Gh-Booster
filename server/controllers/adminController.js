@@ -253,14 +253,6 @@ class AdminController {
       }
       const targetStatus = String(status).toLowerCase();
       const deposit = await AdminService.updateDepositStatus({ id, status: targetStatus });
-      if (targetStatus === 'completed' && deposit && deposit.user_id && deposit.amount) {
-        try {
-          const MoolreService = require('../services/moolreService');
-          await MoolreService._creditUserWallet(deposit.user_id, deposit.amount, deposit.reference || deposit.payment_ref);
-        } catch (creditErr) {
-          console.error('[AdminController] Wallet credit failed on deposit status update:', creditErr.message);
-        }
-      }
       const { supabaseAdmin } = require('../config/supabase');
       await supabaseAdmin.from('audit_logs').insert({
         user_id: req.user.id,

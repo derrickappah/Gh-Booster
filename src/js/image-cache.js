@@ -314,7 +314,7 @@
           } else if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
             if (mutation.target && mutation.target.nodeName === 'IMG') {
               const src = mutation.target.getAttribute('src');
-              if (src && !src.startsWith('data:')) {
+              if (src && !src.startsWith('data:') && !src.startsWith('blob:')) {
                 self.applyToElement(mutation.target);
               }
             }

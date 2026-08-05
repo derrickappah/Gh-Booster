@@ -277,11 +277,12 @@ class MoolreService {
 
       // In sandbox, simulate a hosted link if API rejects
       if (creds.environment === 'sandbox') {
+        const fallbackUrl = `${resolvedAppUrl}/dashboard.html?deposit=success&ref=${reference}`;
         return {
           success: true,
           reference,
           transaction_id: txn.id,
-          authorization_url: null,
+          authorization_url: fallbackUrl,
           sandbox: true,
           message: `[SANDBOX] Payment link simulated. Reference: ${reference}`,
           environment: 'sandbox'
@@ -296,11 +297,12 @@ class MoolreService {
       if (apiError.message.includes('already exists')) throw apiError;
 
       if (creds.environment === 'sandbox') {
+        const fallbackUrl = `${resolvedAppUrl}/dashboard.html?deposit=success&ref=${reference}`;
         return {
           success: true,
           reference,
           transaction_id: txn.id,
-          authorization_url: null,
+          authorization_url: fallbackUrl,
           sandbox: true,
           message: `[SANDBOX] API unreachable. Reference: ${reference}.`,
           environment: 'sandbox'
@@ -430,16 +432,20 @@ class MoolreService {
     const validSecret = creds.webhookSecret || creds.apiKey;
     const bodySecret = payload?.data?.secret || payload?.secret;
 
-    // Reject if body secret is supplied but invalid
-    if (bodySecret && validSecret) {
-      if (bodySecret !== validSecret) {
-        console.error(`[Moolre Webhook] Body secret mismatch: received ${bodySecret}`);
-        throw new Error('Invalid webhook secret — request rejected');
-      }
+    if (!validSecret) {
+      console.error('[Moolre Webhook] Gateway credentials are not configured on server');
+      throw new Error('Moolre gateway credentials are not configured on server');
+    }
+
+    let isVerified = false;
+
+    // 1. Verify via payload body secret if supplied
+    if (bodySecret && bodySecret === validSecret) {
+      isVerified = true;
       console.log('[Moolre Webhook] Valid secret confirmed from payload body');
     }
 
-    // Verify webhook signature if present in header
+    // 2. Verify via HMAC signature header if supplied
     if (signatureHeader && creds.apiKey) {
       try {
         const crypto = require('crypto');
@@ -449,20 +455,18 @@ class MoolreService {
           .digest('hex');
         const sigBuffer = Buffer.from(signatureHeader, 'utf8');
         const expectedBuffer = Buffer.from(expectedSig, 'utf8');
-        if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-          console.error('[Moolre Webhook] Signature header present but signature mismatch');
-          throw new Error('Invalid webhook signature — request rejected');
+        if (sigBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+          isVerified = true;
+          console.log('[Moolre Webhook] Valid HMAC signature confirmed from header');
         }
       } catch (sigErr) {
         console.error('[Moolre Webhook] Signature check error:', sigErr.message);
-        throw new Error('Invalid webhook signature — request rejected');
       }
     }
 
-    // Mandatory security verification check: If credentials exist, at least one form of secret or signature verification MUST pass
-    if (validSecret && (bodySecret !== validSecret) && !signatureHeader) {
-      console.error('[Moolre Webhook] Request rejected: missing or invalid webhook secret / signature header');
-      throw new Error('Missing or invalid webhook signature or secret verification');
+    if (!isVerified) {
+      console.error('[Moolre Webhook] Request rejected: missing or invalid webhook signature / secret');
+      throw new Error('Invalid or missing webhook signature or secret verification');
     }
 
     // Support all common reference field names sent by Moolre (externalref, reference, etc.)

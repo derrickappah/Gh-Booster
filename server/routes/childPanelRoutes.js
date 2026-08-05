@@ -47,7 +47,7 @@ router.post('/order', authenticateToken, async (req, res) => {
     }
 
     const { hashPassword } = require('../auth');
-    const hashedPassword = hashPassword(admin_password);
+    const hashedPassword = await hashPassword(admin_password);
 
     const { data: panel, error } = await supabaseAdmin.from('child_panels').insert([{
       user_id: req.user.id,

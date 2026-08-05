@@ -3,9 +3,9 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const { supabaseAdmin } = require('../server/config/supabase');
 
-const SMMGEN_URL = 'https://my.smmgen.com/api/v2';
-const SMMGEN_KEY = '8cd0cb8c20e3d65e85280a858ad36964';
-const PROVIDER_ID = '0f853b26-31e7-4345-8380-4576a8f913e4';
+const SMMGEN_URL = process.env.SMMGEN_URL || 'https://my.smmgen.com/api/v2';
+const SMMGEN_KEY = process.env.SMMGEN_KEY || '8cd0cb8c20e3d65e85280a858ad36964';
+const PROVIDER_ID = process.env.SMMGEN_PROVIDER_ID || '0f853b26-31e7-4345-8380-4576a8f913e4';
 
 // Live Market Exchange Rate (July 2026): 1 USD = 11.65 GHS
 // Option A (+20% profit margin): 11.65 * 1.20 = 13.98 GHS per USD

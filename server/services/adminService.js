@@ -491,9 +491,12 @@ class AdminService {
           throw new Error('Only HTTP/HTTPS protocols are allowed for provider API endpoints');
         }
 
-        const addresses = await dns.resolve4(parsedUrl.hostname).catch(() => []);
-        for (const addr of addresses) {
-          if (net.isIP(addr)) {
+        const addrs4 = await dns.resolve4(parsedUrl.hostname).catch(() => []);
+        const addrs6 = await dns.resolve6(parsedUrl.hostname).catch(() => []);
+        const allAddrs = [...addrs4, ...addrs6];
+
+        for (const addr of allAddrs) {
+          if (net.isIP(addr) === 4) {
             const parts = addr.split('.').map(Number);
             if (
               parts[0] === 10 ||
@@ -502,6 +505,19 @@ class AdminService {
               (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
               (parts[0] === 192 && parts[1] === 168) ||
               (parts[0] === 169 && parts[1] === 254)
+            ) {
+              throw new Error('Internal/private URLs are not allowed for provider API endpoints');
+            }
+          } else if (net.isIP(addr) === 6) {
+            const lowerAddr = addr.toLowerCase();
+            if (
+              lowerAddr === '::1' ||
+              lowerAddr.startsWith('fe80:') ||
+              lowerAddr.startsWith('fc00:') ||
+              lowerAddr.startsWith('fd00:') ||
+              lowerAddr.startsWith('::ffff:127.') ||
+              lowerAddr.startsWith('::ffff:10.') ||
+              lowerAddr.startsWith('::ffff:192.168.')
             ) {
               throw new Error('Internal/private URLs are not allowed for provider API endpoints');
             }
