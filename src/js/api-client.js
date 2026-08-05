@@ -876,23 +876,27 @@ async function initDashboardPage() {
   }
 
   // ── Initialize Deposit Form & Return Payment Handlers ────────────────
-  await initDepositForm();
+  try {
+    await initDepositForm();
+  } catch (depositErr) {
+    console.error('Failed to initialize deposit form on dashboard:', depositErr);
+  }
 
   // Populate Dashboard Stats Cards & Recent Orders
+  const tableBody = document.getElementById('dashboard-recent-orders-tbody');
+  const spentElem = document.getElementById('dash-total-spent');
+  const totalOrdersElem = document.getElementById('dash-total-orders');
 
   try {
     const ordersRes = await API.request('/orders');
-    if (ordersRes.success && ordersRes.orders) {
-      const orders = ordersRes.orders;
-      const totalSpent = orders.reduce((sum, o) => sum + (o.charge || 0), 0);
-      
-      const spentElem = document.getElementById('dash-total-spent');
-      if (spentElem) spentElem.textContent = `GH₵${totalSpent.toFixed(2)}`;
+    const orders = (ordersRes && ordersRes.orders) ? ordersRes.orders : (Array.isArray(ordersRes) ? ordersRes : (ordersRes && ordersRes.data ? ordersRes.data : null));
 
-      const totalOrdersElem = document.getElementById('dash-total-orders');
+    if (orders && Array.isArray(orders)) {
+      const totalSpent = orders.reduce((sum, o) => sum + (parseFloat(o.charge || o.total_price || 0) || 0), 0);
+      
+      if (spentElem) spentElem.textContent = `GH₵${totalSpent.toFixed(2)}`;
       if (totalOrdersElem) totalOrdersElem.textContent = orders.length.toLocaleString();
 
-      const tableBody = document.getElementById('dashboard-recent-orders-tbody');
       if (tableBody) {
         if (orders.length === 0) {
           tableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 font-medium">No recent orders yet. Place your first order above!</td></tr>`;
@@ -921,7 +925,7 @@ async function initDashboardPage() {
                     ${safeLink ? `<a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 dark:text-pink-400 hover:underline font-mono truncate max-w-[150px] inline-block">${escapeHtml(o.link || '')}</a>` : `<span class="text-gray-400 font-mono truncate block max-w-[150px]">${escapeHtml(o.link || '—')}</span>`}
                     ${o.link ? `
                       <button type="button" class="btn-copy-link p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition rounded" data-copy-link="${escapeHtml(o.link)}" title="Copy Link URL" aria-label="Copy Target Link">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                       </button>
                     ` : ''}
                   </div>
@@ -956,8 +960,17 @@ async function initDashboardPage() {
           });
         }
       }
+    } else {
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 font-medium">No recent orders yet. Place your first order above!</td></tr>`;
+      }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Failed to load recent orders for dashboard:', e);
+    if (tableBody) {
+      tableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-red-500 font-medium">Failed to load recent orders. <button type="button" onclick="window.location.reload()" class="underline font-bold hover:text-red-700">Retry</button></td></tr>`;
+    }
+  }
 }
 
 // ORDERS HISTORY DYNAMIC RENDERER
