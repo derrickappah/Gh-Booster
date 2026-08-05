@@ -60,7 +60,9 @@ router.post('/order', authenticateToken, async (req, res) => {
 
     if (error) {
       // Refund the deducted amount atomically if insertion fails
-      await supabaseAdmin.rpc('credit_wallet', { p_user_id: req.user.id, p_amount: price }).catch(() => {});
+      try {
+        await supabaseAdmin.rpc('credit_wallet', { p_user_id: req.user.id, p_amount: price });
+      } catch (refundErr) {}
       throw new Error(error.message);
     }
 

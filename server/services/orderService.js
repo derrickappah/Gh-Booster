@@ -341,11 +341,12 @@ class OrderService {
         }
       } catch (providerErr) {
         // Mark order as Canceled in DB on unexpected network/provider error
-        await supabaseAdmin
-          .from('orders')
-          .update({ status: 'Canceled', updated_at: new Date().toISOString() })
-          .eq('id', newOrder.id)
-          .catch(() => {});
+        try {
+          await supabaseAdmin
+            .from('orders')
+            .update({ status: 'Canceled', updated_at: new Date().toISOString() })
+            .eq('id', newOrder.id);
+        } catch (cancelErr) {}
 
         if (!skipWalletDeduction) {
           try {
@@ -529,22 +530,28 @@ class OrderService {
 
     if (bErr || !newBatch) {
       // Refund upfront deduction if batch creation failed
-      await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalChargeOfValid }).catch(() => {});
+      try {
+        await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: totalChargeOfValid });
+      } catch (refundErr) {}
       console.error('Error creating batch:', bErr?.message);
       throw new Error(`Failed to create batch record: ${bErr?.message || 'Unknown error'}`);
     }
 
     // Record batch transaction entry for auditing
-    await supabaseAdmin.from('transactions').insert({
-      user_id: userId,
-      amount: -totalChargeOfValid,
-      currency: 'GHS',
-      gateway: 'Wallet Balance',
-      reference: 'batch_' + newBatch.id,
-      type: 'order_charge',
-      status: 'completed',
-      description: `Bulk order batch #${newBatch.id} (${validOrdersToPlace.length} orders)`
-    }).catch(txErr => console.error('[BulkOrders] Batch charge transaction insert error:', txErr.message));
+    try {
+      await supabaseAdmin.from('transactions').insert({
+        user_id: userId,
+        amount: -totalChargeOfValid,
+        currency: 'GHS',
+        gateway: 'Wallet Balance',
+        reference: 'batch_' + newBatch.id,
+        type: 'order_charge',
+        status: 'completed',
+        description: `Bulk order batch #${newBatch.id} (${validOrdersToPlace.length} orders)`
+      });
+    } catch (txErr) {
+      console.error('[BulkOrders] Batch charge transaction insert error:', txErr.message);
+    }
 
     // Now insert each valid order referencing the batch ID with skipWalletDeduction=true
     for (const item of validOrdersToPlace) {
@@ -562,16 +569,18 @@ class OrderService {
         // Refund individual failed order amount
         try {
           await supabaseAdmin.rpc('credit_wallet', { p_user_id: userId, p_amount: item.charge });
-          await supabaseAdmin.from('transactions').insert({
-            user_id: userId,
-            amount: item.charge,
-            currency: 'GHS',
-            gateway: 'Wallet Balance',
-            reference: 'refund_bulk_' + newBatch.id + '_' + Date.now().toString(36),
-            type: 'refund',
-            status: 'completed',
-            description: `Bulk order item refund for Batch #${newBatch.id}`
-          }).catch(() => {});
+          try {
+            await supabaseAdmin.from('transactions').insert({
+              user_id: userId,
+              amount: item.charge,
+              currency: 'GHS',
+              gateway: 'Wallet Balance',
+              reference: 'refund_bulk_' + newBatch.id + '_' + Date.now().toString(36),
+              type: 'refund',
+              status: 'completed',
+              description: `Bulk order item refund for Batch #${newBatch.id}`
+            });
+          } catch (txErr) {}
         } catch (rErr) {
           console.error('[BulkOrders] Failed to refund failed order item:', rErr.message);
         }

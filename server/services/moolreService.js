@@ -582,7 +582,7 @@ class MoolreService {
       }
 
       if (targetTxn) {
-        if (targetTxn.status === 'completed') {
+        if (targetTxn.status === 'completed' || targetTxn.status === 'processing') {
           const { data: currentWallet } = await supabaseAdmin.from('wallets').select('balance').eq('user_id', userId).maybeSingle();
           return { newBalance: currentWallet ? parseFloat(currentWallet.balance) : 0, depositAmount };
         }
@@ -596,7 +596,7 @@ class MoolreService {
             metadata: { ...(targetTxn.metadata || {}), processing_at: new Date().toISOString() }
           })
           .eq('id', targetTxn.id)
-          .eq('status', targetTxn.status)
+          .eq('status', 'pending')
           .select('id')
           .maybeSingle();
 

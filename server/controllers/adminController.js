@@ -254,11 +254,13 @@ class AdminController {
       const targetStatus = String(status).toLowerCase();
       const deposit = await AdminService.updateDepositStatus({ id, status: targetStatus });
       const { supabaseAdmin } = require('../config/supabase');
-      await supabaseAdmin.from('audit_logs').insert({
-        user_id: req.user.id,
-        action: 'ADMIN_UPDATE_DEPOSIT_STATUS',
-        details: `Admin ${req.user.email || req.user.id} updated deposit #${id} status to ${status}`
-      }).catch(() => {});
+      try {
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: req.user.id,
+          action: 'ADMIN_UPDATE_DEPOSIT_STATUS',
+          details: `Admin ${req.user.email || req.user.id} updated deposit #${id} status to ${status}`
+        });
+      } catch (auditErr) {}
       res.json({ success: true, deposit });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });
