@@ -41,17 +41,21 @@ const adminCreateServiceSchema = z.object({
   category_id: z.string().min(1, 'Category ID is required'),
   rate_per_1k: z.number().nonnegative('Rate must not be negative')
     .or(z.string().transform(v => parseFloat(v)).pipe(z.number().nonnegative('Rate must not be negative'))),
-  min_quantity: z.number().int().positive().optional(),
-  max_quantity: z.number().int().positive().optional(),
-  description: z.string().max(1000).optional(),
-  status: z.enum(['active', 'disabled']).optional()
+  min_quantity: z.number().int().positive().optional()
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive()).optional()),
+  max_quantity: z.number().int().positive().optional()
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive()).optional()),
+  description: z.string().max(1000).optional().nullable(),
+  status: z.preprocess(v => (typeof v === 'string' ? v.toLowerCase() : v), z.enum(['active', 'disabled'])).optional(),
+  provider_service_id: z.string().max(200).optional().nullable(),
+  provider_id: z.string().max(200).optional().nullable()
 });
 
 const adminCreateProviderSchema = z.object({
   name: z.string().min(1, 'Provider name is required').max(200),
   api_url: z.string().url('API URL must be valid'),
   api_key: z.string().min(1, 'API key is required'),
-  status: z.enum(['active', 'disabled']).optional()
+  status: z.preprocess(v => (typeof v === 'string' ? v.toLowerCase() : v), z.enum(['active', 'disabled', 'degraded', 'offline'])).optional()
 });
 
 const adminUpdateDepositStatusSchema = z.object({
@@ -85,7 +89,7 @@ const adminCreateBonusSchema = z.object({
   bonus_percentage: z.number().min(0).max(100)
     .or(z.string().transform(v => parseFloat(v)).pipe(z.number().min(0).max(100))),
   gateway: z.string().max(100).optional(),
-  status: z.enum(['active', 'disabled']).optional()
+  status: z.preprocess(v => (typeof v === 'string' ? v.toLowerCase() : v), z.enum(['active', 'disabled'])).optional()
 });
 
 const adminCreatePromotionSchema = z.object({
@@ -94,7 +98,7 @@ const adminCreatePromotionSchema = z.object({
     .or(z.string().transform(v => parseFloat(v)).pipe(z.number().min(0).max(100))),
   max_uses: z.number().int().positive().optional()
     .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive()).optional()),
-  status: z.enum(['active', 'expired', 'disabled']).optional()
+  status: z.preprocess(v => (typeof v === 'string' ? v.toLowerCase() : v), z.enum(['active', 'expired', 'disabled'])).optional()
 });
 
 const adminCreateNewsSchema = z.object({
@@ -109,10 +113,14 @@ const adminUpdateServiceSchema = z.object({
   category_id: z.string().min(1).optional(),
   rate_per_1k: z.number().nonnegative().optional()
     .or(z.string().transform(v => parseFloat(v)).pipe(z.number().nonnegative()).optional()),
-  min_quantity: z.number().int().positive().optional(),
-  max_quantity: z.number().int().positive().optional(),
-  description: z.string().max(1000).optional(),
-  status: z.enum(['active', 'disabled']).optional()
+  min_quantity: z.number().int().positive().optional()
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive()).optional()),
+  max_quantity: z.number().int().positive().optional()
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive()).optional()),
+  description: z.string().max(1000).optional().nullable(),
+  status: z.preprocess(v => (typeof v === 'string' ? v.toLowerCase() : v), z.enum(['active', 'disabled'])).optional(),
+  provider_service_id: z.string().max(200).optional().nullable(),
+  provider_id: z.string().max(200).optional().nullable()
 });
 
 const adminUpdateChildPanelStatusSchema = z.object({

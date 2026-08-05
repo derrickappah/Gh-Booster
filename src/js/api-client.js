@@ -4094,7 +4094,7 @@ async function initAdminServicesPage() {
                       </button>
                     </div>
                     <div class="py-1">
-                      <button type="button" data-action="toggle" data-id="${s.id}" data-status="${isActive ? 'Disabled' : 'Active'}" class="toggle-svc-btn w-full text-left px-3.5 py-2 ${isActive ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'} dark:hover:bg-gray-700 transition flex items-center">
+                      <button type="button" data-action="toggle" data-id="${s.id}" data-status="${isActive ? 'disabled' : 'active'}" class="toggle-svc-btn w-full text-left px-3.5 py-2 ${isActive ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'} dark:hover:bg-gray-700 transition flex items-center">
                         ${isActive ? `
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -4156,7 +4156,7 @@ async function initAdminServicesPage() {
             const menu = btn.closest('.svc-actions-menu');
             if (menu) menu.classList.add('hidden');
             try {
-              await API.request(`/admin/services/${svcId}`, 'PUT', { status: newStatus });
+              await API.request(`/admin/services/${svcId}`, 'PUT', { status: (newStatus || 'active').toLowerCase() });
               initAdminServicesPage();
             } catch (err) {
               alert('Failed to update service status: ' + err.message);
@@ -4178,7 +4178,7 @@ async function initAdminServicesPage() {
           if (modalSvcProvider) modalSvcProvider.value = svc.provider_id || '';
           if (modalSvcMin) modalSvcMin.value = svc.min_quantity || 100;
           if (modalSvcMax) modalSvcMax.value = svc.max_quantity || 100000;
-          if (modalSvcStatus) modalSvcStatus.value = svc.status || 'Active';
+          if (modalSvcStatus) modalSvcStatus.value = (svc.status || 'active').toLowerCase();
           if (modalSvcDescription) modalSvcDescription.value = svc.description || '';
         } else {
           if (modalTitle) modalTitle.textContent = 'Add New Service';
@@ -4188,7 +4188,7 @@ async function initAdminServicesPage() {
           if (modalSvcRate) modalSvcRate.value = '0';
           if (modalSvcMin) modalSvcMin.value = '100';
           if (modalSvcMax) modalSvcMax.value = '100000';
-          if (modalSvcStatus) modalSvcStatus.value = 'Active';
+          if (modalSvcStatus) modalSvcStatus.value = 'active';
         }
         modal.classList.remove('hidden');
       }
@@ -4231,7 +4231,7 @@ async function initAdminServicesPage() {
             provider_id: modalSvcProvider && modalSvcProvider.value ? modalSvcProvider.value : null,
             min_quantity: modalSvcMin ? parseInt(modalSvcMin.value, 10) || 100 : 100,
             max_quantity: modalSvcMax ? parseInt(modalSvcMax.value, 10) || 100000 : 100000,
-            status: modalSvcStatus ? modalSvcStatus.value : 'Active',
+            status: modalSvcStatus ? modalSvcStatus.value.toLowerCase() : 'active',
             description: modalSvcDescription ? modalSvcDescription.value.trim() : ''
           };
 
