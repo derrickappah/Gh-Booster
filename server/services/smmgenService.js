@@ -1,8 +1,60 @@
 class SmmgenService {
-  static _getCredentials() {
+  static async _getCredentials(providerId = null) {
+    if (process.env.SMMGEN_KEY) {
+      return {
+        url: process.env.SMMGEN_URL || 'https://my.smmgen.com/api/v2',
+        key: process.env.SMMGEN_KEY
+      };
+    }
+
+    try {
+      const { supabaseAdmin } = require('../config/supabase');
+      if (providerId) {
+        const { data: p } = await supabaseAdmin
+          .from('providers')
+          .select('api_url, api_key')
+          .eq('id', providerId)
+          .maybeSingle();
+        if (p && p.api_key) {
+          return { url: p.api_url || 'https://my.smmgen.com/api/v2', key: p.api_key };
+        }
+      }
+
+      // Try active provider with key
+      const { data: activeProvider } = await supabaseAdmin
+        .from('providers')
+        .select('api_url, api_key')
+        .eq('status', 'active')
+        .not('api_key', 'is', null)
+        .neq('api_key', '')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (activeProvider && activeProvider.api_key) {
+        return { url: activeProvider.api_url || 'https://my.smmgen.com/api/v2', key: activeProvider.api_key };
+      }
+
+      // Fallback to any provider with non-empty key
+      const { data: anyProvider } = await supabaseAdmin
+        .from('providers')
+        .select('api_url, api_key')
+        .not('api_key', 'is', null)
+        .neq('api_key', '')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (anyProvider && anyProvider.api_key) {
+        return { url: anyProvider.api_url || 'https://my.smmgen.com/api/v2', key: anyProvider.api_key };
+      }
+    } catch (dbErr) {
+      console.error('[SMMGen] Error fetching provider credentials from DB:', dbErr.message);
+    }
+
     return {
       url: process.env.SMMGEN_URL || 'https://my.smmgen.com/api/v2',
-      key: process.env.SMMGEN_KEY || ''
+      key: ''
     };
   }
 
@@ -20,9 +72,9 @@ class SmmgenService {
     }
   }
 
-  static async getBalance() {
+  static async getBalance(providerId = null) {
     try {
-      const { url, key } = SmmgenService._getCredentials();
+      const { url, key } = await SmmgenService._getCredentials(providerId);
       if (!key) return { error: 'SMMGen API key not configured' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
@@ -48,9 +100,9 @@ class SmmgenService {
     }
   }
 
-  static async placeOrder({ providerServiceId, link, quantity }) {
+  static async placeOrder({ providerServiceId, link, quantity, providerId = null }) {
     try {
-      const { url, key } = SmmgenService._getCredentials();
+      const { url, key } = await SmmgenService._getCredentials(providerId);
       if (!key) return { error: 'SMMGen API key not configured' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
@@ -83,9 +135,9 @@ class SmmgenService {
     }
   }
 
-  static async getOrderStatus(providerOrderId) {
+  static async getOrderStatus(providerOrderId, providerId = null) {
     try {
-      const { url, key } = SmmgenService._getCredentials();
+      const { url, key } = await SmmgenService._getCredentials(providerId);
       if (!key) return { error: 'SMMGen API key not configured' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
@@ -115,9 +167,9 @@ class SmmgenService {
     }
   }
 
-  static async refillOrder(providerOrderId) {
+  static async refillOrder(providerOrderId, providerId = null) {
     try {
-      const { url, key } = SmmgenService._getCredentials();
+      const { url, key } = await SmmgenService._getCredentials(providerId);
       if (!key) return { error: 'SMMGen API key not configured' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',

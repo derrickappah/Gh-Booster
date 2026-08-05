@@ -309,7 +309,8 @@ class OrderService {
         const smmRes = await SmmgenService.placeOrder({
           providerServiceId: service.provider_service_id,
           link: link,
-          quantity: qty
+          quantity: qty,
+          providerId: service.provider_id
         });
 
         if (smmRes && smmRes.order) {
