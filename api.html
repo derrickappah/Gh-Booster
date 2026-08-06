@@ -179,7 +179,7 @@
         </a>
 
         <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">API Documentation v2</h1>
+        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">API Documentation v2</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-2 md:space-x-3">
@@ -213,19 +213,19 @@
     <main class="p-4 md:p-6 space-y-6 flex-grow">
 
       <!-- API Credentials Box -->
-      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4 dark:bg-gray-800 dark:border-gray-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4 dark:border-gray-800">
           <div>
-            <h2 class="text-lg font-bold text-gray-900 flex items-center">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
               Developer API Key & Endpoint
             </h2>
-            <p class="text-xs text-gray-500 mt-1">Keep your secret API key confidential. Do not expose it in client-side code.</p>
+            <p class="text-xs text-gray-500 mt-1 dark:text-gray-400">Keep your secret API key confidential. Do not expose it in client-side code.</p>
           </div>
           <button id="regen-key-btn" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-2xl transition flex items-center self-start md:self-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Generate New Key
@@ -235,19 +235,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           <!-- Secret API Key -->
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1.5">HTTP POST API Key</label>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5 dark:text-gray-300">HTTP POST API Key</label>
             <div class="flex items-center space-x-2">
-              <input type="password" id="api-key-input" readonly value="ghb_live_key" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-gray-900 focus:outline-none">
-              <button id="toggle-key-btn" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl text-xs font-semibold transition">Show</button>
+              <input type="password" id="api-key-input" readonly value="ghb_live_key" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-gray-900 focus:outline-none dark:bg-gray-900 dark:border-gray-700">
+              <button id="toggle-key-btn" class="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl text-xs font-semibold transition dark:text-gray-300">Show</button>
               <button id="copy-key-btn" class="px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl text-xs font-bold shadow transition">Copy</button>
             </div>
           </div>
 
           <!-- API URL -->
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1.5">API Endpoint URL</label>
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5 dark:text-gray-300">API Endpoint URL</label>
             <div class="flex items-center space-x-2">
-              <input type="text" id="api-url-input" readonly value="https://ghbooster.com/api/v2" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-gray-900 focus:outline-none">
+              <input type="text" id="api-url-input" readonly value="https://ghbooster.com/api/v2" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-gray-900 focus:outline-none dark:bg-gray-900 dark:border-gray-700">
               <button id="copy-url-btn" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-2xl text-xs font-bold transition">Copy URL</button>
             </div>
           </div>
@@ -295,14 +295,14 @@
       </div>
 
       <!-- API Parameters Reference Table -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 border-b border-gray-100">
-          <h3 class="text-base font-bold text-gray-900">API Parameters Reference</h3>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden dark:bg-gray-800 dark:border-gray-800">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-800">
+          <h3 class="text-base font-bold text-gray-900 dark:text-white">API Parameters Reference</h3>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600">
-            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">
+          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300">
+            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
               <tr>
                 <th class="py-3.5 px-4">Parameter</th>
                 <th class="py-3.5 px-4">Type</th>
@@ -326,19 +326,19 @@
               <tr>
                 <td class="py-3.5 px-4 font-mono font-bold text-pink-600">service</td>
                 <td class="py-3.5 px-4 font-mono">Integer</td>
-                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px]">For 'add'</span></td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px] dark:text-gray-300">For 'add'</span></td>
                 <td class="py-3.5 px-4">ID of the requested service (e.g. 101, 104).</td>
               </tr>
               <tr>
                 <td class="py-3.5 px-4 font-mono font-bold text-pink-600">link</td>
                 <td class="py-3.5 px-4 font-mono">String</td>
-                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px]">For 'add'</span></td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px] dark:text-gray-300">For 'add'</span></td>
                 <td class="py-3.5 px-4">Target profile or video URL.</td>
               </tr>
               <tr>
                 <td class="py-3.5 px-4 font-mono font-bold text-pink-600">quantity</td>
                 <td class="py-3.5 px-4 font-mono">Integer</td>
-                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px]">For 'add'</span></td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-700 font-bold rounded text-[10px] dark:text-gray-300">For 'add'</span></td>
                 <td class="py-3.5 px-4">Requested order quantity.</td>
               </tr>
             </tbody>

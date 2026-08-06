@@ -58,7 +58,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" sizes="32x32" href="/src/img/favicon.png?v=5">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col dark:bg-gray-900">
 
   <header class="fixed top-0 left-0 right-0 z-40 h-20 flex items-center bg-white/95 backdrop-blur border-b border-gray-100 dark:border-gray-800 shadow-sm dark:bg-gray-800/95">
     <nav class="w-full">
@@ -67,7 +67,7 @@
           <img src="/src/img/logo.png?v=4" alt="GhBooster Logo" class="h-10 md:h-12 w-auto object-contain">
         </a>
         <div class="flex items-center space-x-3">
-          <a class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 text-sm" href="/api.html">API Docs</a>
+          <a class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 text-sm dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300" href="/api.html">API Docs</a>
           <a class="px-5 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold text-sm shadow-md" href="/register">Get API Key</a>
         </div>
       </div>
@@ -76,11 +76,11 @@
 
   <main class="flex-grow pt-28 pb-16">
     <div class="container xl:max-w-4xl mx-auto px-4">
-      <article class="bg-white p-8 md:p-12 rounded-3xl border border-gray-100 shadow-sm">
+      <article class="bg-white p-8 md:p-12 rounded-3xl border border-gray-100 shadow-sm dark:bg-gray-800 dark:border-gray-800">
         <span class="inline-block px-3 py-1 rounded-md bg-purple-100 text-purple-700 font-bold text-xs uppercase mb-4">Developer & Reseller Guide</span>
-        <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">How to Connect & Resell SMM Services via API v2 (2026 Complete Guide)</h1>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6">How to Connect & Resell SMM Services via API v2 (2026 Complete Guide)</h1>
         
-        <div class="flex items-center space-x-4 text-sm text-gray-500 mb-8 border-b pb-6">
+        <div class="flex items-center space-x-4 text-sm text-gray-500 mb-8 border-b pb-6 dark:text-gray-400">
           <span>By GhBooster Engineering</span>
           <span>•</span>
           <span>Updated August 2026</span>
@@ -88,13 +88,13 @@
           <span>8 min read</span>
         </div>
 
-        <div class="prose max-w-none text-gray-700 space-y-6">
+        <div class="prose max-w-none text-gray-700 space-y-6 dark:text-gray-300">
           <p class="text-lg font-medium text-gray-800">Scaling a Social Media Marketing agency or launching an automated reseller website requires instant, programmatic order submission. The GhBooster REST API v2 enables child panel owners and software developers to execute orders, fetch live pricing, and verify status in real-time.</p>
 
-          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Generating Your GhBooster API Key</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">1. Generating Your GhBooster API Key</h2>
           <p>Before making API requests, log in to your <a href="/account" class="text-pink-600 hover:underline">GhBooster Account Settings</a> and navigate to the API section to copy your unique API Secret Key. Treat this key as confidential access credentials.</p>
 
-          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Core API Endpoints & Request Payload</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">2. Core API Endpoints & Request Payload</h2>
           <p>All requests must be sent as HTTP <code>POST</code> requests to <code>https://ghbooster.com/api/v2</code> using standard form-urlencoded or JSON parameters.</p>
 
           <div class="bg-gray-900 text-gray-100 p-6 rounded-2xl font-mono text-sm overflow-x-auto shadow-inner">
@@ -110,7 +110,7 @@ key=YOUR_API_KEY
 &quantity=1000</pre>
           </div>
 
-          <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Supported Platform API Pillars</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">3. Supported Platform API Pillars</h2>
           <p>Explore our programmatic platform guides for specific SMM category integration:</p>
           <ul class="list-disc pl-6 space-y-2">
             <li><a href="/smm-panel-instagram.html" class="text-pink-600 hover:underline font-bold">Instagram SMM Services</a> - Followers, Likes, Reels Views.</li>

@@ -211,7 +211,7 @@
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-total" class="text-base font-bold text-gray-900 leading-tight truncate dark:text-white">0</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Orders</span>
+            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate dark:text-gray-400">Total Orders</span>
             <span id="admin-orders-completed-sub" class="text-[11px] text-green-600 font-medium block mt-0.5 truncate">0 completed</span>
           </div>
           <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0">
@@ -224,7 +224,7 @@
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-in-progress" class="text-base font-bold text-blue-600 leading-tight truncate">0 Orders</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">In Progress</span>
+            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate dark:text-gray-400">In Progress</span>
             <span class="text-[11px] text-blue-600 font-medium block mt-0.5 truncate">Active fulfillment</span>
           </div>
           <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
@@ -237,7 +237,7 @@
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-pending" class="text-base font-bold text-yellow-600 leading-tight truncate">0 Orders</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Pending Queue</span>
+            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate dark:text-gray-400">Pending Queue</span>
             <span class="text-[11px] text-yellow-600 font-medium block mt-0.5 truncate">Awaiting provider API</span>
           </div>
           <div class="p-2.5 bg-yellow-50 text-yellow-600 rounded-lg flex-shrink-0">
@@ -250,7 +250,7 @@
         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-canceled" class="text-base font-bold text-red-600 leading-tight truncate">0 Orders</h3>
-            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Canceled / Refunded</span>
+            <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate dark:text-gray-400">Canceled / Refunded</span>
             <span class="text-[11px] text-gray-400 block mt-0.5 truncate">Auto balance returned</span>
           </div>
           <div class="p-2.5 bg-red-50 text-red-600 rounded-lg flex-shrink-0">
@@ -323,10 +323,10 @@
         <!-- Pagination Controls -->
         <div id="admin-orders-pagination" class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs dark:bg-gray-900 dark:border-gray-800" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px;">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div id="admin-orders-pagination-info" class="text-gray-500 font-medium">
+            <div id="admin-orders-pagination-info" class="text-gray-500 font-medium dark:text-gray-400">
               Showing <span class="font-bold text-gray-900 dark:text-white">0</span> entries
             </div>
-            <div style="display: flex; align-items: center; gap: 6px;" class="text-gray-500">
+            <div style="display: flex; align-items: center; gap: 6px;" class="text-gray-500 dark:text-gray-400">
               <span>Per page:</span>
               <select id="admin-orders-page-size" class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-900 focus:outline-none focus:border-pink-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white" aria-label="Orders per page">
                 <option value="10">10</option>
@@ -337,7 +337,7 @@
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 4px;" id="admin-orders-pagination-controls" aria-label="Pagination controls">
-            <button id="admin-orders-prev-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold dark:bg-gray-800 dark:border-gray-700" disabled aria-label="Previous page">Previous</button>
+            <button id="admin-orders-prev-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400" disabled aria-label="Previous page">Previous</button>
             <div id="admin-orders-page-buttons" style="display: flex; align-items: center; gap: 4px;"></div>
             <button id="admin-orders-next-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300" disabled aria-label="Next page">Next</button>
           </div>

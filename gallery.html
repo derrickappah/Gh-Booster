@@ -234,7 +234,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="/src/img/favicon.png?v=4">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col dark:bg-gray-900">
 
   <!-- ========== { HEADER } ========== -->
   <header class="fixed top-0 left-0 right-0 z-40 h-20 flex items-center bg-white/95 backdrop-blur border-b border-gray-100 dark:border-gray-800 shadow-sm dark:bg-gray-800/95">
@@ -250,7 +250,7 @@
             
             <!-- Desktop Nav Buttons -->
             <div class="flex items-center space-x-3">
-              <a class="px-5 py-2 rounded-lg border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition text-sm" href="/login">Login</a>
+              <a class="px-5 py-2 rounded-lg border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition text-sm dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300" href="/login">Login</a>
               <a class="px-5 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold transition text-sm shadow-md" href="/register">Create Account</a>
             </div>
           </div>
@@ -265,7 +265,7 @@
     <section class="relative bg-gradient-to-tr from-pink-700 via-pink-600 to-indigo-900 text-white py-16 md:py-24 overflow-hidden">
       <!-- Background decorative shapes -->
       <div class="absolute inset-0 opacity-10">
-        <div class="absolute -top-10 -right-10 w-96 h-96 rounded-full bg-white filter blur-2xl"></div>
+        <div class="absolute -top-10 -right-10 w-96 h-96 rounded-full bg-white filter blur-2xl dark:bg-gray-800"></div>
       </div>
       
       <div class="container xl:max-w-6xl mx-auto px-4 relative z-10 text-center">
@@ -278,260 +278,260 @@
     </section>
 
     <!-- Media Grid Section -->
-    <section class="py-16 bg-gray-50">
+    <section class="py-16 bg-gray-50 dark:bg-gray-900">
       <div class="container xl:max-w-6xl mx-auto px-4">
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
           <!-- Card 1 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-1.png', 'Social Engagement & Growth Dashboard')">
               <img src="src/img/gallery/ghbooster-media-1.png" alt="GhBooster Social Engagement & Growth Dashboard" title="Social Engagement & Growth Dashboard" loading="eager" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Social Engagement Dashboard</h3><p class="text-xs text-gray-500 leading-relaxed">Graphic illustrating active engagement counters, passwordless security, and global reach.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-1.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-1.png', 'Social Engagement & Growth Dashboard')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Social Engagement Dashboard</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Graphic illustrating active engagement counters, passwordless security, and global reach.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-1.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-1.png', 'Social Engagement & Growth Dashboard')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 2 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-2.png', 'Instant Social Boost Infographic')">
               <img src="src/img/gallery/ghbooster-media-2.png" alt="GhBooster Instant Social Boost Infographic" title="Instant Social Boost Infographic" loading="eager" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Instant Social Boost</h3><p class="text-xs text-gray-500 leading-relaxed">Infographic showing automated social media boosting and instant delivery metrics.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-2.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-2.png', 'Instant Social Boost Infographic')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Instant Social Boost</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Infographic showing automated social media boosting and instant delivery metrics.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-2.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-2.png', 'Instant Social Boost Infographic')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 3 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-3.png', 'Global Audience Reach Artwork')">
               <img src="src/img/gallery/ghbooster-media-3.png" alt="GhBooster Global Audience Reach Artwork" title="Global Audience Reach Artwork" loading="eager" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Global Audience Reach</h3><p class="text-xs text-gray-500 leading-relaxed">Artwork depicting rapid follower velocity, verified service delivery, and cross-platform growth.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-3.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-3.png', 'Global Audience Reach Artwork')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Global Audience Reach</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Artwork depicting rapid follower velocity, verified service delivery, and cross-platform growth.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-3.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-3.png', 'Global Audience Reach Artwork')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 4 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-4.png', 'Creator Growth & Analytics Showcase')">
               <img src="src/img/gallery/ghbooster-media-4.png" alt="GhBooster Creator Growth Showcase" title="Creator Growth & Analytics Showcase" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Creator Growth Showcase</h3><p class="text-xs text-gray-500 leading-relaxed">Showcase of creator growth stats, audience engagement graphs, and platform indicators.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-4.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-4.png', 'Creator Growth Showcase')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Creator Growth Showcase</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Showcase of creator growth stats, audience engagement graphs, and platform indicators.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-4.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-4.png', 'Creator Growth Showcase')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 5 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-5.png', 'SMM Growth Stats Visualizer')">
               <img src="src/img/gallery/ghbooster-media-5.png" alt="GhBooster SMM Growth Stats Visualizer" title="SMM Growth Stats Visualizer" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Growth Stats Visualizer</h3><p class="text-xs text-gray-500 leading-relaxed">Promotional graphic showing mobile growth visualizer and active metric counters.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-5.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-5.png', 'SMM Growth Stats Visualizer')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Growth Stats Visualizer</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Promotional graphic showing mobile growth visualizer and active metric counters.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-5.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-5.png', 'SMM Growth Stats Visualizer')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 6 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-6.png', 'Grow Faster Today Light Poster')">
               <img src="src/img/gallery/ghbooster-media-6.png" alt="GhBooster Grow Faster Today Light Poster" title="Grow Faster Today Light Poster" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Grow Faster Today Poster</h3><p class="text-xs text-gray-500 leading-relaxed">Light promotional banner featuring creator celebrating fast engagement growth results.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-6.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-6.png', 'Grow Faster Today Light Poster')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Grow Faster Today Poster</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Light promotional banner featuring creator celebrating fast engagement growth results.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-6.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-6.png', 'Grow Faster Today Light Poster')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 7 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-7.png', 'Grow Faster Social Analytics Banner')">
               <img src="src/img/gallery/ghbooster-media-7.png" alt="GhBooster Grow Faster Social Analytics Banner" title="Grow Faster Social Analytics Banner" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Grow Faster Social Analytics</h3><p class="text-xs text-gray-500 leading-relaxed">Official promo poster detailing 128.3k followers growth, 7.8M likes, and 24.6M views metrics.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-7.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-7.png', 'Grow Faster Social Analytics Banner')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Grow Faster Social Analytics</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Official promo poster detailing 128.3k followers growth, 7.8M likes, and 24.6M views metrics.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-7.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-7.png', 'Grow Faster Social Analytics Banner')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 8 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-8.png', 'Multi-Platform SMM Growth Banner')">
               <img src="src/img/gallery/ghbooster-media-8.png" alt="GhBooster Multi-Platform SMM Growth Banner" title="Multi-Platform SMM Growth Banner" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Multi-Platform SMM Growth</h3><p class="text-xs text-gray-500 leading-relaxed">Clean promotional banner illustrating instant order execution and 24/7 delivery speed.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-8.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-8.png', 'Multi-Platform SMM Growth Banner')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Multi-Platform SMM Growth</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Clean promotional banner illustrating instant order execution and 24/7 delivery speed.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-8.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-8.png', 'Multi-Platform SMM Growth Banner')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 9 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-9.png', 'Full Spectrum Growth Infographic')">
               <img src="src/img/gallery/ghbooster-media-9.png" alt="GhBooster Full Spectrum Growth Infographic" title="Full Spectrum Growth Infographic" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Full Spectrum Infographic</h3><p class="text-xs text-gray-500 leading-relaxed">Graphic highlighting 128.3k growth milestones, 256k total followers, and 7.8M total likes.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-9.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-9.png', 'Full Spectrum Growth Infographic')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Full Spectrum Infographic</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Graphic highlighting 128.3k growth milestones, 256k total followers, and 7.8M total likes.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-9.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-9.png', 'Full Spectrum Growth Infographic')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 10 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-10.png', 'High Speed Marketing Graphic')">
               <img src="src/img/gallery/ghbooster-media-10.png" alt="GhBooster High Speed Marketing Graphic" title="High Speed Marketing Graphic" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">High Speed Marketing Graphic</h3><p class="text-xs text-gray-500 leading-relaxed">High resolution promotional graphic with call-to-action, growth charts, and platform icons.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-10.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-10.png', 'High Speed Marketing Graphic')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">High Speed Marketing Graphic</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">High resolution promotional graphic with call-to-action, growth charts, and platform icons.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-10.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-10.png', 'High Speed Marketing Graphic')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 11 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-11.png', 'Master Social Marketing Artwork')">
               <img src="src/img/gallery/ghbooster-media-11.png" alt="GhBooster Master Social Marketing Artwork" title="Master Social Marketing Artwork" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Master Social Marketing Artwork</h3><p class="text-xs text-gray-500 leading-relaxed">Master promotional image displaying full social media integration for Instagram, TikTok, and YouTube.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-11.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-11.png', 'Master Social Marketing Artwork')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Master Social Marketing Artwork</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Master promotional image displaying full social media integration for Instagram, TikTok, and YouTube.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-11.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-11.png', 'Master Social Marketing Artwork')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 12 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-12.png', 'Automated Social Growth Platform')">
               <img src="src/img/gallery/ghbooster-media-12.png" alt="GhBooster Automated Social Growth Platform" title="Automated Social Growth Platform" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Automated Growth Platform</h3><p class="text-xs text-gray-500 leading-relaxed">Visual representation of automated social media marketing panel services and high-volume delivery.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-12.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-12.png', 'Automated Social Growth Platform')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Automated Growth Platform</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Visual representation of automated social media marketing panel services and high-volume delivery.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-12.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-12.png', 'Automated Social Growth Platform')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 13 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-13.png', 'Social Media Booster Showcase')">
               <img src="src/img/gallery/ghbooster-media-13.png" alt="GhBooster Social Media Booster Showcase" title="Social Media Booster Showcase" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Social Media Booster Showcase</h3><p class="text-xs text-gray-500 leading-relaxed">High-impact social media marketing banner displaying engagement velocity and reach.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-13.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-13.png', 'Social Media Booster Showcase')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Social Media Booster Showcase</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">High-impact social media marketing banner displaying engagement velocity and reach.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-13.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-13.png', 'Social Media Booster Showcase')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 14 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-14.png', 'Creator Engagement & Reach Visual')">
               <img src="src/img/gallery/ghbooster-media-14.png" alt="GhBooster Creator Engagement & Reach Visual" title="Creator Engagement & Reach Visual" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Creator Engagement Visual</h3><p class="text-xs text-gray-500 leading-relaxed">Graphic showing creator growth statistics, verified engagement, and automated delivery.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-14.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-14.png', 'Creator Engagement & Reach Visual')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Creator Engagement Visual</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Graphic showing creator growth statistics, verified engagement, and automated delivery.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-14.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-14.png', 'Creator Engagement & Reach Visual')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 15 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-15.png', 'Ultra-Fast Social Boost Poster')">
               <img src="src/img/gallery/ghbooster-media-15.png" alt="GhBooster Ultra-Fast Social Boost Poster" title="Ultra-Fast Social Boost Poster" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Ultra-Fast Social Boost</h3><p class="text-xs text-gray-500 leading-relaxed">Poster detailing ultra-fast social growth services, follower boosts, and channel graphics.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-15.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-15.png', 'Ultra-Fast Social Boost Poster')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Ultra-Fast Social Boost</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Poster detailing ultra-fast social growth services, follower boosts, and channel graphics.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-15.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-15.png', 'Ultra-Fast Social Boost Poster')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 16 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-16.png', 'Social Media Expansion Infographic')">
               <img src="src/img/gallery/ghbooster-media-16.png" alt="GhBooster Social Media Expansion Infographic" title="Social Media Expansion Infographic" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Social Media Expansion</h3><p class="text-xs text-gray-500 leading-relaxed">Infographic outlining multi-platform audience expansion for creators, brands, and resellers.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-16.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-16.png', 'Social Media Expansion Infographic')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Social Media Expansion</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Infographic outlining multi-platform audience expansion for creators, brands, and resellers.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-16.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-16.png', 'Social Media Expansion Infographic')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 17 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-17.png', 'Premium SMM Panel Graphics')">
               <img src="src/img/gallery/ghbooster-media-17.png" alt="GhBooster Premium SMM Panel Graphics" title="Premium SMM Panel Graphics" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Premium SMM Panel Graphics</h3><p class="text-xs text-gray-500 leading-relaxed">Official marketing assets displaying GhBooster's #1 SMM panel growth solutions.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-17.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-17.png', 'Premium SMM Panel Graphics')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Premium SMM Panel Graphics</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Official marketing assets displaying GhBooster's #1 SMM panel growth solutions.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-17.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-17.png', 'Premium SMM Panel Graphics')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 18 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-18.png', 'Social Growth Velocity Banner')">
               <img src="src/img/gallery/ghbooster-media-18.png" alt="GhBooster Social Growth Velocity Banner" title="Social Growth Velocity Banner" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Social Growth Velocity Banner</h3><p class="text-xs text-gray-500 leading-relaxed">High-speed engagement banner showing real-time follower counter stats.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-18.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-18.png', 'Social Growth Velocity Banner')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Social Growth Velocity Banner</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">High-speed engagement banner showing real-time follower counter stats.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-18.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-18.png', 'Social Growth Velocity Banner')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 19 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-19.png', 'Verified Growth Proof Graphic')">
               <img src="src/img/gallery/ghbooster-media-19.png" alt="GhBooster Verified Growth Proof Graphic" title="Verified Growth Proof Graphic" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Verified Growth Proof</h3><p class="text-xs text-gray-500 leading-relaxed">Graphic illustrating verified customer results, high retention followers, and viral engagement.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-19.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-19.png', 'Verified Growth Proof Graphic')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Verified Growth Proof</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Graphic illustrating verified customer results, high retention followers, and viral engagement.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-19.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-19.png', 'Verified Growth Proof Graphic')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 20 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-100 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-20.png', 'Influencer Marketing & Boost Poster')">
               <img src="src/img/gallery/ghbooster-media-20.png" alt="GhBooster Influencer Marketing Poster" title="Influencer Marketing & Boost Poster" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Influencer Marketing Poster</h3><p class="text-xs text-gray-500 leading-relaxed">Influencer growth poster highlighting targeted audience expansion and campaign delivery.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-20.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-20.png', 'Influencer Marketing Poster')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Influencer Marketing Poster</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Influencer growth poster highlighting targeted audience expansion and campaign delivery.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-20.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-20.png', 'Influencer Marketing Poster')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
           <!-- Card 21 -->
-          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col">
+          <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800">
             <div class="relative group bg-gray-900 overflow-hidden aspect-square cursor-pointer" onclick="openLightbox('src/img/gallery/ghbooster-media-21.png', 'Cross-Platform Growth Showcase')">
               <img src="src/img/gallery/ghbooster-media-21.png" alt="GhBooster Cross-Platform Growth Showcase" title="Cross-Platform Growth Showcase" loading="lazy" width="1200" height="1200" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"><span class="px-4 py-2 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-gray-900 shadow">🔍 View Full Size</span></div>
             </div>
             <figcaption class="p-5 flex flex-col flex-grow justify-between">
-              <div><h3 class="text-base font-bold text-gray-900 mb-1 leading-snug">Cross-Platform Growth Showcase</h3><p class="text-xs text-gray-500 leading-relaxed">Full promotional banner showcasing unified Instagram, TikTok, YouTube, and Telegram marketing tools.</p></div>
-              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs"><a href="src/img/gallery/ghbooster-media-21.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-21.png', 'Cross-Platform Growth Showcase')" class="text-gray-400 hover:text-gray-700">Expand →</button></div>
+              <div><h3 class="text-base font-bold text-gray-900 dark:text-white mb-1 leading-snug">Cross-Platform Growth Showcase</h3><p class="text-xs text-gray-500 leading-relaxed dark:text-gray-400">Full promotional banner showcasing unified Instagram, TikTok, YouTube, and Telegram marketing tools.</p></div>
+              <div class="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs dark:border-gray-800"><a href="src/img/gallery/ghbooster-media-21.png" target="_blank" download class="text-pink-600 font-semibold hover:text-pink-700 flex items-center gap-1">⬇ Download PNG</a><button onclick="openLightbox('src/img/gallery/ghbooster-media-21.png', 'Cross-Platform Growth Showcase')" class="text-gray-400 hover:text-gray-700 dark:text-gray-300">Expand →</button></div>
             </figcaption>
           </figure>
 
@@ -556,7 +556,7 @@
   </div>
 
   <!-- ========== { FOOTER } ========== -->
-  <footer class="bg-gray-50 text-gray-700 border-t border-gray-200 mt-auto">
+  <footer class="bg-gray-50 text-gray-700 border-t border-gray-200 mt-auto dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
     <div id="footer-content" class="relative pt-8 xl:pt-16 pb-6 xl:pb-12">
       <div class="container xl:max-w-6xl mx-auto px-4 overflow-hidden">
         <div class="flex flex-wrap flex-row lg:justify-between -mx-3">
@@ -569,7 +569,7 @@
           <div class="flex-shrink max-w-full w-full lg:w-3/5 px-3">
             <div class="flex flex-wrap flex-row">
               <div class="flex-shrink max-w-full w-1/2 md:w-1/3 mb-6 lg:mb-0">
-                <h4 class="text-sm font-semibold uppercase text-gray-800 mb-3 tracking-wider">Services</h4>
+                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Services</h4>
                 <ul class="text-sm space-y-2">
                   <li class="hover:text-gray-900"><a href="/#services">Instagram Followers</a></li>
                   <li class="hover:text-gray-900"><a href="/#services">TikTok Likes & Views</a></li>
@@ -578,7 +578,7 @@
                 </ul>
               </div>
               <div class="flex-shrink max-w-full w-1/2 md:w-1/3 mb-6 lg:mb-0">
-                <h4 class="text-sm font-semibold uppercase text-gray-800 mb-3 tracking-wider">Quick Links</h4>
+                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Quick Links</h4>
                 <ul class="text-sm space-y-2">
                   <li class="hover:text-gray-900"><a href="/">Home</a></li>
                   <li class="hover:text-gray-900"><a href="/blog">Blog</a></li>
@@ -588,7 +588,7 @@
                 </ul>
               </div>
               <div class="flex-shrink max-w-full w-1/2 md:w-1/3 mb-6 lg:mb-0">
-                <h4 class="text-sm font-semibold uppercase text-gray-800 mb-3 tracking-wider">Legal</h4>
+                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Legal</h4>
                 <ul class="text-sm space-y-2">
                   <li class="hover:text-gray-900"><a href="/terms">Privacy Policy</a></li>
                   <li class="hover:text-gray-900"><a href="/terms">Terms of Service</a></li>
@@ -602,7 +602,7 @@
       </div>
     </div>
     
-    <div class="border-t border-gray-200/50 py-4 text-center text-xs text-gray-500 bg-white">
+    <div class="border-t border-gray-200/50 py-4 text-center text-xs text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400">
       Copyright © GhBooster | All rights reserved.
     </div>
   </footer>
