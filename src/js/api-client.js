@@ -887,9 +887,9 @@ async function initDashboardPage() {
     for (const [catName, items] of Object.entries(grouped)) {
       const icon = getPlatformIcon(catName);
       html += `
-        <div class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 px-3.5 py-2 font-bold text-xs text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 flex items-center shadow-xs whitespace-nowrap overflow-hidden">
+        <div class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 px-3.5 py-2 font-bold text-xs text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 flex items-center shadow-xs">
           <img src="${icon}" class="w-4 h-4 mr-2 object-contain flex-shrink-0" alt="icon">
-          <span class="truncate whitespace-nowrap">${escapeHtml(catName)}</span>
+          <span class="break-words font-bold">${escapeHtml(catName)}</span>
         </div>
       `;
       html += items.map(s => {
@@ -899,12 +899,14 @@ async function initDashboardPage() {
         const activeClass = isSelected ? 'bg-pink-50/90 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 font-bold' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200';
 
         return `
-          <div data-svc-id="${s.id}" class="svc-option-item px-4 py-2.5 cursor-pointer text-xs transition flex items-center justify-between border-b border-gray-50 dark:border-gray-800/40 whitespace-nowrap ${activeClass}">
-            <div class="min-w-0 flex-1 pr-3 flex items-center whitespace-nowrap overflow-hidden">
-              <span class="font-bold text-pink-600 dark:text-pink-400 font-mono mr-1.5 text-[11px] flex-shrink-0 whitespace-nowrap">ID: ${escapeHtml(String(providerId))}</span>
-              <span class="font-medium truncate whitespace-nowrap">${escapeHtml(s.name)}</span>
+          <div data-svc-id="${s.id}" class="svc-option-item px-4 py-2.5 cursor-pointer text-xs transition flex items-start justify-between border-b border-gray-50 dark:border-gray-800/40 gap-3 ${activeClass}">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-baseline gap-1.5">
+                <span class="font-bold text-pink-600 dark:text-pink-400 font-mono text-[11px] flex-shrink-0">ID: ${escapeHtml(String(providerId))}</span>
+                <span class="font-medium text-gray-900 dark:text-white break-words leading-relaxed">${escapeHtml(s.name)}</span>
+              </div>
             </div>
-            <div class="flex items-center space-x-2 flex-shrink-0 whitespace-nowrap">
+            <div class="flex items-center flex-shrink-0 pt-0.5 whitespace-nowrap">
               <span class="font-extrabold text-green-600 dark:text-green-400 text-xs">GH₵${rate}</span>
             </div>
           </div>
@@ -2509,9 +2511,9 @@ async function initBulkOrderPage() {
     for (const [catName, items] of Object.entries(grouped)) {
       const icon = getPlatformIcon(catName);
       html += `
-        <div class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 px-3.5 py-2 font-bold text-xs text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 flex items-center shadow-xs whitespace-nowrap overflow-hidden">
+        <div class="sticky top-0 bg-gray-50 dark:bg-gray-900/90 px-3.5 py-2 font-bold text-xs text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700 flex items-center shadow-xs">
           <img src="${icon}" class="w-4 h-4 mr-2 object-contain flex-shrink-0" alt="icon">
-          <span class="truncate whitespace-nowrap">${escapeHtml(catName)}</span>
+          <span class="break-words font-bold">${escapeHtml(catName)}</span>
         </div>
       `;
       html += items.map(s => {
@@ -2521,12 +2523,14 @@ async function initBulkOrderPage() {
         const activeClass = isSelected ? 'bg-pink-50/90 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 font-bold' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-200';
 
         return `
-          <div data-svc-id="${s.id}" class="bulk-svc-option-item px-4 py-2.5 cursor-pointer text-xs transition flex items-center justify-between border-b border-gray-50 dark:border-gray-800/40 whitespace-nowrap ${activeClass}">
-            <div class="min-w-0 flex-1 pr-3 flex items-center whitespace-nowrap overflow-hidden">
-              <span class="font-bold text-pink-600 dark:text-pink-400 font-mono mr-1.5 text-[11px] flex-shrink-0 whitespace-nowrap">ID: ${escapeHtml(String(providerId))}</span>
-              <span class="font-medium truncate whitespace-nowrap">${escapeHtml(s.name)}</span>
+          <div data-svc-id="${s.id}" class="bulk-svc-option-item px-4 py-2.5 cursor-pointer text-xs transition flex items-start justify-between border-b border-gray-50 dark:border-gray-800/40 gap-3 ${activeClass}">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-baseline gap-1.5">
+                <span class="font-bold text-pink-600 dark:text-pink-400 font-mono text-[11px] flex-shrink-0">ID: ${escapeHtml(String(providerId))}</span>
+                <span class="font-medium text-gray-900 dark:text-white break-words leading-relaxed">${escapeHtml(s.name)}</span>
+              </div>
             </div>
-            <div class="flex items-center space-x-2 flex-shrink-0 whitespace-nowrap">
+            <div class="flex items-center flex-shrink-0 pt-0.5 whitespace-nowrap">
               <span class="font-extrabold text-green-600 dark:text-green-400 text-xs">GH₵${rate}</span>
             </div>
           </div>
