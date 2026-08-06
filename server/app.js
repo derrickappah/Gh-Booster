@@ -188,9 +188,9 @@ const pageRoutesMap = {
   '/review-ghbooster-smm': 'review-ghbooster-smm.html'
 };
 
-// Server-side protection for admin pages — redirect unauthenticated users
+// Server-side protection for admin pages — redirect unauthenticated users & non-admins
 const { authenticateToken } = require('./middleware/authMiddleware');
-const adminPageMiddleware = (req, res, next) => {
+const adminPageMiddleware = async (req, res, next) => {
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.startsWith('Bearer ')
     ? authHeader.substring(7)
@@ -200,21 +200,23 @@ const adminPageMiddleware = (req, res, next) => {
     return res.redirect('/login');
   }
 
-  const originalStatus = res.status.bind(res);
-  res.status = function(code) {
-    if (code === 401 || code === 403) {
-      return {
-        json: () => res.redirect('/login')
-      };
-    }
-    return originalStatus(code);
+  let authFailed = false;
+  const dummyRes = {
+    status: () => dummyRes,
+    json: () => { authFailed = true; }
   };
 
-  authenticateToken(req, res, () => {
-    if (!req.user) return res.redirect('/login');
-    if (!req.user.is_admin) return res.redirect('/dashboard');
-    next();
-  });
+  await authenticateToken(req, dummyRes, () => {});
+
+  if (authFailed || !req.user) {
+    return res.redirect('/login');
+  }
+
+  if (!req.user.is_admin) {
+    return res.redirect('/dashboard');
+  }
+
+  next();
 };
 
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {

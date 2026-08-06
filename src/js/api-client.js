@@ -167,7 +167,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isOrderDetailPage = window.location.pathname.includes('/orders/') || currentPage === 'order-detail';
   const isProtectedPage = isOrderDetailPage || currentPage.startsWith('admin-') || ['dashboard', 'orders', 'bulk-order', 'add-funds', 'wallet', 'tickets', 'account', 'profile', 'referrals', 'child-panel', 'services', 'transactions'].includes(currentPage);
 
-  if (isProtectedPage && !token) {
+  if (currentPage.startsWith('admin-')) {
+    if (!token) {
+      const targetPath = window.location.pathname + window.location.search;
+      window.location.href = `/login?redirect=${encodeURIComponent(targetPath)}`;
+      return;
+    }
+    const cachedUser = API.getUser();
+    if (cachedUser && !isAdminUser(cachedUser)) {
+      console.warn('[Auth Guard] Non-admin user attempted to access admin page. Redirecting to dashboard.');
+      window.location.href = '/dashboard';
+      return;
+    }
+  } else if (isProtectedPage && !token) {
     const targetPath = window.location.pathname + window.location.search;
     window.location.href = `/login?redirect=${encodeURIComponent(targetPath)}`;
     return;
@@ -188,6 +200,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         API.setUser(meRes.user);
         updateUserUI(meRes.user);
+
+        if (currentPage.startsWith('admin-') && !isAdminUser(meRes.user)) {
+          console.warn('[Auth Guard] Non-admin user session verified by backend. Redirecting to dashboard.');
+          window.location.href = '/dashboard';
+          return;
+        }
       }
     } catch (e) {
       if (e.status !== 401) {
@@ -207,6 +225,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
+
+  // Security guard for admin pages before running handlers
+  if (currentPage.startsWith('admin-')) {
+    const activeUser = API.getUser();
+    if (!isAdminUser(activeUser)) {
+      console.warn('[Auth Guard] Non-admin user blocked from running admin page handlers. Redirecting to dashboard.');
+      window.location.href = '/dashboard';
+      return;
+    }
+  }
 
   // Page Specific Handlers
   if (isOrderDetailPage) initOrderDetailPage();

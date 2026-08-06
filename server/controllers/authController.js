@@ -4,6 +4,14 @@ class AuthController {
   static async register(req, res, next) {
     try {
       const result = await AuthService.register(req.body);
+      if (result.token) {
+        res.cookie('token', result.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+      }
       res.json({
         success: true,
         message: 'Account created successfully! Welcome to GhBooster.',
@@ -17,6 +25,14 @@ class AuthController {
   static async login(req, res, next) {
     try {
       const result = await AuthService.login(req.body);
+      if (result.token) {
+        res.cookie('token', result.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+      }
       res.json({
         success: true,
         message: 'Login successful',
