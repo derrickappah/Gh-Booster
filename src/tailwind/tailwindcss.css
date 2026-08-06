@@ -1654,3 +1654,9 @@ iframe.wait-autoplay {
   }
 }
 /*! purgecss end ignore */
+/* Global Faded Muted Placeholder for Inputs & Textareas in Dark Mode */
+html.dark textarea::placeholder,
+html.dark input::placeholder {
+  color: #71717a !important;
+  opacity: 0.55 !important;
+}

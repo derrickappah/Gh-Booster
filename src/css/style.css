@@ -3512,6 +3512,16 @@ video {
   text-decoration-line:line-through;
 }
 
+.placeholder-gray-400::-moz-placeholder {
+  --tw-placeholder-opacity:1;
+  color:rgb(217 217 217 / var(--tw-placeholder-opacity, 1));
+}
+
+.placeholder-gray-400::placeholder {
+  --tw-placeholder-opacity:1;
+  color:rgb(217 217 217 / var(--tw-placeholder-opacity, 1));
+}
+
 .opacity-0 {
   opacity:0;
 }
@@ -5313,6 +5323,19 @@ iframe.wait-autoplay {
 
 /*! purgecss end ignore */
 
+/* Global Faded Muted Placeholder for Inputs & Textareas in Dark Mode */
+
+html.dark textarea::-moz-placeholder, html.dark input::-moz-placeholder {
+  color: #71717a !important;
+  opacity: 0.55 !important;
+}
+
+html.dark textarea::placeholder,
+html.dark input::placeholder {
+  color: #71717a !important;
+  opacity: 0.55 !important;
+}
+
 @media (min-width: 1280px) {
   .xl\:container {
     width:100%;
@@ -6356,6 +6379,14 @@ iframe.wait-autoplay {
 .dark\:text-yellow-400:is(.dark *) {
   --tw-text-opacity:1;
   color:rgb(250 204 21 / var(--tw-text-opacity, 1));
+}
+
+.dark\:placeholder-gray-500\/70:is(.dark *)::-moz-placeholder {
+  color:rgb(125 125 125 / 0.7);
+}
+
+.dark\:placeholder-gray-500\/70:is(.dark *)::placeholder {
+  color:rgb(125 125 125 / 0.7);
 }
 
 .dark\:focus-within\:bg-gray-900:focus-within:is(.dark *) {
