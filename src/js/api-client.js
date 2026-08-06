@@ -3930,7 +3930,89 @@ async function initAdminOrdersPage() {
       if (pendingElem) pendingElem.textContent = `${pendingCount.toLocaleString()} Orders`;
       if (canceledElem) canceledElem.textContent = `${canceledCount.toLocaleString()} Orders`;
 
+      // Pagination state
+      let adminOrdersCurrentPage = 1;
+      let adminOrdersPageSize = parseInt(document.getElementById('admin-orders-page-size')?.value || '25', 10);
+      let adminOrdersFilteredList = orders;
+
+      function renderAdminOrdersPagination(totalCount) {
+        const paginationInfo = document.getElementById('admin-orders-pagination-info');
+        const prevBtn = document.getElementById('admin-orders-prev-btn');
+        const nextBtn = document.getElementById('admin-orders-next-btn');
+        const pageButtonsContainer = document.getElementById('admin-orders-page-buttons');
+
+        const totalPages = Math.max(1, Math.ceil(totalCount / adminOrdersPageSize));
+        if (adminOrdersCurrentPage > totalPages) adminOrdersCurrentPage = totalPages;
+
+        const startIdx = totalCount === 0 ? 0 : (adminOrdersCurrentPage - 1) * adminOrdersPageSize + 1;
+        const endIdx = Math.min(totalCount, adminOrdersCurrentPage * adminOrdersPageSize);
+
+        if (paginationInfo) {
+          paginationInfo.innerHTML = `Showing <span class="font-bold text-gray-900">${startIdx}–${endIdx}</span> of <span class="font-bold text-gray-900">${totalCount.toLocaleString()}</span> entries`;
+        }
+
+        if (prevBtn) {
+          prevBtn.disabled = adminOrdersCurrentPage <= 1;
+          prevBtn.onclick = () => {
+            if (adminOrdersCurrentPage > 1) {
+              adminOrdersCurrentPage--;
+              renderTable(adminOrdersFilteredList);
+            }
+          };
+        }
+
+        if (nextBtn) {
+          nextBtn.disabled = adminOrdersCurrentPage >= totalPages;
+          nextBtn.onclick = () => {
+            if (adminOrdersCurrentPage < totalPages) {
+              adminOrdersCurrentPage++;
+              renderTable(adminOrdersFilteredList);
+            }
+          };
+        }
+
+        if (pageButtonsContainer) {
+          pageButtonsContainer.innerHTML = '';
+          const maxButtons = 5;
+          let startPage = Math.max(1, adminOrdersCurrentPage - 2);
+          let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+          if (endPage - startPage < maxButtons - 1) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+          }
+
+          for (let p = startPage; p <= endPage; p++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = p === adminOrdersCurrentPage
+              ? 'px-3 py-1.5 bg-pink-600 text-white font-bold rounded-lg shadow-sm text-xs transition'
+              : 'px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition text-xs';
+            btn.textContent = p;
+            btn.onclick = () => {
+              adminOrdersCurrentPage = p;
+              renderTable(adminOrdersFilteredList);
+            };
+            pageButtonsContainer.appendChild(btn);
+          }
+        }
+      }
+
+      // Page size selector
+      const pageSizeSelect = document.getElementById('admin-orders-page-size');
+      if (pageSizeSelect && !pageSizeSelect.__bound) {
+        pageSizeSelect.__bound = true;
+        pageSizeSelect.addEventListener('change', () => {
+          adminOrdersPageSize = parseInt(pageSizeSelect.value, 10);
+          adminOrdersCurrentPage = 1;
+          renderTable(adminOrdersFilteredList);
+        });
+      }
+
       function renderTable(orderList) {
+        adminOrdersFilteredList = orderList;
+        const totalCount = orderList.length;
+
+        renderAdminOrdersPagination(totalCount);
+
         if (!orderList || orderList.length === 0) {
           tableBody.innerHTML = `
             <tr class="hover:bg-gray-50/50 transition">
@@ -3940,7 +4022,11 @@ async function initAdminOrdersPage() {
           return;
         }
 
-        tableBody.innerHTML = orderList.map(o => {
+        // Slice to current page
+        const startIdx = (adminOrdersCurrentPage - 1) * adminOrdersPageSize;
+        const pageOrders = orderList.slice(startIdx, startIdx + adminOrdersPageSize);
+
+        tableBody.innerHTML = pageOrders.map(o => {
           const rawId = String(o.id || '');
           const shortId = rawId.length > 8 ? rawId.substring(0, 8) : rawId;
           const userObj = o.profiles || {};
@@ -4207,6 +4293,7 @@ async function initAdminOrdersPage() {
       });
 
       function applyFilters() {
+        adminOrdersCurrentPage = 1;
         const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
         let filtered = orders;
 

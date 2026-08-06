@@ -295,6 +295,30 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <div id="admin-orders-pagination" class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div id="admin-orders-pagination-info" class="text-gray-500 font-medium">
+              Showing <span class="font-bold text-gray-900">0</span> entries
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;" class="text-gray-500">
+              <span>Per page:</span>
+              <select id="admin-orders-page-size" class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-900 focus:outline-none focus:border-pink-500" aria-label="Orders per page">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;" id="admin-orders-pagination-controls" aria-label="Pagination controls">
+            <button id="admin-orders-prev-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold" disabled aria-label="Previous page">Previous</button>
+            <div id="admin-orders-page-buttons" style="display: flex; align-items: center; gap: 4px;"></div>
+            <button id="admin-orders-next-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold" disabled aria-label="Next page">Next</button>
+          </div>
+        </div>
+
       </div>
 
     </main>
