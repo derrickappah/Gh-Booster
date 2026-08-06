@@ -586,42 +586,60 @@ function renderAnnouncementsBanner(newsList, container) {
 
   if (newsList.length === 1) {
     const n = newsList[0];
+    const dateStr = n.created_at ? new Date(n.created_at).toLocaleDateString() : '';
     container.innerHTML = `
-      <div class="bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-900/60 rounded-xl p-3 mb-3 flex items-center space-x-2.5 shadow-xs">
-        <span class="text-pink-600 dark:text-pink-400 text-sm flex-shrink-0">📢</span>
-        <div class="text-xs text-gray-800 dark:text-gray-200 truncate min-w-0 flex-1">
-          <strong class="font-bold text-gray-900 dark:text-white mr-1">${escapeHtml(n.title)}:</strong>
-          <span class="text-gray-600 dark:text-gray-300">${escapeHtml(n.content)}</span>
+      <div class="bg-white dark:bg-gray-800 border-l-4 border-l-pink-500 dark:border-l-pink-400 border-y border-r border-gray-200/80 dark:border-gray-700/80 rounded-xl p-4 sm:p-4.5 shadow-xs mb-3">
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center space-x-2">
+            <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300 border border-pink-200/60 dark:border-pink-800/40 inline-flex items-center gap-1">
+              <span>📢</span> Announcement
+            </span>
+            ${dateStr ? `<span class="text-[11px] text-gray-400 dark:text-gray-500 font-normal">${escapeHtml(dateStr)}</span>` : ''}
+          </div>
         </div>
+        <h4 class="font-semibold text-sm sm:text-base text-gray-900 dark:text-white mt-2.5 leading-snug">${escapeHtml(n.title)}</h4>
+        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">${escapeHtml(n.content)}</p>
       </div>
     `;
     return;
   }
 
-  // Multiple Announcements -> Clean Compact Slider Bar
+  // Multiple Announcements -> Clean Modern Carousel Card
   container.innerHTML = `
-    <div id="announcement-carousel" class="bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-900/60 rounded-xl p-3 mb-3 flex items-center justify-between gap-2.5 shadow-xs select-none">
-      <div class="flex items-center space-x-2.5 min-w-0 flex-1">
-        <span class="text-pink-600 dark:text-pink-400 text-sm flex-shrink-0">📢</span>
-        <div style="width: 100% !important; overflow: hidden !important;">
-          <div id="carousel-slides-wrapper" style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; transition: transform 0.4s ease-in-out;">
-            ${newsList.map(n => `
-              <div style="flex: 0 0 100% !important; width: 100% !important; min-width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;" class="truncate text-xs">
-                <strong class="font-bold text-gray-900 dark:text-white mr-1">${escapeHtml(n.title)}:</strong>
-                <span class="text-gray-600 dark:text-gray-300">${escapeHtml(n.content)}</span>
-              </div>
-            `).join('')}
+    <div id="announcement-carousel" class="bg-white dark:bg-gray-800 border-l-4 border-l-pink-500 dark:border-l-pink-400 border-y border-r border-gray-200/80 dark:border-gray-700/80 rounded-xl p-4 sm:p-4.5 shadow-xs mb-3 relative overflow-hidden select-none">
+      <!-- Top Header Row -->
+      <div class="flex items-center justify-between mb-2">
+        <div class="inline-flex items-center space-x-2">
+          <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300 border border-pink-200/60 dark:border-pink-800/40 inline-flex items-center gap-1">
+            <span>📢</span> Announcement
+          </span>
+          <span id="announcement-date-text" class="text-[11px] text-gray-400 dark:text-gray-500 font-normal"></span>
+        </div>
+
+        <!-- Counter & Prev/Next Controls -->
+        <div class="flex items-center space-x-2">
+          <span id="announcement-counter-text" class="text-xs font-medium text-gray-400 dark:text-gray-500">1 of ${newsList.length}</span>
+          <div class="flex items-center space-x-0.5 bg-gray-100 dark:bg-gray-700/60 p-0.5 rounded-lg border border-gray-200/60 dark:border-gray-600/50">
+            <button id="carousel-prev-btn" type="button" aria-label="Previous" class="p-1 rounded text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-white dark:hover:bg-gray-600 transition focus:outline-none">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="carousel-next-btn" type="button" aria-label="Next" class="p-1 rounded text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-white dark:hover:bg-gray-600 transition focus:outline-none">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="flex items-center space-x-1 flex-shrink-0">
-        <button id="carousel-prev-btn" type="button" aria-label="Previous" class="p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition focus:outline-none">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button id="carousel-next-btn" type="button" aria-label="Next" class="p-1 text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition focus:outline-none">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-        </button>
+      <!-- Slide Content Viewport -->
+      <div style="width: 100% !important; overflow: hidden !important;">
+        <div id="carousel-slides-wrapper" style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+          ${newsList.map(n => `
+            <div style="flex: 0 0 100% !important; width: 100% !important; min-width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;">
+              <h4 class="font-semibold text-sm sm:text-base text-gray-900 dark:text-white leading-snug">${escapeHtml(n.title)}</h4>
+              <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">${escapeHtml(n.content)}</p>
+            </div>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
@@ -629,6 +647,8 @@ function renderAnnouncementsBanner(newsList, container) {
   // Controller Logic
   const carouselEl = container.querySelector('#announcement-carousel');
   const slidesWrapper = container.querySelector('#carousel-slides-wrapper');
+  const counterText = container.querySelector('#announcement-counter-text');
+  const dateText = container.querySelector('#announcement-date-text');
   const prevBtn = container.querySelector('#carousel-prev-btn');
   const nextBtn = container.querySelector('#carousel-next-btn');
 
@@ -638,13 +658,21 @@ function renderAnnouncementsBanner(newsList, container) {
   function updateCarousel(index) {
     currentIndex = (index + newsList.length) % newsList.length;
     slidesWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+    
+    if (counterText) {
+      counterText.textContent = `${currentIndex + 1} of ${newsList.length}`;
+    }
+    if (dateText) {
+      const curItem = newsList[currentIndex];
+      dateText.textContent = curItem && curItem.created_at ? new Date(curItem.created_at).toLocaleDateString() : '';
+    }
   }
 
   function startAutoPlay() {
     stopAutoPlay();
     timer = setInterval(() => {
       updateCarousel(currentIndex + 1);
-    }, 5000);
+    }, 6000);
   }
 
   function stopAutoPlay() {
