@@ -1,15 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Anti-Flash Dark Mode Script -->
+    <!-- Anti-Flash & Failsafe Dark Mode Script -->
   <script>
     (function(){
-      var t=localStorage.getItem('ghb_theme');
-      if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
+      var t = localStorage.getItem('ghb_theme');
+      var isDark = t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
         document.documentElement.classList.add('dark');
-      }else{
+      } else {
         document.documentElement.classList.remove('dark');
       }
+
+      window.updateThemeUI = function(dark) {
+        var suns = document.querySelectorAll('#theme-icon-sun, .theme-icon-sun');
+        var moons = document.querySelectorAll('#theme-icon-moon, .theme-icon-moon');
+        suns.forEach(function(s){
+          if (dark) s.classList.remove('hidden');
+          else s.classList.add('hidden');
+        });
+        moons.forEach(function(m){
+          if (dark) m.classList.add('hidden');
+          else m.classList.remove('hidden');
+        });
+        var btns = document.querySelectorAll('#theme-toggle-btn, .theme-toggle-btn');
+        btns.forEach(function(b){
+          b.setAttribute('aria-label', dark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+          b.setAttribute('title', dark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+        });
+      };
+
+      window.toggleDarkMode = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var nowDark = document.documentElement.classList.toggle('dark');
+        try { localStorage.setItem('ghb_theme', nowDark ? 'dark' : 'light'); } catch(_) {}
+        window.updateThemeUI(nowDark);
+        return false;
+      };
+
+      document.addEventListener('DOMContentLoaded', function(){
+        var nowDark = document.documentElement.classList.contains('dark');
+        window.updateThemeUI(nowDark);
+      });
     })();
   </script>
   <meta charset="UTF-8">

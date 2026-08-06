@@ -1,15 +1,47 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <!-- Anti-Flash Dark Mode Script -->
+    <!-- Anti-Flash & Failsafe Dark Mode Script -->
   <script>
     (function(){
-      var t=localStorage.getItem('ghb_theme');
-      if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
+      var t = localStorage.getItem('ghb_theme');
+      var isDark = t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
         document.documentElement.classList.add('dark');
-      }else{
+      } else {
         document.documentElement.classList.remove('dark');
       }
+
+      window.updateThemeUI = function(dark) {
+        var suns = document.querySelectorAll('#theme-icon-sun, .theme-icon-sun');
+        var moons = document.querySelectorAll('#theme-icon-moon, .theme-icon-moon');
+        suns.forEach(function(s){
+          if (dark) s.classList.remove('hidden');
+          else s.classList.add('hidden');
+        });
+        moons.forEach(function(m){
+          if (dark) m.classList.add('hidden');
+          else m.classList.remove('hidden');
+        });
+        var btns = document.querySelectorAll('#theme-toggle-btn, .theme-toggle-btn');
+        btns.forEach(function(b){
+          b.setAttribute('aria-label', dark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+          b.setAttribute('title', dark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+        });
+      };
+
+      window.toggleDarkMode = function(e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var nowDark = document.documentElement.classList.toggle('dark');
+        try { localStorage.setItem('ghb_theme', nowDark ? 'dark' : 'light'); } catch(_) {}
+        window.updateThemeUI(nowDark);
+        return false;
+      };
+
+      document.addEventListener('DOMContentLoaded', function(){
+        var nowDark = document.documentElement.classList.contains('dark');
+        window.updateThemeUI(nowDark);
+      });
     })();
   </script>
   <!-- Required meta tags -->
@@ -222,7 +254,7 @@
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-2 md:space-x-3">
         <!-- Dark/Light Theme Toggle Button -->
-        <button id="theme-toggle-btn" type="button" class="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 flex items-center justify-center cursor-pointer z-50" aria-label="Toggle Theme" title="Toggle Light/Dark Mode">
+        <button id="theme-toggle-btn" type="button" onclick="window.toggleDarkMode(event)" class="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 flex items-center justify-center cursor-pointer z-50" aria-label="Toggle Theme" title="Toggle Light/Dark Mode">
           <!-- Sun Icon (shown in Dark Mode) -->
           <svg id="theme-icon-sun" class="w-5 h-5 hidden text-yellow-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
