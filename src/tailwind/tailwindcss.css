@@ -31,6 +31,17 @@
     background-color: #ffffff;
     border-bottom: var(--gray) 1px solid;
 }
+html.dark .navbar-scrolled {
+    background-color: #1c1c1c !important;
+    border-bottom: 1px solid #383838 !important;
+}
+html.dark .menu-mobile,
+html.dark .menu-mobile svg,
+html.dark .menu-mobile span {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+    fill: #ffffff !important;
+}
 .navbar>li>a.active:before {
     background-color: var(--primary);
 }
