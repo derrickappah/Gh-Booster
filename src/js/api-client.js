@@ -5495,14 +5495,72 @@ async function initAdminPromotionsPage() {
 // ADMIN NEWS HANDLER
 async function initAdminNewsPage() {
   const tableBody = document.getElementById('news-tbody') || document.querySelector('tbody');
+  const editModal = document.getElementById('edit-news-modal');
+  const editForm = document.getElementById('edit-news-form');
+  const editIdInput = document.getElementById('edit-news-id');
+  const editTitleInput = document.getElementById('edit-news-title');
+  const editTargetSelect = document.getElementById('edit-news-target');
+  const editStatusSelect = document.getElementById('edit-news-status');
+  const editContentTextarea = document.getElementById('edit-news-content');
+  const closeEditModalBtn = document.getElementById('close-edit-news-modal');
+  const cancelEditModalBtn = document.getElementById('cancel-edit-news-modal');
+
   if (!tableBody) return;
+
+  let currentNewsList = [];
+
+  function openEditModal(n) {
+    if (!editModal) return;
+    if (editIdInput) editIdInput.value = n.id || '';
+    if (editTitleInput) editTitleInput.value = n.title || '';
+    if (editTargetSelect) editTargetSelect.value = n.target || n.target_audience || 'all';
+    if (editStatusSelect) editStatusSelect.value = n.status || 'Active';
+    if (editContentTextarea) editContentTextarea.value = n.content || '';
+    editModal.classList.remove('hidden');
+  }
+
+  function closeEditModal() {
+    if (editModal) editModal.classList.add('hidden');
+  }
+
+  if (closeEditModalBtn) closeEditModalBtn.onclick = closeEditModal;
+  if (cancelEditModalBtn) cancelEditModalBtn.onclick = closeEditModal;
+
+  if (editForm) {
+    editForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const id = editIdInput ? editIdInput.value : '';
+      const title = editTitleInput ? editTitleInput.value.trim() : '';
+      const target = editTargetSelect ? editTargetSelect.value : 'all';
+      const status = editStatusSelect ? editStatusSelect.value : 'Active';
+      const content = editContentTextarea ? editContentTextarea.value.trim() : '';
+
+      if (!id || !title || !content) {
+        alert('Please fill out all required announcement fields.');
+        return;
+      }
+
+      try {
+        const res = await API.request(`/admin/news/${id}`, 'PUT', { title, target, target_audience: target, status, content });
+        if (res.success) {
+          alert('Announcement updated successfully!');
+          closeEditModal();
+          await loadNews();
+        } else {
+          alert(res.error || res.message || 'Failed to update announcement.');
+        }
+      } catch (err) {
+        alert('Failed to update announcement: ' + err.message);
+      }
+    };
+  }
 
   async function loadNews() {
     try {
       const res = await API.request('/admin/news');
       if (res.success && Array.isArray(res.news)) {
-        const news = res.news;
-        if (news.length === 0) {
+        currentNewsList = res.news;
+        if (currentNewsList.length === 0) {
           tableBody.innerHTML = `
             <tr class="hover:bg-gray-50/50 transition">
               <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No announcements posted yet.</td>
@@ -5511,26 +5569,115 @@ async function initAdminNewsPage() {
           return;
         }
 
-        tableBody.innerHTML = news.map(n => {
+        tableBody.innerHTML = currentNewsList.map(n => {
           const title = n.title || 'Untitled Announcement';
-          const target = n.target === 'all' || !n.target ? 'All Users & Visitors' : (n.target === 'resellers' ? 'Resellers & API Users' : (n.target === 'new' ? 'New Users' : n.target));
+          const targetRaw = n.target || n.target_audience || 'all';
+          const target = targetRaw === 'all' ? 'All Users & Visitors' : (targetRaw === 'resellers' ? 'Resellers & API Users' : (targetRaw === 'new' ? 'New Users' : targetRaw));
           const date = n.created_at ? new Date(n.created_at).toLocaleDateString() : 'N/A';
           const status = n.status || 'Active';
           const content = n.content || '';
 
+          const statusBadge = status.toLowerCase() === 'active'
+            ? `<span class="px-2.5 py-0.5 text-[11px] font-bold text-green-700 bg-green-100 rounded-full">${escapeHtml(status)}</span>`
+            : `<span class="px-2.5 py-0.5 text-[11px] font-bold text-gray-700 bg-gray-100 rounded-full">${escapeHtml(status)}</span>`;
+
           return `
-            <tr class="hover:bg-gray-50 border-b border-gray-100">
+            <tr class="hover:bg-gray-50 border-b border-gray-100" data-id="${n.id}">
               <td class="px-6 py-3.5 font-bold text-gray-900">
                 <div>${escapeHtml(title)}</div>
                 <div class="text-xs font-normal text-gray-500 max-w-md truncate mt-0.5">${escapeHtml(content)}</div>
               </td>
               <td class="px-6 py-3.5 text-xs text-gray-600 font-medium">${escapeHtml(target)}</td>
               <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(date)}</td>
-              <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold text-green-700 bg-green-100 rounded-full">${escapeHtml(status)}</span></td>
-              <td class="px-6 py-3.5 text-xs text-gray-400">—</td>
+              <td class="px-6 py-3.5">${statusBadge}</td>
+              <td class="px-6 py-3.5 text-center relative">
+                <div class="inline-block text-left relative">
+                  <button type="button" class="news-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none" aria-label="Actions for ${escapeHtml(title)}" title="Announcement Actions">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                  <div class="news-actions-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
+                    <div class="py-1">
+                      <button type="button" data-action="edit" data-id="${n.id}" class="edit-news-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit Announcement
+                      </button>
+                    </div>
+                    <div class="py-1">
+                      <button type="button" data-action="delete" data-id="${n.id}" class="delete-news-btn w-full text-left px-3.5 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Announcement
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </td>
             </tr>
           `;
         }).join('');
+
+        // Toggle 3-dots action menu dropdown
+        tableBody.querySelectorAll('.news-actions-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMenu = btn.nextElementSibling;
+            const isHidden = currentMenu.classList.contains('hidden');
+            document.querySelectorAll('.news-actions-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) {
+              currentMenu.classList.remove('hidden');
+            }
+          });
+        });
+
+        // Close dropdown when clicking outside
+        if (!window.__newsDropdownOutsideClickBound) {
+          window.__newsDropdownOutsideClickBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.news-actions-menu').forEach(m => m.classList.add('hidden'));
+          });
+        }
+
+        // Edit Announcement Handler
+        tableBody.querySelectorAll('.edit-news-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const newsId = btn.getAttribute('data-id');
+            const menu = btn.closest('.news-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            const targetNews = currentNewsList.find(item => String(item.id) === String(newsId));
+            if (targetNews) openEditModal(targetNews);
+          });
+        });
+
+        // Delete Announcement Handler
+        tableBody.querySelectorAll('.delete-news-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const newsId = btn.getAttribute('data-id');
+            const menu = btn.closest('.news-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            const targetNews = currentNewsList.find(item => String(item.id) === String(newsId));
+            const newsTitle = targetNews ? targetNews.title : 'this announcement';
+            
+            if (!confirm(`Are you sure you want to delete "${newsTitle}"?`)) return;
+
+            try {
+              const res = await API.request(`/admin/news/${newsId}`, 'DELETE');
+              if (res.success) {
+                alert('Announcement deleted successfully!');
+                await loadNews();
+              } else {
+                alert(res.error || res.message || 'Failed to delete announcement.');
+              }
+            } catch (err) {
+              alert('Error deleting announcement: ' + err.message);
+            }
+          });
+        });
+
       }
     } catch (e) {
       console.error('News load error:', e);
@@ -5562,7 +5709,7 @@ async function initAdminNewsPage() {
       }
 
       try {
-        const res = await API.request('/admin/news', 'POST', { title, target, content });
+        const res = await API.request('/admin/news', 'POST', { title, target, target_audience: target, content, status: 'Active' });
         if (res.success) {
           alert('Announcement broadcasted successfully!');
           newsForm.reset();

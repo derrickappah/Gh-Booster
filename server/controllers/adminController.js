@@ -368,6 +368,26 @@ class AdminController {
     }
   }
 
+  static async updateNews(req, res, next) {
+    try {
+      const { id } = req.params;
+      const news = await AdminService.updateNews(id, req.body);
+      res.json({ success: true, news });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
+  static async deleteNews(req, res, next) {
+    try {
+      const { id } = req.params;
+      await AdminService.deleteNews(id);
+      res.json({ success: true, message: 'Announcement deleted successfully' });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
   static async getLogs(req, res, next) {
     try {
       const logs = await AdminService.getLogs();

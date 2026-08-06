@@ -69,6 +69,8 @@ router.get('/promotions', AdminController.getPromotions);
 router.post('/promotions', validate(adminCreatePromotionSchema), AdminController.createPromotion);
 router.get('/news', AdminController.getNews);
 router.post('/news', validate(adminCreateNewsSchema), AdminController.createNews);
+router.put('/news/:id', AdminController.updateNews);
+router.delete('/news/:id', AdminController.deleteNews);
 
 // Audit Logs & Settings
 router.get('/logs', AdminController.getLogs);

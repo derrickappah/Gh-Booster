@@ -710,6 +710,18 @@ class AdminService {
     return data[0];
   }
 
+  static async updateNews(id, updateData) {
+    const { data, error } = await supabaseAdmin.from('announcements').update(updateData).eq('id', id).select();
+    if (error) throw new Error(error.message);
+    return data[0];
+  }
+
+  static async deleteNews(id) {
+    const { error } = await supabaseAdmin.from('announcements').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+    return true;
+  }
+
   static async getLogs() {
     const { data } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false });
     return data || [];
