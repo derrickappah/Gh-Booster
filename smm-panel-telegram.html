@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Anti-Flash Dark Mode Script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('ghb_theme');
+      if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
+        document.documentElement.classList.add('dark');
+      }else{
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

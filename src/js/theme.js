@@ -297,6 +297,73 @@
     // Custom logic
   };
 
+  // Dark Mode Toggle Logic
+  const initDarkMode = function () {
+    const updateThemeIcons = function (isDark) {
+      const sunIcons = document.querySelectorAll('#theme-icon-sun, .theme-icon-sun');
+      const moonIcons = document.querySelectorAll('#theme-icon-moon, .theme-icon-moon');
+      
+      sunIcons.forEach(function (icon) {
+        if (isDark) icon.classList.remove('hidden');
+        else icon.classList.add('hidden');
+      });
+      moonIcons.forEach(function (icon) {
+        if (isDark) icon.classList.add('hidden');
+        else icon.classList.remove('hidden');
+      });
+
+      const toggleBtns = document.querySelectorAll('#theme-toggle-btn, .theme-toggle-btn');
+      toggleBtns.forEach(function (btn) {
+        btn.setAttribute('aria-label', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+        btn.setAttribute('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+      });
+    };
+
+    const applyTheme = function (theme) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        updateThemeIcons(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        updateThemeIcons(false);
+      }
+    };
+
+    // Determine initial theme
+    const savedTheme = localStorage.getItem('ghb_theme');
+    let isDarkMode = false;
+    if (savedTheme === 'dark') {
+      isDarkMode = true;
+    } else if (savedTheme === 'light') {
+      isDarkMode = false;
+    } else {
+      isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    applyTheme(isDarkMode ? 'dark' : 'light');
+
+    // Attach click handlers to theme toggle buttons
+    document.addEventListener('click', function (e) {
+      const toggleBtn = e.target.closest('#theme-toggle-btn, .theme-toggle-btn');
+      if (toggleBtn) {
+        e.preventDefault();
+        const nowDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('ghb_theme', nowDark ? 'dark' : 'light');
+        updateThemeIcons(nowDark);
+      }
+    });
+
+    // Listen for OS system theme changes if no manual override is set
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        if (!localStorage.getItem('ghb_theme')) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+  };
+
+
   // Register Service Worker for PWA installability
   const registerServiceWorker = function () {
     if ('serviceWorker' in navigator) {
@@ -1352,6 +1419,7 @@
    */
    
   // Immediate handlers for critical interactive UI elements
+  initDarkMode();
   myBacktotop();
   menu_Mobile();
   myTyped();
