@@ -8,12 +8,12 @@ class AdminService {
   static async getStats() {
     if (statsCache && Date.now() - statsCacheTime < STATS_CACHE_TTL) return statsCache;
     const { data: users, count: userCount } = await supabaseAdmin.from('profiles').select('created_at', { count: 'exact' }).limit(10000);
-    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('charge, total_price, price, amount, cost, status, created_at', { count: 'exact' }).limit(10000);
-    const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('status, mode', { count: 'exact' });
+    const { data: orders, count: orderCount } = await supabaseAdmin.from('orders').select('charge, status, created_at', { count: 'exact' }).limit(10000);
+    const { data: services, count: serviceCount } = await supabaseAdmin.from('services').select('status', { count: 'exact' });
     const { data: providers, count: providerCount } = await supabaseAdmin.from('providers').select('id', { count: 'exact' });
     const { data: wallets } = await supabaseAdmin.from('wallets').select('balance').limit(10000);
     const { data: tickets } = await supabaseAdmin.from('tickets').select('status');
-    const { data: transactions } = await supabaseAdmin.from('transactions').select('amount, charge, value, status, type, created_at').limit(10000);
+    const { data: transactions } = await supabaseAdmin.from('transactions').select('amount, status, type, created_at').limit(10000);
     const { data: logs } = await supabaseAdmin.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(10);
 
     let referrals = [];
@@ -85,7 +85,7 @@ class AdminService {
 
     const pendingReferrals = (referrals || []).filter(r => String(r.status || '').toLowerCase() === 'pending').length;
     const activePaymentMethods = (paymentMethods || []).filter(p => String(p.status || '').toLowerCase() === 'active' || p.is_active || true).length;
-    const activeServicesCount = (services || []).filter(s => String(s.status || '').toLowerCase() === 'active' || s.status === 1 || s.status === true || s.mode !== 'disabled').length;
+    const activeServicesCount = (services || []).filter(s => String(s.status || '').toLowerCase() === 'active' || s.status === 1 || s.status === true).length;
 
     // Exceptions
     const expiredDeposits = (transactions || []).filter(t => String(t.status || '').toLowerCase() === 'expired' || String(t.status || '').toLowerCase() === 'rejected' || String(t.status || '').toLowerCase() === 'declined').length;
