@@ -2329,7 +2329,7 @@ async function initTicketsPage() {
       const res = await API.request('/tickets');
       if (res.success && res.tickets) {
         tableBody.innerHTML = res.tickets.map(t => `
-          <tr class="hover:bg-gray-50 border-b border-gray-100">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
             <td class="px-6 py-3.5 font-bold text-gray-900 font-mono text-xs">#${escapeHtml(String(t.id || ''))}</td>
             <td class="px-6 py-3.5 font-medium text-gray-900">${escapeHtml(t.subject || '')}</td>
             <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(new Date(t.created_at).toLocaleString())}</td>
@@ -2948,7 +2948,7 @@ async function initChildPanelPage() {
       const res = await API.request('/child-panels');
       if (res.success && res.panels) {
         tableBody.innerHTML = res.panels.map(p => `
-          <tr class="hover:bg-gray-50 border-b border-gray-100">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
             <td class="px-6 py-3.5 font-bold text-gray-900">${escapeHtml(p.domain || '')}</td>
             <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${parseFloat(p.price || 25).toFixed(2)}</td>
             <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-yellow-100 text-yellow-700">${escapeHtml(p.status || '')}</span></td>
@@ -3615,7 +3615,7 @@ async function initAdminDashboard() {
       if (tableBody) {
         if (!stats.recent_orders || stats.recent_orders.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="8" class="py-8 text-center text-gray-400 font-medium">No recent orders found.</td>
             </tr>
           `;
@@ -3631,11 +3631,11 @@ async function initAdminDashboard() {
             const status = o.status || 'Processing';
 
             return `
-              <tr class="hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}">
+              <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition" data-order-id="${encodeURIComponent(o.id)}">
                 <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
                 <td class="py-4 px-4">
                   <div class="font-bold text-gray-900">${escapeHtml(username)}</div>
-                  <span class="text-[10px] text-gray-400">Balance: GH₵${userBal}</span>
+                  <span class="text-[10px] text-gray-400 dark:text-gray-300">Balance: GH₵${userBal}</span>
                 </td>
                 <td class="py-4 px-4">
                   <span class="font-semibold text-gray-900 flex items-center">
@@ -3716,7 +3716,7 @@ async function initAdminUsersPage() {
       function renderTable(userList) {
         if (!userList || userList.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="9" class="py-8 text-center text-gray-400 font-medium">No user accounts found matching your search.</td>
             </tr>
           `;
@@ -3731,11 +3731,11 @@ async function initAdminUsersPage() {
             : (u.role === 'reseller' ? 'bg-purple-100 text-purple-700 font-bold' : 'bg-blue-100 text-blue-700 font-bold');
 
           return `
-            <tr class="user-row hover:bg-gray-50/50 transition" data-user-id="${encodeURIComponent(u.id)}" data-role="${escapeHtml(u.role || 'user')}">
+            <tr class="user-row hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100/50 dark:border-gray-700/50" data-user-id="${encodeURIComponent(u.id)}" data-role="${escapeHtml(u.role || 'user')}">
               <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
               <td class="py-4 px-4">
-                <div class="font-bold text-gray-900 text-sm">${escapeHtml(u.username || '')}</div>
-                <div class="text-[10px] text-gray-400">${escapeHtml(u.email || '')}</div>
+                <div class="font-bold text-gray-900 dark:text-white text-sm">${escapeHtml(u.username || '')}</div>
+                <div class="text-[10px] text-gray-400 dark:text-gray-300">${escapeHtml(u.email || '')}</div>
               </td>
               <td class="py-4 px-4 font-mono text-xs">
                 ${u.phone ? `<span class="font-mono text-pink-600 font-bold">${escapeHtml(u.phone)}</span>` : '<span class="text-gray-400 font-normal italic">N/A</span>'}
@@ -3744,8 +3744,8 @@ async function initAdminUsersPage() {
                 <span class="px-2.5 py-0.5 ${roleBadgeClass} rounded text-[10px] uppercase">${escapeHtml(u.role || 'user')}</span>
               </td>
               <td class="py-4 px-4 font-extrabold text-green-600 text-sm">GH₵${parseFloat(u.balance || 0).toFixed(2)}</td>
-              <td class="py-4 px-4 font-extrabold text-gray-900">GH₵${parseFloat(u.total_spent || 0).toFixed(2)}</td>
-              <td class="py-4 px-4 text-gray-500">${escapeHtml(u.created_at || '')}</td>
+              <td class="py-4 px-4 font-extrabold text-gray-900 dark:text-white">GH₵${parseFloat(u.total_spent || 0).toFixed(2)}</td>
+              <td class="py-4 px-4 text-gray-500 dark:text-gray-300">${escapeHtml(u.created_at || '')}</td>
               <td class="py-4 px-4">
                 <span class="px-2.5 py-1 bg-green-100 text-green-700 rounded-full font-bold text-[11px] inline-flex items-center">
                   <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse" aria-hidden="true"></span> Active
@@ -4066,7 +4066,7 @@ async function initAdminOrdersPage() {
             btn.type = 'button';
             btn.className = p === adminOrdersCurrentPage
               ? 'px-3 py-1.5 bg-pink-600 text-white font-bold rounded-lg shadow-sm text-xs transition'
-              : 'px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition text-xs';
+              : 'px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs';
             btn.textContent = p;
             btn.onclick = () => {
               adminOrdersCurrentPage = p;
@@ -4096,7 +4096,7 @@ async function initAdminOrdersPage() {
 
         if (!orderList || orderList.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="10" class="py-8 text-center text-gray-400 font-medium">No orders found matching your criteria.</td>
             </tr>
           `;
@@ -4152,7 +4152,7 @@ async function initAdminOrdersPage() {
           else if (['refunded', 'refunds'].includes(statusLower)) statusDisplay = 'Refunds';
 
           return `
-            <tr class="admin-order-row hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
+            <tr class="admin-order-row hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100/50 dark:border-gray-700/50" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
               <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
               <td class="py-4 px-4 font-bold text-gray-900">${escapeHtml(username)}</td>
               <td class="py-4 px-4">
@@ -4160,16 +4160,16 @@ async function initAdminOrdersPage() {
                   <img src="${platformIcon}" alt="Platform" class="w-4 h-4 mr-1.5 object-contain flex-shrink-0" onerror="this.style.display='none'">
                   ${escapeHtml(serviceName)}
                 </span>
-                ${serviceId ? `<span class="text-[10px] text-gray-400">ID: ${escapeHtml(String(serviceId))}</span>` : ''}
+                ${serviceId ? `<span class="text-[10px] text-gray-400 dark:text-gray-300">ID: ${escapeHtml(String(serviceId))}</span>` : ''}
               </td>
               <td class="py-4 px-4">
                 <a href="${escapeHtml(targetLink)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 hover:underline font-mono truncate block max-w-[140px]">${escapeHtml(targetLink)}</a>
               </td>
               <td class="py-4 px-4 font-mono">
                 <span class="font-bold text-gray-900 block">${qty}</span>
-                <span class="text-[10px] text-gray-400">${startCount} / ${remains}</span>
+                <span class="text-[10px] text-gray-400 dark:text-gray-300">${startCount} / ${remains}</span>
               </td>
-              <td class="py-4 px-4 font-extrabold text-gray-900">GH₵${charge}</td>
+              <td class="py-4 px-4 font-extrabold text-gray-900 dark:text-white">GH₵${charge}</td>
               <td class="py-4 px-4 text-gray-500 text-xs">${escapeHtml(createdAt)}</td>
               <td class="py-4 px-4">
                 <span class="px-2.5 py-1 ${getStatusBadgeClass(o.status)} rounded-full font-bold text-[11px] inline-flex items-center">
@@ -4426,7 +4426,7 @@ async function initAdminOrdersPage() {
   } catch (e) {
     console.error('Failed to load admin orders:', e.message);
     tableBody.innerHTML = `
-      <tr class="hover:bg-gray-50/50 transition">
+      <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
         <td colspan="10" class="py-8 text-center text-red-500 font-medium">Failed to load orders. ${escapeHtml(e.message || '')}</td>
       </tr>
     `;
@@ -4504,7 +4504,7 @@ async function initAdminServicesPage() {
       function renderTable(list) {
         if (!list || list.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="9" class="py-12 text-center text-gray-400 font-medium">No services found.</td>
             </tr>
           `;
@@ -4526,7 +4526,7 @@ async function initAdminServicesPage() {
             : `<button data-action="toggle" data-id="${s.id}" data-status="Active" class="svc-action-btn px-2.5 py-1 bg-green-100 hover:bg-green-200 text-green-700 font-bold rounded text-[11px] transition">Enable</button>`;
 
           return `
-            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100" data-id="${s.id}">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60" data-id="${s.id}">
               <td class="py-4 px-4 font-mono text-gray-500 text-xs font-bold">#${shortId}</td>
               <td class="py-4 px-4 font-bold text-gray-900 text-xs">${s.name}</td>
               <td class="py-4 px-4"><span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded text-[10px]">${catName}</span></td>
@@ -4778,7 +4778,7 @@ async function initAdminProvidersPage() {
       function renderTable(list) {
         if (!list || list.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="6" class="py-12 text-center text-gray-400 font-medium">No wholesale providers connected.</td>
             </tr>
           `;
@@ -4799,7 +4799,7 @@ async function initAdminProvidersPage() {
           }
 
           return `
-            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100" data-id="${p.id}">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60" data-id="${p.id}">
               <td class="py-4 px-4 font-bold text-gray-900">${p.name}</td>
               <td class="py-4 px-4 font-mono text-gray-600 text-[11px]">${p.api_url}</td>
               <td class="py-4 px-4 font-mono text-xs text-gray-500">${maskedKey}</td>
@@ -5028,7 +5028,7 @@ async function initAdminDepositsPage() {
       function renderTable(list) {
         if (!list || list.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No deposit records found.</td>
             </tr>
           `;
@@ -5125,7 +5125,7 @@ async function initAdminDepositsPage() {
           return `
             <tr class="dep-row hover:bg-gray-50/50 transition border-b border-gray-100" data-id="${d.id}">
               <td class="py-3.5 px-4 font-bold text-pink-600 font-mono text-xs">${refDisplay}</td>
-              <td class="py-3.5 px-4 font-bold text-gray-900">${username}</td>
+              <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">${username}</td>
               <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded text-[10px] uppercase">${method}</span></td>
               <td class="py-3.5 px-4 text-gray-500 font-mono text-xs max-w-xs truncate">${notes}</td>
               <td class="py-3.5 px-4 font-extrabold ${amtClass}">GH₵${amt}</td>
@@ -5277,7 +5277,7 @@ async function initAdminTransactionsPage() {
       function renderTable(data) {
         if (!data || data.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No transaction records found.</td>
             </tr>
           `;
@@ -5309,13 +5309,13 @@ async function initAdminTransactionsPage() {
           }
 
           return `
-            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60">
               <td class="py-3.5 px-4 font-bold text-pink-600 font-mono text-xs">${ref}</td>
-              <td class="py-3.5 px-4 font-bold text-gray-900">${user}</td>
+              <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">${user}</td>
               <td class="py-3.5 px-4">${typeBadge}</td>
               <td class="py-3.5 px-4 text-gray-600 text-xs max-w-xs truncate">${desc}</td>
               <td class="py-3.5 px-4 font-extrabold ${amtClass}">${sign}GH₵${amt}</td>
-              <td class="py-3.5 px-4 font-bold text-gray-900">GH₵${bal}</td>
+              <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">GH₵${bal}</td>
               <td class="py-3.5 px-4 text-gray-500 text-xs">${date}</td>
               <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px] capitalize">${status}</span></td>
             </tr>
@@ -5455,7 +5455,7 @@ async function initAdminReferralsPage() {
 
       if (list.length === 0) {
         tableBody.innerHTML = `
-          <tr class="hover:bg-gray-50/50 transition">
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
             <td colspan="7" class="py-12 text-center text-gray-400 font-medium">No referral statistics available.</td>
           </tr>
         `;
@@ -5475,13 +5475,13 @@ async function initAdminReferralsPage() {
         const lastRef = r.last_referral_date || r.created_at ? new Date(r.last_referral_date || r.created_at).toISOString().split('T')[0] : 'N/A';
 
         return `
-          <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60">
             <td class="py-4 px-4">${rankBadge}</td>
             <td class="py-4 px-4 font-bold text-gray-900">${escapeHtml(username)}</td>
             <td class="py-4 px-4 font-bold text-gray-900">${count}</td>
             <td class="py-4 px-4 font-bold text-green-600">${activeCount}</td>
             <td class="py-4 px-4 font-extrabold text-green-600">GH₵${comms}</td>
-            <td class="py-4 px-4 text-gray-500">${lastRef}</td>
+            <td class="py-4 px-4 text-gray-500 dark:text-gray-300">${lastRef}</td>
             <td class="py-4 px-4 text-center">
               <button class="px-3 py-1 bg-pink-50 text-pink-700 font-bold rounded text-[11px] hover:bg-pink-100 transition" onclick="alert('Viewing referral tree for ${escapeHtml(username)}')">View Tree</button>
             </td>
@@ -5529,7 +5529,7 @@ async function initAdminChildPanelsPage() {
 
       if (list.length === 0) {
         tableBody.innerHTML = `
-          <tr class="hover:bg-gray-50/50 transition">
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
             <td colspan="6" class="py-12 text-center text-gray-400 font-medium">No child panels connected.</td>
           </tr>
         `;
@@ -5551,7 +5551,7 @@ async function initAdminChildPanelsPage() {
         }
 
         return `
-          <tr class="hover:bg-gray-50 border-b border-gray-100">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
             <td class="px-6 py-3.5 font-bold text-pink-600">${escapeHtml(domain)}</td>
             <td class="px-6 py-3.5 font-bold text-gray-900">${escapeHtml(owner)}</td>
             <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${fee}</td>
@@ -5712,7 +5712,7 @@ async function initAdminPromotionsPage() {
 
         if (list.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="8" class="py-12 text-center text-gray-400 font-medium">No promotional codes found.</td>
             </tr>
           `;
@@ -5736,13 +5736,13 @@ async function initAdminPromotionsPage() {
           }
 
           return `
-            <tr class="hover:bg-gray-50/50 transition border-b border-gray-100">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60">
               <td class="py-4 px-4 font-mono font-extrabold text-pink-600 text-sm tracking-widest">${escapeHtml(code)}</td>
               <td class="py-4 px-4 font-extrabold text-green-600">${disc}</td>
               <td class="py-4 px-4"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">${escapeHtml(type)}</span></td>
               <td class="py-4 px-4 font-bold text-gray-900">${uses}</td>
               <td class="py-4 px-4 text-gray-600">${escapeHtml(applies)}</td>
-              <td class="py-4 px-4 text-gray-500">${expires}</td>
+              <td class="py-4 px-4 text-gray-500 dark:text-gray-300">${expires}</td>
               <td class="py-4 px-4">${badge}</td>
               <td class="py-4 px-4 text-center space-x-1">
                 <button onclick="alert('Edit ${escapeHtml(code)}')" class="px-2.5 py-1 bg-gray-100 text-gray-700 font-bold rounded text-[11px]">Edit</button>
@@ -5872,7 +5872,7 @@ async function initAdminNewsPage() {
         currentNewsList = res.news;
         if (currentNewsList.length === 0) {
           tableBody.innerHTML = `
-            <tr class="hover:bg-gray-50/50 transition">
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
               <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No announcements posted yet.</td>
             </tr>
           `;
@@ -5892,7 +5892,7 @@ async function initAdminNewsPage() {
             : `<span class="px-2.5 py-0.5 text-[11px] font-bold text-gray-700 bg-gray-100 rounded-full">${escapeHtml(status)}</span>`;
 
           return `
-            <tr class="hover:bg-gray-50 border-b border-gray-100" data-id="${n.id}">
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60" data-id="${n.id}">
               <td class="px-6 py-3.5 font-bold text-gray-900">
                 <div>${escapeHtml(title)}</div>
                 <div class="text-xs font-normal text-gray-500 max-w-md truncate mt-0.5">${escapeHtml(content)}</div>
@@ -5992,7 +5992,7 @@ async function initAdminNewsPage() {
     } catch (e) {
       console.error('News load error:', e);
       tableBody.innerHTML = `
-        <tr class="hover:bg-gray-50/50 transition">
+        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
           <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No announcements posted yet.</td>
         </tr>
       `;
@@ -6078,7 +6078,7 @@ async function initAdminLogsPage() {
 
       if (logs.length === 0) {
         tableBody.innerHTML = `
-          <tr class="hover:bg-gray-50/50 transition">
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition">
             <td colspan="5" class="py-12 text-center text-gray-400 font-medium">No audit logs recorded yet.</td>
           </tr>
         `;
@@ -6093,7 +6093,7 @@ async function initAdminLogsPage() {
         const ip = l.ip_address || '—';
 
         return `
-          <tr class="hover:bg-gray-50 border-b border-gray-100">
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
             <td class="px-6 py-3.5 font-medium text-gray-900">${time}</td>
             <td class="px-6 py-3.5 text-pink-600 font-bold">${escapeHtml(user)}</td>
             <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-[11px] font-bold text-blue-700 bg-blue-100 rounded-full">${escapeHtml(action)}</span></td>

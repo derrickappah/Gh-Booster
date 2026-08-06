@@ -217,7 +217,7 @@
           <div class="min-w-0 pr-2">
             <h3 id="admin-dep-today" class="text-base font-bold text-pink-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate dark:text-gray-400">Today's Deposits</span>
-            <span id="admin-dep-today-count" class="text-[11px] text-gray-400 block mt-0.5 truncate">0 transactions</span>
+            <span id="admin-dep-today-count" class="text-[11px] text-gray-400 dark:text-gray-300 block mt-0.5 truncate">0 transactions</span>
           </div>
           <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -227,7 +227,7 @@
           <div class="min-w-0 pr-2">
             <h3 id="admin-dep-failed-count" class="text-base font-bold text-red-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate dark:text-gray-400">Rejected / Failed</span>
-            <span class="text-[11px] text-gray-400 block mt-0.5 truncate">All time</span>
+            <span class="text-[11px] text-gray-400 dark:text-gray-300 block mt-0.5 truncate">All time</span>
           </div>
           <div class="p-2.5 bg-red-50 text-red-600 rounded-lg flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -243,9 +243,9 @@
         </div>
         <div class="flex items-center space-x-2 text-xs font-semibold w-full md:w-auto justify-start md:justify-end overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5" id="dep-tabs">
           <button class="dep-tab px-3.5 py-2 bg-pink-600 text-white rounded-lg shadow-sm font-bold flex-shrink-0" data-tab="all">All</button>
-          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold flex-shrink-0 dark:text-gray-400" data-tab="pending">Pending</button>
-          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold flex-shrink-0 dark:text-gray-400" data-tab="completed">Approved</button>
-          <button class="dep-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg font-bold flex-shrink-0 dark:text-gray-400" data-tab="failed">Rejected</button>
+          <button class="dep-tab px-3.5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-bold flex-shrink-0 dark:text-gray-400" data-tab="pending">Pending</button>
+          <button class="dep-tab px-3.5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-bold flex-shrink-0 dark:text-gray-400" data-tab="completed">Approved</button>
+          <button class="dep-tab px-3.5 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-bold flex-shrink-0 dark:text-gray-400" data-tab="failed">Rejected</button>
           <button onclick="alert('Exporting deposits CSV...')" class="bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow transition flex items-center shrink-0 flex-shrink-0 whitespace-nowrap">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             Export CSV
