@@ -276,10 +276,7 @@ function isAdminUser(user) {
   if (!user) return false;
   if (user.is_admin === true) return true;
   const role = String(user.role || '').toLowerCase().trim();
-  if (role === 'admin' || role === 'super_admin' || role === 'superadmin' || role.includes('admin')) {
-    return true;
-  }
-  return false;
+  return role === 'admin' || role === 'super_admin' || role === 'superadmin';
 }
 
 function updateUserUI(user) {
