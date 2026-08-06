@@ -297,7 +297,7 @@
     // Custom logic
   };
 
-  // Dark Mode Toggle Logic
+  // Robust Mobile & Desktop Dark Mode Toggle Logic
   const initDarkMode = function () {
     const updateThemeIcons = function (isDark) {
       const sunIcons = document.querySelectorAll('#theme-icon-sun, .theme-icon-sun');
@@ -312,7 +312,7 @@
         else icon.classList.remove('hidden');
       });
 
-      const toggleBtns = document.querySelectorAll('#theme-toggle-btn, .theme-toggle-btn');
+      const toggleBtns = document.querySelectorAll('#theme-toggle-btn, .theme-toggle-btn, [data-theme-toggle]');
       toggleBtns.forEach(function (btn) {
         btn.setAttribute('aria-label', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
         btn.setAttribute('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
@@ -342,14 +342,49 @@
 
     applyTheme(isDarkMode ? 'dark' : 'light');
 
-    // Attach click handlers to theme toggle buttons
+    // Debounce toggle state for fast mobile taps
+    let lastToggleTime = 0;
+    const toggleTheme = function (e) {
+      if (e) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+      }
+      const now = Date.now();
+      if (now - lastToggleTime < 300) return; // Prevent double triggering on touchstart + click
+      lastToggleTime = now;
+
+      const nowDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('ghb_theme', nowDark ? 'dark' : 'light');
+      updateThemeIcons(nowDark);
+    };
+
+    // Direct event binding to all toggle buttons (crucial for mobile Safari/WebKit touch bubbling)
+    const bindToggleButtons = function () {
+      const toggleBtns = document.querySelectorAll('#theme-toggle-btn, .theme-toggle-btn, [data-theme-toggle]');
+      toggleBtns.forEach(function (btn) {
+        btn.style.cursor = 'pointer';
+        btn.style.webkitTapHighlightColor = 'transparent';
+        if (btn.dataset.themeBound === 'true') return;
+        btn.dataset.themeBound = 'true';
+        
+        btn.addEventListener('click', toggleTheme);
+        btn.addEventListener('touchend', toggleTheme);
+      });
+    };
+
+    // Bind immediately & on DOM ready
+    bindToggleButtons();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindToggleButtons);
+    } else {
+      setTimeout(bindToggleButtons, 100);
+    }
+
+    // Document fallback listener for dynamically added toggle buttons
     document.addEventListener('click', function (e) {
-      const toggleBtn = e.target.closest('#theme-toggle-btn, .theme-toggle-btn');
+      const toggleBtn = e.target.closest('#theme-toggle-btn, .theme-toggle-btn, [data-theme-toggle]');
       if (toggleBtn) {
-        e.preventDefault();
-        const nowDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('ghb_theme', nowDark ? 'dark' : 'light');
-        updateThemeIcons(nowDark);
+        toggleTheme(e);
       }
     });
 

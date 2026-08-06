@@ -2330,9 +2330,9 @@ async function initTicketsPage() {
       if (res.success && res.tickets) {
         tableBody.innerHTML = res.tickets.map(t => `
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
-            <td class="px-6 py-3.5 font-bold text-gray-900 font-mono text-xs">#${escapeHtml(String(t.id || ''))}</td>
-            <td class="px-6 py-3.5 font-medium text-gray-900">${escapeHtml(t.subject || '')}</td>
-            <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(new Date(t.created_at).toLocaleString())}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900 font-mono text-xs dark:text-white">#${escapeHtml(String(t.id || ''))}</td>
+            <td class="px-6 py-3.5 font-medium text-gray-900 dark:text-white">${escapeHtml(t.subject || '')}</td>
+            <td class="px-6 py-3.5 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(new Date(t.created_at).toLocaleString())}</td>
             <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-blue-100 text-blue-700">${escapeHtml(t.status || 'Open')}</span></td>
           </tr>
         `).join('');
@@ -2949,10 +2949,10 @@ async function initChildPanelPage() {
       if (res.success && res.panels) {
         tableBody.innerHTML = res.panels.map(p => `
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
-            <td class="px-6 py-3.5 font-bold text-gray-900">${escapeHtml(p.domain || '')}</td>
-            <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${parseFloat(p.price || 25).toFixed(2)}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900 dark:text-white">${escapeHtml(p.domain || '')}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900 dark:text-white">GH₵${parseFloat(p.price || 25).toFixed(2)}</td>
             <td class="px-6 py-3.5"><span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-yellow-100 text-yellow-700">${escapeHtml(p.status || '')}</span></td>
-            <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(new Date(p.created_at).toLocaleString())}</td>
+            <td class="px-6 py-3.5 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(new Date(p.created_at).toLocaleString())}</td>
           </tr>
         `).join('');
       }
@@ -3634,19 +3634,19 @@ async function initAdminDashboard() {
               <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition" data-order-id="${encodeURIComponent(o.id)}">
                 <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
                 <td class="py-4 px-4">
-                  <div class="font-bold text-gray-900">${escapeHtml(username)}</div>
+                  <div class="font-bold text-gray-900 dark:text-white">${escapeHtml(username)}</div>
                   <span class="text-[10px] text-gray-400 dark:text-gray-300">Balance: GH₵${userBal}</span>
                 </td>
                 <td class="py-4 px-4">
-                  <span class="font-semibold text-gray-900 flex items-center">
+                  <span class="font-semibold text-gray-900 flex items-center dark:text-white">
                     ${escapeHtml(serviceName)}
                   </span>
                 </td>
                 <td class="py-4 px-4">
                   <a href="${escapeHtml(o.link || '#')}" target="_blank" rel="noopener noreferrer" class="text-pink-600 hover:underline font-mono truncate block max-w-[140px]">${escapeHtml(o.link || 'N/A')}</a>
                 </td>
-                <td class="py-4 px-4 font-mono font-bold text-gray-900">${(o.quantity || 0).toLocaleString()}</td>
-                <td class="py-4 px-4 font-bold text-gray-900">GH₵${charge}</td>
+                <td class="py-4 px-4 font-mono font-bold text-gray-900 dark:text-white">${(o.quantity || 0).toLocaleString()}</td>
+                <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">GH₵${charge}</td>
                 <td class="py-4 px-4">
                   <select class="status-select py-1 px-2 border border-gray-200 font-bold rounded text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 bg-white" aria-label="Order status for order ${escapeHtml(shortId)}">
                     <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
@@ -4029,7 +4029,7 @@ async function initAdminOrdersPage() {
         const endIdx = Math.min(totalCount, adminOrdersCurrentPage * adminOrdersPageSize);
 
         if (paginationInfo) {
-          paginationInfo.innerHTML = `Showing <span class="font-bold text-gray-900">${startIdx}–${endIdx}</span> of <span class="font-bold text-gray-900">${totalCount.toLocaleString()}</span> entries`;
+          paginationInfo.innerHTML = `Showing <span class="font-bold text-gray-900 dark:text-white">${startIdx}–${endIdx}</span> of <span class="font-bold text-gray-900 dark:text-white">${totalCount.toLocaleString()}</span> entries`;
         }
 
         if (prevBtn) {
@@ -4154,9 +4154,9 @@ async function initAdminOrdersPage() {
           return `
             <tr class="admin-order-row hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100/50 dark:border-gray-700/50" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
               <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
-              <td class="py-4 px-4 font-bold text-gray-900">${escapeHtml(username)}</td>
+              <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">${escapeHtml(username)}</td>
               <td class="py-4 px-4">
-                <span class="font-semibold text-gray-900 flex items-center">
+                <span class="font-semibold text-gray-900 flex items-center dark:text-white">
                   <img src="${platformIcon}" alt="Platform" class="w-4 h-4 mr-1.5 object-contain flex-shrink-0" onerror="this.style.display='none'">
                   ${escapeHtml(serviceName)}
                 </span>
@@ -4166,11 +4166,11 @@ async function initAdminOrdersPage() {
                 <a href="${escapeHtml(targetLink)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 hover:underline font-mono truncate block max-w-[140px]">${escapeHtml(targetLink)}</a>
               </td>
               <td class="py-4 px-4 font-mono">
-                <span class="font-bold text-gray-900 block">${qty}</span>
+                <span class="font-bold text-gray-900 block dark:text-white">${qty}</span>
                 <span class="text-[10px] text-gray-400 dark:text-gray-300">${startCount} / ${remains}</span>
               </td>
               <td class="py-4 px-4 font-extrabold text-gray-900 dark:text-white">GH₵${charge}</td>
-              <td class="py-4 px-4 text-gray-500 text-xs">${escapeHtml(createdAt)}</td>
+              <td class="py-4 px-4 text-gray-500 text-xs dark:text-gray-400">${escapeHtml(createdAt)}</td>
               <td class="py-4 px-4">
                 <span class="px-2.5 py-1 ${getStatusBadgeClass(o.status)} rounded-full font-bold text-[11px] inline-flex items-center">
                   <span class="w-1.5 h-1.5 rounded-full ${dotStyle} mr-1.5 animate-pulse" aria-hidden="true"></span>
@@ -4178,7 +4178,7 @@ async function initAdminOrdersPage() {
                 </span>
               </td>
               <td class="py-4 px-4">
-                <select class="status-select py-1 px-2 border border-gray-300 text-gray-900 font-bold rounded text-xs focus:outline-none bg-white">
+                <select class="status-select py-1 px-2 border border-gray-300 text-gray-900 font-bold rounded text-xs focus:outline-none bg-white dark:text-white">
                   <option value="Pending" ${statusLower === 'pending' ? 'selected' : ''}>Pending</option>
                   <option value="In Progress" ${['in progress', 'in-progress', 'in_progress'].includes(statusLower) ? 'selected' : ''}>In progress</option>
                   <option value="Processing" ${statusLower === 'processing' ? 'selected' : ''}>Processing</option>
@@ -4527,13 +4527,13 @@ async function initAdminServicesPage() {
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60" data-id="${s.id}">
-              <td class="py-4 px-4 font-mono text-gray-500 text-xs font-bold">#${shortId}</td>
-              <td class="py-4 px-4 font-bold text-gray-900 text-xs">${s.name}</td>
+              <td class="py-4 px-4 font-mono text-gray-500 dark:text-gray-300 text-xs font-bold">#${shortId}</td>
+              <td class="py-4 px-4 font-bold text-gray-900 dark:text-white text-xs">${s.name}</td>
               <td class="py-4 px-4"><span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded text-[10px]">${catName}</span></td>
-              <td class="py-4 px-4 text-gray-600 text-xs">${providerName}</td>
+              <td class="py-4 px-4 text-gray-600 dark:text-gray-300 text-xs">${providerName}</td>
               <td class="py-4 px-4 font-extrabold text-green-600">GH₵${rate}</td>
-              <td class="py-4 px-4 text-xs">${(s.min_quantity || 10).toLocaleString()}</td>
-              <td class="py-4 px-4 text-xs">${(s.max_quantity || 100000).toLocaleString()}</td>
+              <td class="py-4 px-4 text-xs text-gray-800 dark:text-gray-200">${(s.min_quantity || 10).toLocaleString()}</td>
+              <td class="py-4 px-4 text-xs text-gray-800 dark:text-gray-200">${(s.max_quantity || 100000).toLocaleString()}</td>
               <td class="py-4 px-4">${statusBadge}</td>
               <td class="py-4 px-4 text-center relative">
                 <div class="inline-block text-left relative">
@@ -4800,9 +4800,9 @@ async function initAdminProvidersPage() {
 
           return `
             <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60" data-id="${p.id}">
-              <td class="py-4 px-4 font-bold text-gray-900">${p.name}</td>
-              <td class="py-4 px-4 font-mono text-gray-600 text-[11px]">${p.api_url}</td>
-              <td class="py-4 px-4 font-mono text-xs text-gray-500">${maskedKey}</td>
+              <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">${p.name}</td>
+              <td class="py-4 px-4 font-mono text-gray-600 dark:text-gray-300 text-[11px]">${p.api_url}</td>
+              <td class="py-4 px-4 font-mono text-xs text-gray-500 dark:text-gray-300">${maskedKey}</td>
               <td class="py-4 px-4 font-extrabold text-green-600">GH₵${bal}</td>
               <td class="py-4 px-4">${statusBadge}</td>
               <td class="py-4 px-4 text-center relative">
@@ -5127,9 +5127,9 @@ async function initAdminDepositsPage() {
               <td class="py-3.5 px-4 font-bold text-pink-600 font-mono text-xs">${refDisplay}</td>
               <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">${username}</td>
               <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded text-[10px] uppercase">${method}</span></td>
-              <td class="py-3.5 px-4 text-gray-500 font-mono text-xs max-w-xs truncate">${notes}</td>
+              <td class="py-3.5 px-4 text-gray-500 font-mono text-xs max-w-xs truncate dark:text-gray-400">${notes}</td>
               <td class="py-3.5 px-4 font-extrabold ${amtClass}">GH₵${amt}</td>
-              <td class="py-3.5 px-4 text-gray-500 text-xs">${dateFormatted}</td>
+              <td class="py-3.5 px-4 text-gray-500 text-xs dark:text-gray-400">${dateFormatted}</td>
               <td class="py-3.5 px-4"><span class="px-2.5 py-1 ${badgeClass} font-bold rounded-full text-[11px] capitalize">${statusText}</span></td>
               <td class="py-3.5 px-4 text-center relative">${actionButtons}</td>
             </tr>
@@ -5313,10 +5313,10 @@ async function initAdminTransactionsPage() {
               <td class="py-3.5 px-4 font-bold text-pink-600 font-mono text-xs">${ref}</td>
               <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">${user}</td>
               <td class="py-3.5 px-4">${typeBadge}</td>
-              <td class="py-3.5 px-4 text-gray-600 text-xs max-w-xs truncate">${desc}</td>
+              <td class="py-3.5 px-4 text-gray-600 text-xs max-w-xs truncate dark:text-gray-300">${desc}</td>
               <td class="py-3.5 px-4 font-extrabold ${amtClass}">${sign}GH₵${amt}</td>
               <td class="py-3.5 px-4 font-bold text-gray-900 dark:text-white">GH₵${bal}</td>
-              <td class="py-3.5 px-4 text-gray-500 text-xs">${date}</td>
+              <td class="py-3.5 px-4 text-gray-500 text-xs dark:text-gray-400">${date}</td>
               <td class="py-3.5 px-4"><span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded text-[10px] capitalize">${status}</span></td>
             </tr>
           `;
@@ -5405,7 +5405,7 @@ async function initAdminTicketsPage() {
         } else if (status === 'replied') {
           badge = `<span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">Replied</span>`;
         } else if (status === 'closed') {
-          badge = `<span class="px-2 py-0.5 bg-gray-100 text-gray-600 font-bold rounded text-[10px]">Closed</span>`;
+          badge = `<span class="px-2 py-0.5 bg-gray-100 text-gray-600 font-bold rounded text-[10px] dark:text-gray-300">Closed</span>`;
         }
 
         return `
@@ -5414,7 +5414,7 @@ async function initAdminTicketsPage() {
               <span class="text-xs font-extrabold text-pink-600">#${id}</span>
               ${badge}
             </div>
-            <p class="text-xs font-bold text-gray-900 leading-snug">${escapeHtml(subj)}</p>
+            <p class="text-xs font-bold text-gray-900 leading-snug dark:text-white">${escapeHtml(subj)}</p>
             <div class="flex items-center justify-between text-[11px] text-gray-400">
               <span>${escapeHtml(user)}</span>
               <span>${date}</span>
@@ -5463,7 +5463,7 @@ async function initAdminReferralsPage() {
       }
 
       tableBody.innerHTML = list.map((r, idx) => {
-        let rankBadge = `<span class="font-bold text-gray-500 text-xs">#${idx + 1}</span>`;
+        let rankBadge = `<span class="font-bold text-gray-500 text-xs dark:text-gray-400">#${idx + 1}</span>`;
         if (idx === 0) rankBadge = `<span class="text-yellow-500 font-extrabold text-base">🥇</span>`;
         else if (idx === 1) rankBadge = `<span class="text-gray-400 font-extrabold text-base">🥈</span>`;
         else if (idx === 2) rankBadge = `<span class="text-orange-400 font-extrabold text-base">🥉</span>`;
@@ -5477,8 +5477,8 @@ async function initAdminReferralsPage() {
         return `
           <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100 dark:border-gray-700/60">
             <td class="py-4 px-4">${rankBadge}</td>
-            <td class="py-4 px-4 font-bold text-gray-900">${escapeHtml(username)}</td>
-            <td class="py-4 px-4 font-bold text-gray-900">${count}</td>
+            <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">${escapeHtml(username)}</td>
+            <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">${count}</td>
             <td class="py-4 px-4 font-bold text-green-600">${activeCount}</td>
             <td class="py-4 px-4 font-extrabold text-green-600">GH₵${comms}</td>
             <td class="py-4 px-4 text-gray-500 dark:text-gray-300">${lastRef}</td>
@@ -5553,12 +5553,12 @@ async function initAdminChildPanelsPage() {
         return `
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
             <td class="px-6 py-3.5 font-bold text-pink-600">${escapeHtml(domain)}</td>
-            <td class="px-6 py-3.5 font-bold text-gray-900">${escapeHtml(owner)}</td>
-            <td class="px-6 py-3.5 font-bold text-gray-900">GH₵${fee}</td>
-            <td class="px-6 py-3.5 text-xs text-gray-500">${renewal}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900 dark:text-white">${escapeHtml(owner)}</td>
+            <td class="px-6 py-3.5 font-bold text-gray-900 dark:text-white">GH₵${fee}</td>
+            <td class="px-6 py-3.5 text-xs text-gray-500 dark:text-gray-400">${renewal}</td>
             <td class="px-6 py-3.5">${badge}</td>
             <td class="px-6 py-3.5">
-              <button onclick="alert('Managing ${escapeHtml(domain)}')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-3 py-1 rounded transition">Manage</button>
+              <button onclick="alert('Managing ${escapeHtml(domain)}')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-3 py-1 rounded transition dark:text-gray-200">Manage</button>
             </td>
           </tr>
         `;
@@ -5620,11 +5620,11 @@ async function initAdminBonusesPage() {
                   <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
                 </label>
               </div>
-              <p class="text-xs text-gray-600 leading-relaxed">${escapeHtml(desc)}</p>
+              <p class="text-xs text-gray-600 leading-relaxed dark:text-gray-300">${escapeHtml(desc)}</p>
               <div class="text-xs space-y-1.5 border-t border-gray-100 pt-3">
-                <div class="flex justify-between"><span class="text-gray-500">Bonus Rate</span><span class="font-bold text-pink-600">${pct}%</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Min Deposit</span><span class="font-bold text-gray-900">GH₵${minAmt}</span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Gateway</span><span class="font-bold text-gray-900">${escapeHtml(gateway)}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">Bonus Rate</span><span class="font-bold text-pink-600">${pct}%</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">Min Deposit</span><span class="font-bold text-gray-900 dark:text-white">GH₵${minAmt}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">Gateway</span><span class="font-bold text-gray-900 dark:text-white">${escapeHtml(gateway)}</span></div>
               </div>
               <button onclick="alert('Managing ${escapeHtml(name)}')" class="w-full py-2 bg-slate-900 hover:bg-gray-800 text-white text-xs font-bold rounded-lg transition">Manage Bonus</button>
             </div>
@@ -5730,7 +5730,7 @@ async function initAdminPromotionsPage() {
 
           let badge = `<span class="px-2.5 py-1 bg-green-100 text-green-700 font-bold rounded-full text-[11px]">Active</span>`;
           if (status === 'expired' || (p.expires_at && new Date(p.expires_at) < now)) {
-            badge = `<span class="px-2.5 py-1 bg-gray-100 text-gray-600 font-bold rounded-full text-[11px]">Expired</span>`;
+            badge = `<span class="px-2.5 py-1 bg-gray-100 text-gray-600 font-bold rounded-full text-[11px] dark:text-gray-300">Expired</span>`;
           } else if (status === 'inactive') {
             badge = `<span class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-full text-[11px]">Disabled</span>`;
           }
@@ -5740,12 +5740,12 @@ async function initAdminPromotionsPage() {
               <td class="py-4 px-4 font-mono font-extrabold text-pink-600 text-sm tracking-widest">${escapeHtml(code)}</td>
               <td class="py-4 px-4 font-extrabold text-green-600">${disc}</td>
               <td class="py-4 px-4"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded text-[10px]">${escapeHtml(type)}</span></td>
-              <td class="py-4 px-4 font-bold text-gray-900">${uses}</td>
-              <td class="py-4 px-4 text-gray-600">${escapeHtml(applies)}</td>
+              <td class="py-4 px-4 font-bold text-gray-900 dark:text-white">${uses}</td>
+              <td class="py-4 px-4 text-gray-600 dark:text-gray-300">${escapeHtml(applies)}</td>
               <td class="py-4 px-4 text-gray-500 dark:text-gray-300">${expires}</td>
               <td class="py-4 px-4">${badge}</td>
               <td class="py-4 px-4 text-center space-x-1">
-                <button onclick="alert('Edit ${escapeHtml(code)}')" class="px-2.5 py-1 bg-gray-100 text-gray-700 font-bold rounded text-[11px]">Edit</button>
+                <button onclick="alert('Edit ${escapeHtml(code)}')" class="px-2.5 py-1 bg-gray-100 text-gray-700 font-bold rounded text-[11px] dark:text-gray-300">Edit</button>
               </td>
             </tr>
           `;
@@ -5889,16 +5889,16 @@ async function initAdminNewsPage() {
 
           const statusBadge = status.toLowerCase() === 'active'
             ? `<span class="px-2.5 py-0.5 text-[11px] font-bold text-green-700 bg-green-100 rounded-full">${escapeHtml(status)}</span>`
-            : `<span class="px-2.5 py-0.5 text-[11px] font-bold text-gray-700 bg-gray-100 rounded-full">${escapeHtml(status)}</span>`;
+            : `<span class="px-2.5 py-0.5 text-[11px] font-bold text-gray-700 bg-gray-100 rounded-full dark:text-gray-300">${escapeHtml(status)}</span>`;
 
           return `
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60" data-id="${n.id}">
-              <td class="px-6 py-3.5 font-bold text-gray-900">
+              <td class="px-6 py-3.5 font-bold text-gray-900 dark:text-white">
                 <div>${escapeHtml(title)}</div>
-                <div class="text-xs font-normal text-gray-500 max-w-md truncate mt-0.5">${escapeHtml(content)}</div>
+                <div class="text-xs font-normal text-gray-500 max-w-md truncate mt-0.5 dark:text-gray-400">${escapeHtml(content)}</div>
               </td>
-              <td class="px-6 py-3.5 text-xs text-gray-600 font-medium">${escapeHtml(target)}</td>
-              <td class="px-6 py-3.5 text-xs text-gray-500">${escapeHtml(date)}</td>
+              <td class="px-6 py-3.5 text-xs text-gray-600 font-medium dark:text-gray-300">${escapeHtml(target)}</td>
+              <td class="px-6 py-3.5 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(date)}</td>
               <td class="px-6 py-3.5">${statusBadge}</td>
               <td class="px-6 py-3.5 text-center relative">
                 <div class="inline-block text-left relative">
@@ -6094,10 +6094,10 @@ async function initAdminLogsPage() {
 
         return `
           <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 border-b border-gray-100 dark:border-gray-700/60">
-            <td class="px-6 py-3.5 font-medium text-gray-900">${time}</td>
+            <td class="px-6 py-3.5 font-medium text-gray-900 dark:text-white">${time}</td>
             <td class="px-6 py-3.5 text-pink-600 font-bold">${escapeHtml(user)}</td>
             <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-[11px] font-bold text-blue-700 bg-blue-100 rounded-full">${escapeHtml(action)}</span></td>
-            <td class="px-6 py-3.5 text-xs text-gray-700 max-w-xs truncate">${escapeHtml(details)}</td>
+            <td class="px-6 py-3.5 text-xs text-gray-700 max-w-xs truncate dark:text-gray-300">${escapeHtml(details)}</td>
             <td class="px-6 py-3.5 font-mono text-xs text-gray-400">${escapeHtml(ip)}</td>
           </tr>
         `;
