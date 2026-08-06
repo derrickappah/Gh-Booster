@@ -3967,21 +3967,22 @@ async function initAdminOrdersPage() {
           else if (svcLower.includes('spotify')) platformIcon = 'src/img/platforms/spotify.png';
 
           let dotStyle = 'bg-gray-500';
-          if (statusLower === 'completed') dotStyle = 'bg-green-500';
+          if (statusLower === 'pending') dotStyle = 'bg-yellow-500';
+          else if (['in progress', 'in-progress', 'in_progress'].includes(statusLower)) dotStyle = 'bg-purple-500';
           else if (statusLower === 'processing') dotStyle = 'bg-blue-500';
-          else if (statusLower === 'in progress' || statusLower === 'in-progress') dotStyle = 'bg-purple-500';
-          else if (statusLower === 'pending') dotStyle = 'bg-yellow-500';
+          else if (statusLower === 'completed') dotStyle = 'bg-green-500';
           else if (statusLower === 'partial') dotStyle = 'bg-orange-500';
-          else if (statusLower === 'canceled' || statusLower === 'refunded') dotStyle = 'bg-red-500';
+          else if (['canceled', 'cancelled'].includes(statusLower)) dotStyle = 'bg-red-500';
+          else if (['refunded', 'refunds'].includes(statusLower)) dotStyle = 'bg-rose-500';
 
           let statusDisplay = status;
-          if (statusLower === 'in-progress' || statusLower === 'in progress') statusDisplay = 'In Progress';
+          if (statusLower === 'pending') statusDisplay = 'Pending';
+          else if (['in-progress', 'in progress', 'in_progress'].includes(statusLower)) statusDisplay = 'In progress';
           else if (statusLower === 'processing') statusDisplay = 'Processing';
-          else if (statusLower === 'pending') statusDisplay = 'Pending';
           else if (statusLower === 'completed') statusDisplay = 'Completed';
-          else if (statusLower === 'canceled') statusDisplay = 'Canceled';
-          else if (statusLower === 'refunded') statusDisplay = 'Refunded';
           else if (statusLower === 'partial') statusDisplay = 'Partial';
+          else if (['canceled', 'cancelled'].includes(statusLower)) statusDisplay = 'Canceled';
+          else if (['refunded', 'refunds'].includes(statusLower)) statusDisplay = 'Refunds';
 
           return `
             <tr class="admin-order-row hover:bg-gray-50/50 transition" data-order-id="${encodeURIComponent(o.id)}" data-status="${escapeHtml(statusLower)}">
@@ -4011,26 +4012,73 @@ async function initAdminOrdersPage() {
               </td>
               <td class="py-4 px-4">
                 <select class="status-select py-1 px-2 border border-gray-300 text-gray-900 font-bold rounded text-xs focus:outline-none bg-white">
-                  <option value="Processing" ${statusLower === 'processing' ? 'selected' : ''}>Processing</option>
-                  <option value="In Progress" ${['in progress', 'in-progress'].includes(statusLower) ? 'selected' : ''}>In Progress</option>
                   <option value="Pending" ${statusLower === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="In Progress" ${['in progress', 'in-progress', 'in_progress'].includes(statusLower) ? 'selected' : ''}>In progress</option>
+                  <option value="Processing" ${statusLower === 'processing' ? 'selected' : ''}>Processing</option>
                   <option value="Completed" ${statusLower === 'completed' ? 'selected' : ''}>Completed</option>
                   <option value="Partial" ${statusLower === 'partial' ? 'selected' : ''}>Partial</option>
-                  <option value="Canceled" ${['canceled', 'refunded'].includes(statusLower) ? 'selected' : ''}>Canceled &amp; Refund</option>
+                  <option value="Canceled" ${['canceled', 'cancelled'].includes(statusLower) ? 'selected' : ''}>Canceled</option>
+                  <option value="Refunded" ${['refunded', 'refunds'].includes(statusLower) ? 'selected' : ''}>Refunds</option>
                 </select>
               </td>
-              <td class="py-4 px-4 text-center space-x-1">
-                <button type="button" class="save-status-btn px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded text-[11px] transition">Save</button>
-                <button type="button" class="refund-btn px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded text-[11px] transition">Refund</button>
+              <td class="py-4 px-4 text-center relative">
+                <div class="inline-block text-left relative">
+                  <button type="button" class="order-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none" aria-label="Actions for order #${escapeHtml(shortId)}" title="Order Actions">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                  <div class="order-actions-menu hidden absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
+                    <div class="py-1">
+                      <button type="button" data-action="save-status" data-id="${o.id}" class="save-status-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Save Override Status
+                      </button>
+                    </div>
+                    <div class="py-1">
+                      <button type="button" data-action="refund" data-id="${o.id}" class="refund-btn w-full text-left px-3.5 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                        </svg>
+                        Cancel &amp; Refund Order
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           `;
         }).join('');
 
-        // Event listener for Save Status buttons
+        // Toggle 3-dots action menu dropdown
+        tableBody.querySelectorAll('.order-actions-toggle').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMenu = btn.nextElementSibling;
+            const isHidden = currentMenu.classList.contains('hidden');
+            document.querySelectorAll('.order-actions-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) {
+              currentMenu.classList.remove('hidden');
+            }
+          });
+        });
+
+        // Close dropdown when clicking outside
+        if (!window.__orderDropdownOutsideClickBound) {
+          window.__orderDropdownOutsideClickBound = true;
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.order-actions-menu').forEach(m => m.classList.add('hidden'));
+          });
+        }
+
+        // Event listener for Save Status buttons inside 3-dots menu
         tableBody.querySelectorAll('.save-status-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const tr = e.target.closest('tr');
+            const menu = btn.closest('.order-actions-menu');
+            if (menu) menu.classList.add('hidden');
             const orderId = decodeURIComponent(tr.getAttribute('data-order-id') || '');
             const select = tr.querySelector('.status-select');
             const newStatus = select ? select.value : 'Completed';
@@ -4045,10 +4093,12 @@ async function initAdminOrdersPage() {
           });
         });
 
-        // Event listener for Refund buttons
+        // Event listener for Refund buttons inside 3-dots menu
         tableBody.querySelectorAll('.refund-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const tr = e.target.closest('tr');
+            const menu = btn.closest('.order-actions-menu');
+            if (menu) menu.classList.add('hidden');
             const orderId = decodeURIComponent(tr.getAttribute('data-order-id') || '');
             if (!confirm(`Are you sure you want to cancel and refund Order #${orderId.substring(0, 8)}?`)) return;
             try {
@@ -4099,10 +4149,13 @@ async function initAdminOrdersPage() {
         if (currentStatusFilter !== 'all') {
           filtered = filtered.filter(o => {
             const st = (o.status || '').toLowerCase();
-            if (currentStatusFilter === 'in-progress') return ['in progress', 'in-progress', 'processing'].includes(st);
             if (currentStatusFilter === 'pending') return st === 'pending';
+            if (currentStatusFilter === 'in-progress') return ['in progress', 'in-progress', 'in_progress'].includes(st);
+            if (currentStatusFilter === 'processing') return st === 'processing';
             if (currentStatusFilter === 'completed') return st === 'completed';
-            if (currentStatusFilter === 'canceled') return ['canceled', 'refunded'].includes(st);
+            if (currentStatusFilter === 'partial') return st === 'partial';
+            if (currentStatusFilter === 'canceled') return ['canceled', 'cancelled'].includes(st);
+            if (currentStatusFilter === 'refunded') return ['refunded', 'refunds'].includes(st);
             return true;
           });
         }
@@ -6562,15 +6615,19 @@ async function initOrderDetailPage() {
 }
 
 function getStatusBadgeClass(status) {
-  switch (String(status || '').toLowerCase()) {
-    case 'completed':  return 'text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/40';
-    case 'processing': return 'text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/40';
-    case 'in progress': return 'text-purple-700 bg-purple-100 dark:text-purple-300 dark:bg-purple-900/40';
-    case 'pending':    return 'text-yellow-700 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900/40';
-    case 'partial':    return 'text-orange-700 bg-orange-100 dark:text-orange-300 dark:bg-orange-900/40';
-    case 'canceled':   return 'text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/40';
-    case 'refunded':   return 'text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/40';
-    default:           return 'text-gray-700 bg-gray-100 dark:text-gray-300 dark:bg-gray-700';
+  switch (String(status || '').toLowerCase().trim()) {
+    case 'completed':   return 'text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/40';
+    case 'processing':  return 'text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/40';
+    case 'in progress':
+    case 'in-progress':
+    case 'in_progress': return 'text-purple-700 bg-purple-100 dark:text-purple-300 dark:bg-purple-900/40';
+    case 'pending':     return 'text-yellow-700 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900/40';
+    case 'partial':     return 'text-orange-700 bg-orange-100 dark:text-orange-300 dark:bg-orange-900/40';
+    case 'canceled':
+    case 'cancelled':   return 'text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/40';
+    case 'refunded':
+    case 'refunds':     return 'text-rose-700 bg-rose-100 dark:text-rose-300 dark:bg-rose-900/40';
+    default:            return 'text-gray-700 bg-gray-100 dark:text-gray-300 dark:bg-gray-700';
   }
 }
 
