@@ -367,6 +367,68 @@ class AdminService {
     return { success: true, refilled_count: count, message: count > 0 ? `Batch refill requested for ${count} active orders.` : 'No active orders requiring refill.' };
   }
 
+  static async syncSingleOrder(orderId) {
+    const OrderService = require('./orderService');
+    const SmmgenService = require('./smmgenService');
+
+    const { data: order, error } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('id', orderId)
+      .maybeSingle();
+
+    if (error || !order) throw new Error('Order not found');
+    if (!order.provider_order_id) {
+      return { success: true, message: 'Order has no external provider ID to sync.', order };
+    }
+
+    const providerStatusRes = await SmmgenService.getOrderStatus(order.provider_order_id);
+    if (!providerStatusRes || providerStatusRes.error) {
+      throw new Error(providerStatusRes?.error || 'Provider returned an error during status check');
+    }
+
+    let newStatus = OrderService.normalizeProviderStatus(providerStatusRes.status || order.status);
+    const newStartCount = providerStatusRes.start_count !== undefined && providerStatusRes.start_count !== null
+      ? parseInt(providerStatusRes.start_count, 10)
+      : order.start_count;
+    const newRemains = providerStatusRes.remains !== undefined && providerStatusRes.remains !== null
+      ? parseInt(providerStatusRes.remains, 10)
+      : order.remains;
+
+    const isRefundableStatus = ['Canceled', 'Refunded', 'Partial'].includes(newStatus);
+
+    await supabaseAdmin
+      .from('orders')
+      .update({
+        status: newStatus,
+        start_count: newStartCount,
+        remains: newRemains,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', order.id);
+
+    if (isRefundableStatus) {
+      await OrderService.processOrderRefund({
+        order: { ...order, status: newStatus, start_count: newStartCount, remains: newRemains },
+        newStatus,
+        remains: newRemains,
+        startCount: newStartCount
+      });
+    }
+
+    return {
+      success: true,
+      message: `Order #${String(order.id).substring(0, 8)} synced! Status: ${newStatus}`,
+      order: { ...order, status: newStatus, start_count: newStartCount, remains: newRemains }
+    };
+  }
+
+  static async syncAllOrders() {
+    const OrderService = require('./orderService');
+    const count = await OrderService.syncAllNonFinalizedOrders();
+    return { success: true, message: `Synced ${count} active order(s) with provider APIs!`, count };
+  }
+
   static async getAllServices() {
     const { data: services, error } = await supabaseAdmin
       .from('services')

@@ -4038,6 +4038,14 @@ async function initAdminOrdersPage() {
                       </button>
                     </div>
                     <div class="py-1">
+                      <button type="button" data-action="sync-order" data-id="${o.id}" class="sync-order-btn w-full text-left px-3.5 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Sync with Provider
+                      </button>
+                    </div>
+                    <div class="py-1">
                       <button type="button" data-action="refund" data-id="${o.id}" class="refund-btn w-full text-left px-3.5 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 transition flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
@@ -4093,6 +4101,29 @@ async function initAdminOrdersPage() {
           });
         });
 
+        // Event listener for Sync Single Order buttons inside 3-dots menu
+        tableBody.querySelectorAll('.sync-order-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const tr = e.target.closest('tr');
+            const menu = btn.closest('.order-actions-menu');
+            if (menu) menu.classList.add('hidden');
+            const orderId = decodeURIComponent(tr.getAttribute('data-order-id') || '');
+            
+            try {
+              btn.disabled = true;
+              const syncRes = await API.request(`/admin/orders/${orderId}/sync`, 'POST');
+              const msg = syncRes.message || 'Order synced successfully with provider API!';
+              if (typeof showToast === 'function') showToast(msg, 'success');
+              else alert(msg);
+              initAdminOrdersPage();
+            } catch (err) {
+              alert(err.message || 'Failed to sync order with provider API');
+            } finally {
+              btn.disabled = false;
+            }
+          });
+        });
+
         // Event listener for Refund buttons inside 3-dots menu
         tableBody.querySelectorAll('.refund-btn').forEach(btn => {
           btn.addEventListener('click', async (e) => {
@@ -4110,6 +4141,39 @@ async function initAdminOrdersPage() {
               alert(err.message || 'Failed to refund order');
             }
           });
+        });
+      }
+
+      // Sync All Orders Button Handler
+      const syncAllOrdersBtn = document.getElementById('btn-sync-all-orders');
+      if (syncAllOrdersBtn && !syncAllOrdersBtn.__bound) {
+        syncAllOrdersBtn.__bound = true;
+        syncAllOrdersBtn.addEventListener('click', async () => {
+          try {
+            syncAllOrdersBtn.disabled = true;
+            syncAllOrdersBtn.innerHTML = `
+              <svg class="animate-spin h-4 w-4 mr-1.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Syncing...
+            `;
+            const syncRes = await API.request('/admin/orders/sync', 'POST');
+            const msg = syncRes.message || `Successfully synced ${syncRes.count || 0} order(s) with provider APIs!`;
+            if (typeof showToast === 'function') showToast(msg, 'success');
+            else alert(msg);
+            initAdminOrdersPage();
+          } catch (err) {
+            alert('Failed to sync orders: ' + (err.message || 'Unknown error'));
+          } finally {
+            syncAllOrdersBtn.disabled = false;
+            syncAllOrdersBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Sync Orders
+            `;
+          }
         });
       }
 

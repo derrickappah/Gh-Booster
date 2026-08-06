@@ -33,6 +33,8 @@ router.get('/orders', AdminController.getOrders);
 router.post('/orders/status', validate(adminUpdateOrderStatusSchema), AdminController.updateOrderStatus);
 router.put('/orders/:orderId/status', validate(adminUpdateOrderStatusSchema), AdminController.updateOrderStatus);
 router.post('/orders/batch-refill', AdminController.batchRefillOrders);
+router.post('/orders/sync', AdminController.syncOrders);
+router.post('/orders/:orderId/sync', AdminController.syncOrders);
 
 // Services & Categories
 router.get('/services', AdminController.getServices);

@@ -130,6 +130,21 @@ class AdminController {
     }
   }
 
+  static async syncOrders(req, res, next) {
+    try {
+      const orderId = req.params.orderId || req.body.orderId;
+      if (orderId) {
+        const result = await AdminService.syncSingleOrder(orderId);
+        res.json({ success: true, ...result });
+      } else {
+        const result = await AdminService.syncAllOrders();
+        res.json({ success: true, ...result });
+      }
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
   static async getServices(req, res, next) {
     try {
       const services = await AdminService.getAllServices();
