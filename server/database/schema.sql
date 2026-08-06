@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     remains INT DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'Processing' CHECK (status IN ('Pending', 'Processing', 'In Progress', 'Completed', 'Partial', 'Canceled', 'Refunded')),
     provider_order_id TEXT,
+    comments TEXT,
     refunded_amount NUMERIC(12, 4) DEFAULT 0.0000 CHECK (refunded_amount >= 0),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

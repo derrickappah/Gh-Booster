@@ -774,8 +774,48 @@ async function initDashboardPage() {
   const selectedSvcLimits = document.getElementById('selected-svc-limits');
   const selectedSvcDesc = document.getElementById('selected-svc-desc');
 
+  const customCommentsGroup = document.getElementById('custom-comments-group');
+  const customCommentsInput = document.getElementById('custom-comments-input');
+  const customCommentsCountMsg = document.getElementById('custom-comments-count-msg');
+
   let allCategories = [];
   let selectedService = null;
+
+  function isCustomCommentsService(s) {
+    if (!s) return false;
+    const name = (s.name || '').toLowerCase();
+    const type = (s.service_type || '').toLowerCase();
+    const desc = (s.description || '').toLowerCase();
+    return (
+      (name.includes('custom') && (name.includes('comment') || name.includes('comments'))) ||
+      (type.includes('custom') && (type.includes('comment') || type.includes('comments'))) ||
+      desc.includes('type the comments')
+    );
+  }
+
+  function updateCommentsQuantity() {
+    if (!selectedService || !isCustomCommentsService(selectedService)) return;
+    if (!customCommentsInput) return;
+
+    const text = customCommentsInput.value || '';
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const count = lines.length;
+
+    if (customCommentsCountMsg) {
+      customCommentsCountMsg.textContent = `${count} comment(s) detected`;
+    }
+
+    if (qtyInput) {
+      if (count > 0) {
+        qtyInput.value = count;
+      }
+      updateCharge();
+    }
+  }
+
+  if (customCommentsInput) {
+    customCommentsInput.addEventListener('input', updateCommentsQuantity);
+  }
 
   // Load services and categories from live database
   try {
@@ -847,6 +887,17 @@ async function initDashboardPage() {
       if (selectedSvcMax) selectedSvcMax.textContent = max;
       if (selectedSvcDesc) selectedSvcDesc.textContent = s.description || 'Fast automated delivery with refill guarantee.';
       selectedServiceCard.classList.remove('hidden');
+    }
+
+    if (customCommentsGroup) {
+      if (isCustomCommentsService(s)) {
+        customCommentsGroup.classList.remove('hidden');
+        updateCommentsQuantity();
+      } else {
+        customCommentsGroup.classList.add('hidden');
+        if (customCommentsInput) customCommentsInput.value = '';
+        if (customCommentsCountMsg) customCommentsCountMsg.textContent = '0 comment(s) detected';
+      }
     }
 
     if (qtyInput) {
@@ -965,7 +1016,16 @@ async function initDashboardPage() {
     const rate = parseFloat(selectedService.rate_per_1000 || selectedService.our_price_per_1000 || selectedService.rate_per_1k || selectedService.rate || 0);
     const minQty = parseInt(selectedService.min_quantity || selectedService.min || 1, 10);
     const maxQty = parseInt(selectedService.max_quantity || selectedService.max || 1000000, 10);
-    const qty = parseInt(qtyInput.value || 0, 10);
+    let qty = parseInt(qtyInput.value || 0, 10);
+
+    if (isCustomCommentsService(selectedService) && customCommentsInput) {
+      const text = customCommentsInput.value || '';
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length > 0) {
+        qty = lines.length;
+      }
+    }
+
     const validationMsg = document.getElementById('quantity-validation-msg');
 
     if (qty > 0 && minQty && qty < minQty) {
@@ -995,8 +1055,22 @@ async function initDashboardPage() {
       const service_id = serviceSelect ? serviceSelect.value : null;
       const linkInput = document.getElementById('link') || orderForm.querySelector('input[name="link"]');
       const link = linkInput ? linkInput.value.trim() : '';
-      const quantity = qtyInput ? parseInt(qtyInput.value, 10) : 0;
+      let quantity = qtyInput ? parseInt(qtyInput.value, 10) : 0;
       const orderSubmitBtn = document.getElementById('order-submit-btn');
+
+      let commentsVal = null;
+      if (selectedService && isCustomCommentsService(selectedService)) {
+        const text = customCommentsInput ? customCommentsInput.value.trim() : '';
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) {
+          showToast('Please enter your custom comments (one comment per line).', 'warning');
+          if (customCommentsInput) customCommentsInput.focus();
+          return;
+        }
+        commentsVal = lines.join('\n');
+        quantity = lines.length;
+        if (qtyInput) qtyInput.value = quantity;
+      }
 
       if (!service_id || !link || !quantity || isNaN(quantity) || quantity <= 0) {
         showToast('Please select a service, target link, and valid quantity.', 'warning');
@@ -1018,7 +1092,10 @@ async function initDashboardPage() {
       }
 
       try {
-        const res = await API.request('/orders', 'POST', { service_id, link, quantity });
+        const orderPayload = { service_id, link, quantity };
+        if (commentsVal) orderPayload.comments = commentsVal;
+
+        const res = await API.request('/orders', 'POST', orderPayload);
         showToast(`🎉 ${res.message || 'Order placed successfully!'} Order ID: #${res.order_id}`, 'success');
         const user = API.getUser();
         if (user && res.new_balance !== undefined) {

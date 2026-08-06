@@ -23,7 +23,8 @@ const createOrderSchema = z.object({
   service_id: z.string().min(1, 'Service ID is required'),
   link: z.string().url('Link must be a valid URL').or(z.string().min(5, 'Valid link required')),
   quantity: z.number().int().positive('Quantity must be greater than 0').max(10000000, 'Quantity too large')
-    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive('Quantity must be greater than 0').max(10000000, 'Quantity too large')))
+    .or(z.string().transform(v => parseInt(v, 10)).pipe(z.number().int().positive('Quantity must be greater than 0').max(10000000, 'Quantity too large'))),
+  comments: z.string().optional().nullable()
 });
 
 const depositSchema = z.object({

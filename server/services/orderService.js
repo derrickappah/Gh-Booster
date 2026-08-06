@@ -228,7 +228,7 @@ class OrderService {
     return updatedCount;
   }
 
-  static async createOrder({ userId, serviceId, link, quantity, batchId, skipWalletDeduction = false }) {
+  static async createOrder({ userId, serviceId, link, quantity, comments = null, batchId, skipWalletDeduction = false }) {
     const qty = parseInt(quantity, 10);
     if (!qty || qty <= 0) {
       throw new Error('Valid quantity greater than 0 is required');
@@ -277,21 +277,26 @@ class OrderService {
     // Step 2: Insert initial order into database FIRST before calling external provider
     let newOrder;
     const initialStatus = service.provider_service_id ? 'Processing' : 'Pending';
+    const insertPayload = {
+      user_id: userId,
+      service_id: serviceId,
+      batch_id: batchId || null,
+      link: link,
+      quantity: qty,
+      charge: totalCharge,
+      status: initialStatus,
+      start_count: 0,
+      remains: qty,
+      provider_order_id: null
+    };
+    if (comments) {
+      insertPayload.comments = comments;
+    }
+
     try {
       const { data: orderData, error: oErr } = await supabaseAdmin
         .from('orders')
-        .insert({
-          user_id: userId,
-          service_id: serviceId,
-          batch_id: batchId || null,
-          link: link,
-          quantity: qty,
-          charge: totalCharge,
-          status: initialStatus,
-          start_count: 0,
-          remains: qty,
-          provider_order_id: null
-        })
+        .insert(insertPayload)
         .select()
         .single();
 
@@ -320,6 +325,7 @@ class OrderService {
           providerServiceId: service.provider_service_id,
           link: link,
           quantity: qty,
+          comments: comments || null,
           providerId: service.provider_id
         });
 

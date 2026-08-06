@@ -100,20 +100,24 @@ class SmmgenService {
     }
   }
 
-  static async placeOrder({ providerServiceId, link, quantity, providerId = null }) {
+  static async placeOrder({ providerServiceId, link, quantity, comments = null, providerId = null }) {
     try {
       const { url, key } = await SmmgenService._getCredentials(providerId);
       if (!key) return { error: 'SMMGen API key not configured' };
+      const bodyPayload = {
+        key,
+        action: 'add',
+        service: providerServiceId,
+        link: link,
+        quantity: quantity
+      };
+      if (comments) {
+        bodyPayload.comments = comments;
+      }
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          key,
-          action: 'add',
-          service: providerServiceId,
-          link: link,
-          quantity: quantity
-        })
+        body: JSON.stringify(bodyPayload)
       });
       let data;
       try {

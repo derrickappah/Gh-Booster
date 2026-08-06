@@ -25,7 +25,8 @@ class OrderController {
         userId: req.user.id,
         serviceId: req.body.service_id,
         link: req.body.link,
-        quantity: req.body.quantity
+        quantity: req.body.quantity,
+        comments: req.body.comments || null
       });
       res.json({ success: true, message: 'Order placed successfully!', ...result });
     } catch (err) {
