@@ -32,7 +32,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/src/img/favicon.png?v=5">
   <link rel="shortcut icon" href="/favicon.ico?v=5">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:text-gray-200">
 
   <!-- Admin Sidebar -->
     <!-- Sidebar -->
@@ -163,7 +163,7 @@
   <div class="flex-grow flex flex-col min-w-0">
 
     <!-- Top Admin Sticky Header -->
-    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0 dark:bg-gray-800/95">
       <div class="flex items-center space-x-3">
         <!-- Mobile Logo (visible on mobile only) -->
         <a href="/admin-dashboard" class="flex items-center md:hidden">
@@ -171,7 +171,7 @@
         </a>
 
         <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">Orders Control & Status Override</h1>
+        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Orders Control & Status Override</h1>
       </div>
 
 
@@ -208,9 +208,9 @@
 
       <!-- Order KPI Summary Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
-            <h3 id="admin-orders-total" class="text-base font-bold text-gray-900 leading-tight truncate">0</h3>
+            <h3 id="admin-orders-total" class="text-base font-bold text-gray-900 leading-tight truncate dark:text-white">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Orders</span>
             <span id="admin-orders-completed-sub" class="text-[11px] text-green-600 font-medium block mt-0.5 truncate">0 completed</span>
           </div>
@@ -221,7 +221,7 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-in-progress" class="text-base font-bold text-blue-600 leading-tight truncate">0 Orders</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">In Progress</span>
@@ -234,7 +234,7 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-pending" class="text-base font-bold text-yellow-600 leading-tight truncate">0 Orders</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Pending Queue</span>
@@ -247,7 +247,7 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-orders-canceled" class="text-base font-bold text-red-600 leading-tight truncate">0 Orders</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Canceled / Refunded</span>
@@ -262,7 +262,7 @@
       </div>
 
       <!-- Search & Status Filter Bar -->
-      <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 space-y-4 max-w-full overflow-hidden">
+      <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 space-y-4 max-w-full overflow-hidden dark:bg-gray-800 dark:border-gray-800">
         
         <!-- Search Input & Sync Orders Button -->
         <div style="display: flex; flex-direction: row; align-items: center; gap: 12px; width: 100%;">
@@ -270,7 +270,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" style="position: absolute; left: 14px; top: 14px; pointer-events: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" id="admin-order-search" placeholder="Search orders by Order ID, User, Target Link, or Service Name..." class="w-full bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition" style="padding: 10px 16px 10px 40px; width: 100%;">
+            <input type="text" id="admin-order-search" placeholder="Search orders by Order ID, User, Target Link, or Service Name..." class="w-full bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition dark:bg-gray-800 dark:border-gray-700 dark:text-white" style="padding: 10px 16px 10px 40px; width: 100%;">
           </div>
           <button id="btn-sync-all-orders" type="button" class="bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-lg shadow-sm transition" style="flex: none; white-space: nowrap; padding: 10px 16px; display: inline-flex; align-items: center; gap: 6px;">
             <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -281,24 +281,24 @@
         </div>
 
         <!-- Status Filter Tabs -->
-        <div class="flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-t border-gray-100 pt-4 text-xs font-semibold [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div class="flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-t border-gray-100 pt-4 text-xs font-semibold [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden dark:border-gray-800">
           <button class="order-tab px-3.5 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active flex-shrink-0" data-status="all">All Orders</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="pending">Pending</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="in-progress">In progress</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="processing">Processing</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="completed">Completed</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="partial">Partial</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="canceled">Canceled</button>
-          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0" data-status="refunded">Refunds</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="pending">Pending</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="in-progress">In progress</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="processing">Processing</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="completed">Completed</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="partial">Partial</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="canceled">Canceled</button>
+          <button class="order-tab px-3.5 py-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition flex-shrink-0 dark:text-gray-400" data-status="refunded">Refunds</button>
         </div>
 
       </div>
 
       <!-- Orders Control Table Card -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden dark:bg-gray-800 dark:border-gray-800">
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600">
-            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">
+          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-400">
+            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
               <tr>
                 <th class="py-3.5 px-4 w-20">Order ID</th>
                 <th class="py-3.5 px-4">User</th>
@@ -321,14 +321,14 @@
         </div>
 
         <!-- Pagination Controls -->
-        <div id="admin-orders-pagination" class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px;">
+        <div id="admin-orders-pagination" class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs dark:bg-gray-900 dark:border-gray-800" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px;">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div id="admin-orders-pagination-info" class="text-gray-500 font-medium">
-              Showing <span class="font-bold text-gray-900">0</span> entries
+              Showing <span class="font-bold text-gray-900 dark:text-white">0</span> entries
             </div>
             <div style="display: flex; align-items: center; gap: 6px;" class="text-gray-500">
               <span>Per page:</span>
-              <select id="admin-orders-page-size" class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-900 focus:outline-none focus:border-pink-500" aria-label="Orders per page">
+              <select id="admin-orders-page-size" class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-900 focus:outline-none focus:border-pink-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white" aria-label="Orders per page">
                 <option value="10">10</option>
                 <option value="25" selected>25</option>
                 <option value="50">50</option>
@@ -337,9 +337,9 @@
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 4px;" id="admin-orders-pagination-controls" aria-label="Pagination controls">
-            <button id="admin-orders-prev-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold" disabled aria-label="Previous page">Previous</button>
+            <button id="admin-orders-prev-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold dark:bg-gray-800 dark:border-gray-700" disabled aria-label="Previous page">Previous</button>
             <div id="admin-orders-page-buttons" style="display: flex; align-items: center; gap: 4px;"></div>
-            <button id="admin-orders-next-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold" disabled aria-label="Next page">Next</button>
+            <button id="admin-orders-next-btn" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition disabled:opacity-50 text-xs font-semibold dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300" disabled aria-label="Next page">Next</button>
           </div>
         </div>
 
@@ -348,7 +348,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">
+    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">
       Copyright © GhBooster Admin Control Panel | All rights reserved.
     </footer>
 

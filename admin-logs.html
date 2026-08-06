@@ -32,7 +32,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/src/img/favicon.png?v=5">
   <link rel="shortcut icon" href="/favicon.ico?v=5">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:text-gray-200">
 
   <!-- Admin Sidebar -->
   <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden">
@@ -160,7 +160,7 @@
   <div class="flex-grow flex flex-col min-w-0">
 
     <!-- Top Admin Header -->
-    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0 dark:bg-gray-800/95">
       <div class="flex items-center space-x-3">
         <!-- Mobile Logo (visible on mobile only) -->
         <a href="/admin-dashboard" class="flex items-center md:hidden">
@@ -168,7 +168,7 @@
         </a>
 
         <!-- Desktop Header Title (hidden on mobile) -->
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">System Audit & Action Logs</h1>
+        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">System Audit & Action Logs</h1>
       </div>
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
       <div class="flex items-center space-x-2 md:space-x-3">
@@ -203,9 +203,9 @@
 
       <!-- KPI Summary Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0">
-            <h3 id="admin-logs-total" class="text-base font-bold text-gray-900 truncate">0</h3>
+            <h3 id="admin-logs-total" class="text-base font-bold text-gray-900 truncate dark:text-white">0</h3>
             <span class="text-xs text-gray-500 block truncate">Total Audit Events</span>
           </div>
           <div class="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
@@ -213,9 +213,9 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0">
-            <h3 id="admin-logs-balance-edits" class="text-base font-bold text-gray-900 truncate">0</h3>
+            <h3 id="admin-logs-balance-edits" class="text-base font-bold text-gray-900 truncate dark:text-white">0</h3>
             <span class="text-xs text-pink-600 font-medium block truncate">Admin Balance Edits</span>
           </div>
           <div class="p-2 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0">
@@ -223,9 +223,9 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0">
-            <h3 id="admin-logs-security-alerts" class="text-base font-bold text-gray-900 truncate">0 Critical</h3>
+            <h3 id="admin-logs-security-alerts" class="text-base font-bold text-gray-900 truncate dark:text-white">0 Critical</h3>
             <span class="text-xs text-green-600 font-medium block truncate">Security Alerts</span>
           </div>
           <div class="p-2 bg-green-50 text-green-600 rounded-lg flex-shrink-0">
@@ -233,9 +233,9 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0">
-            <h3 id="admin-logs-uptime" class="text-base font-bold text-gray-900 truncate">100%</h3>
+            <h3 id="admin-logs-uptime" class="text-base font-bold text-gray-900 truncate dark:text-white">100%</h3>
             <span class="text-xs text-gray-500 block truncate">API Webhook Uptime</span>
           </div>
           <div class="p-2 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
@@ -245,14 +245,14 @@
       </div>
 
       <!-- Logs Table Card -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 class="text-base font-bold text-gray-900">System Activity Audit Log</h3>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between dark:border-gray-800">
+          <h3 class="text-base font-bold text-gray-900 dark:text-white">System Activity Audit Log</h3>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-gray-600">
-            <thead class="bg-gray-50 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200">
+          <table class="w-full text-left text-sm text-gray-600 dark:text-gray-400">
+            <thead class="bg-gray-50 text-gray-700 text-xs uppercase font-semibold border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
               <tr>
                 <th class="px-6 py-3">Timestamp</th>
                 <th class="px-6 py-3">User / Admin</th>

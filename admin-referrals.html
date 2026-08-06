@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/src/img/favicon.png?v=5">
   <link rel="shortcut icon" href="/favicon.ico?v=5">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:text-gray-200">
 
     <!-- Sidebar -->
   <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden">
@@ -152,13 +152,13 @@
   </aside>
 
   <div class="flex-grow flex flex-col min-w-0">
-    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0 dark:bg-gray-800/95">
       <div class="flex items-center space-x-3">
         <!-- Mobile Logo (visible on mobile only) -->
         <a href="/admin-dashboard" class="flex items-center md:hidden">
           <img src="/src/img/logo.png?v=4" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">Referral Program</h1>
+        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Referral Program</h1>
       </div>
 
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
@@ -191,7 +191,7 @@
 
       <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-ref-total-referrers" class="text-base font-bold text-pink-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Referrers</span>
@@ -199,7 +199,7 @@
           </div>
           <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-ref-total-referred" class="text-base font-bold text-blue-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Referred</span>
@@ -207,7 +207,7 @@
           </div>
           <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg></div>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-ref-total-commissions" class="text-base font-bold text-green-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Commissions</span>
@@ -215,7 +215,7 @@
           </div>
           <div class="p-2.5 bg-green-50 text-green-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-ref-rate" class="text-base font-bold text-purple-600 leading-tight truncate">5%</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Commission Rate</span>
@@ -226,23 +226,23 @@
       </div>
 
       <!-- Commission Rate Config -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h3 class="font-bold text-gray-900 text-sm mb-4 flex items-center">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-800">
+        <h3 class="font-bold text-gray-900 text-sm mb-4 flex items-center dark:text-white">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
           Referral Commission Settings
         </h3>
         <form id="referral-settings-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Commission Rate (%)</label>
-            <input type="number" id="ref-setting-rate" value="5" min="1" max="50" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-900 focus:outline-none focus:border-pink-600 transition">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5 dark:text-gray-300">Commission Rate (%)</label>
+            <input type="number" id="ref-setting-rate" value="5" min="1" max="50" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-900 focus:outline-none focus:border-pink-600 transition dark:bg-gray-900 dark:border-gray-700 dark:text-white">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Min. Deposit to Qualify</label>
-            <input type="number" id="ref-setting-min-deposit" value="5" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 transition">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5 dark:text-gray-300">Min. Deposit to Qualify</label>
+            <input type="number" id="ref-setting-min-deposit" value="5" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 transition dark:bg-gray-900 dark:border-gray-700 dark:text-white">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Commission Applies To</label>
-            <select id="ref-setting-applies-to" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 focus:outline-none focus:border-pink-600">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5 dark:text-gray-300">Commission Applies To</label>
+            <select id="ref-setting-applies-to" class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 focus:outline-none focus:border-pink-600 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
               <option value="first_deposit">First Deposit Only</option>
               <option value="all_deposits">All Deposits</option>
               <option value="first_3_deposits">First 3 Deposits</option>
@@ -255,13 +255,13 @@
       </div>
 
       <!-- Referral Leaderboard Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-5 border-b border-gray-100">
-          <h3 class="font-bold text-gray-900 text-sm">Top Referrers Leaderboard</h3>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden dark:bg-gray-800 dark:border-gray-800">
+        <div class="p-5 border-b border-gray-100 dark:border-gray-800">
+          <h3 class="font-bold text-gray-900 text-sm dark:text-white">Top Referrers Leaderboard</h3>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-600">
-            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase">
+          <table class="w-full text-left text-xs text-gray-600 dark:text-gray-400">
+            <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200 uppercase dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
               <tr>
                 <th class="py-3.5 px-4">Rank</th>
                 <th class="py-3.5 px-4">Referrer</th>
@@ -281,7 +281,7 @@
         </div>
       </div>
     </main>
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">Copyright © GhBooster Admin Control Panel | All rights reserved.</footer>
+    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">Copyright © GhBooster Admin Control Panel | All rights reserved.</footer>
   </div>
 
   

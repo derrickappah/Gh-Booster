@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/src/img/favicon.png?v=5">
   <link rel="shortcut icon" href="/favicon.ico?v=5">
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex dark:text-gray-200">
 
     <!-- Sidebar -->
   <aside id="sidebar" class="w-64 bg-gray-900 text-white h-screen flex flex-col justify-between transition-all duration-300 flex-shrink-0 shadow-xl overflow-hidden">
@@ -152,13 +152,13 @@
   </aside>
 
   <div class="flex-grow flex flex-col min-w-0">
-    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0">
+    <header class="sticky top-0 z-30 h-20 bg-white/95 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 flex items-center justify-between shadow-sm flex-shrink-0 dark:bg-gray-800/95">
       <div class="flex items-center space-x-3">
         <!-- Mobile Logo (visible on mobile only) -->
         <a href="/admin-dashboard" class="flex items-center md:hidden">
           <img src="/src/img/logo.png?v=4" alt="GhBooster Logo" class="h-8 w-auto object-contain">
         </a>
-        <h1 class="hidden md:block text-xl font-bold text-gray-900">Bonus Manager</h1>
+        <h1 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white">Bonus Manager</h1>
       </div>
 
       <!-- Mobile Hamburger Toggle Button (Right Side) -->
@@ -191,21 +191,21 @@
 
       <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-bonus-active" class="text-base font-bold text-green-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Active Bonuses</span>
           </div>
           <div class="p-2.5 bg-green-50 text-green-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 13C10.832 21 4 20 4 20V9a2 2 0 012-2h12a2 2 0 012 2v11s-6.832 1-8 1z"/></svg></div>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-bonus-claimed" class="text-base font-bold text-pink-600 leading-tight truncate">GH₵0.00</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Total Claimed</span>
           </div>
           <div class="p-2.5 bg-pink-50 text-pink-600 rounded-lg flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
           <div class="min-w-0 pr-2">
             <h3 id="admin-bonus-users" class="text-base font-bold text-blue-600 leading-tight truncate">0</h3>
             <span class="text-xs font-normal text-gray-500 block mt-0.5 truncate">Users Benefited</span>
@@ -215,8 +215,8 @@
       </div>
 
       <!-- Toolbar Controls (Moved below stats cards) -->
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
-        <h3 class="font-bold text-gray-900 text-sm">Active Bonus Rules &amp; Promotions</h3>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
+        <h3 class="font-bold text-gray-900 text-sm dark:text-white">Active Bonus Rules &amp; Promotions</h3>
         <button onclick="document.getElementById('add-bonus-modal').classList.remove('hidden')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center shrink-0 cursor-pointer" style="white-space: nowrap !important; width: auto !important;">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           Create Bonus
@@ -225,49 +225,49 @@
 
       <!-- Bonus Rules Cards -->
       <div id="bonuses-container" class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div class="col-span-full py-12 text-center text-gray-400 font-medium bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="col-span-full py-12 text-center text-gray-400 font-medium bg-white rounded-xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-800">
           Loading active bonus rules...
         </div>
       </div>
 
     </main>
-    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500">Copyright © GhBooster Admin Control Panel | All rights reserved.</footer>
+    <footer class="py-4 bg-white border-t border-gray-200 text-center text-xs text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">Copyright © GhBooster Admin Control Panel | All rights reserved.</footer>
   </div>
 
   <!-- Add Bonus Modal -->
   <div id="add-bonus-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 dark:bg-gray-800">
       <div class="flex items-center justify-between">
-        <h3 class="font-extrabold text-gray-900">Create New Bonus</h3>
-        <button type="button" onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+        <h3 class="font-extrabold text-gray-900 dark:text-white">Create New Bonus</h3>
+        <button type="button" onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 dark:text-gray-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
       <form id="add-bonus-form" class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Bonus Name / Title</label>
-          <input type="text" id="bonus-name" placeholder="e.g. Flash Deposit Bonus" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+          <label class="block text-xs font-semibold text-gray-700 mb-1 dark:text-gray-300">Bonus Name / Title</label>
+          <input type="text" id="bonus-name" placeholder="e.g. Flash Deposit Bonus" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 dark:bg-gray-900 dark:border-gray-700">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Bonus %</label>
-            <input type="number" id="bonus-percentage" step="0.1" placeholder="e.g. 10" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+            <label class="block text-xs font-semibold text-gray-700 mb-1 dark:text-gray-300">Bonus %</label>
+            <input type="number" id="bonus-percentage" step="0.1" placeholder="e.g. 10" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 dark:bg-gray-900 dark:border-gray-700">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">Min Deposit (GH₵)</label>
-            <input type="number" id="bonus-min-amount" step="0.01" placeholder="e.g. 50" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+            <label class="block text-xs font-semibold text-gray-700 mb-1 dark:text-gray-300">Min Deposit (GH₵)</label>
+            <input type="number" id="bonus-min-amount" step="0.01" placeholder="e.g. 50" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 dark:bg-gray-900 dark:border-gray-700">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Gateway / Trigger</label>
-          <input type="text" id="bonus-gateway" placeholder="e.g. All Gateways / Mobile Money" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600">
+          <label class="block text-xs font-semibold text-gray-700 mb-1 dark:text-gray-300">Gateway / Trigger</label>
+          <input type="text" id="bonus-gateway" placeholder="e.g. All Gateways / Mobile Money" required class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 dark:bg-gray-900 dark:border-gray-700">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-700 mb-1">Description</label>
-          <textarea id="bonus-description" rows="2" placeholder="Describe this bonus..." class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 resize-none"></textarea>
+          <label class="block text-xs font-semibold text-gray-700 mb-1 dark:text-gray-300">Description</label>
+          <textarea id="bonus-description" rows="2" placeholder="Describe this bonus..." class="w-full py-2.5 px-3 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-pink-600 resize-none dark:bg-gray-900 dark:border-gray-700"></textarea>
         </div>
         <div class="flex space-x-2 pt-2">
-          <button type="button" onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">Cancel</button>
+          <button type="button" onclick="document.getElementById('add-bonus-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg dark:text-gray-300">Cancel</button>
           <button type="submit" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg shadow transition">Create Bonus</button>
         </div>
       </form>
