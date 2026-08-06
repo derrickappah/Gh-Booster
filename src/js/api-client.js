@@ -5595,7 +5595,7 @@ async function initAdminBonusesPage() {
 
         if (list.length === 0) {
           container.innerHTML = `
-            <div class="col-span-full py-12 text-center text-gray-400 font-medium bg-white rounded-xl shadow-sm border border-gray-100">
+            <div class="col-span-full py-12 text-center text-gray-400 dark:text-gray-300 font-medium bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
               No active bonus rules configured yet.
             </div>
           `;
@@ -5612,7 +5612,7 @@ async function initAdminBonusesPage() {
           const isChecked = status === 'active' ? 'checked' : '';
 
           return `
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 space-y-3">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-extrabold text-pink-600 uppercase tracking-wider">${escapeHtml(name)}</span>
                 <label class="relative inline-flex items-center cursor-pointer">
