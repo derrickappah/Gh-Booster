@@ -6145,6 +6145,10 @@ iframe.wait-autoplay {
   background-color:rgb(4 47 46 / 0.5);
 }
 
+.dark\:bg-transparent:is(.dark *) {
+  background-color:transparent;
+}
+
 .dark\:bg-violet-950\/50:is(.dark *) {
   background-color:rgb(46 16 101 / 0.5);
 }
@@ -6345,6 +6349,11 @@ iframe.wait-autoplay {
 .dark\:focus-within\:bg-gray-900:focus-within:is(.dark *) {
   --tw-bg-opacity:1;
   background-color:rgb(28 28 28 / var(--tw-bg-opacity, 1));
+}
+
+.dark\:hover\:border-gray-600:hover:is(.dark *) {
+  --tw-border-opacity:1;
+  border-color:rgb(104 100 101 / var(--tw-border-opacity, 1));
 }
 
 .dark\:hover\:bg-gray-600:hover:is(.dark *) {
