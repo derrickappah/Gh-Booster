@@ -1345,6 +1345,10 @@ video {
   flex:1 1 0%;
 }
 
+.flex-initial {
+  flex:0 1 auto;
+}
+
 .flex-shrink {
   flex-shrink:1;
 }
@@ -6519,10 +6523,6 @@ html.dark input::placeholder {
     width:auto;
   }
 
-  .sm\:flex-none {
-    flex:none;
-  }
-
   .sm\:grid-cols-2 {
     grid-template-columns:repeat(2, minmax(0, 1fr));
   }
@@ -6537,6 +6537,10 @@ html.dark input::placeholder {
 
   .sm\:flex-row {
     flex-direction:row;
+  }
+
+  .sm\:flex-nowrap {
+    flex-wrap:nowrap;
   }
 
   .sm\:items-center {
@@ -6592,9 +6596,9 @@ html.dark input::placeholder {
     padding-right:1.5rem;
   }
 
-  .sm\:px-8 {
-    padding-left:2rem;
-    padding-right:2rem;
+  .sm\:px-7 {
+    padding-left:1.75rem;
+    padding-right:1.75rem;
   }
 
   .sm\:pl-6 {
