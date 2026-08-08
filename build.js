@@ -7,14 +7,16 @@ const publicDir = path.join(root, 'public');
 
 const { execSync } = require('child_process');
 
-// Run esbuild minification
+// Compile Tailwind CSS & Run esbuild minification
 try {
+  console.log('Compiling Tailwind CSS...');
+  execSync('npx -y tailwindcss -i ./src/tailwind/tailwindcss.css -o ./src/css/style.css', { stdio: 'inherit' });
   execSync('npx -y esbuild src/js/theme.js --minify --outfile=src/js/theme.min.js', { stdio: 'inherit' });
   execSync('npx -y esbuild src/js/api-client.js --minify --outfile=src/js/api-client.min.js', { stdio: 'inherit' });
   execSync('npx -y esbuild src/js/analytics.js --minify --outfile=src/js/analytics.min.js', { stdio: 'inherit' });
   execSync('npx -y esbuild src/css/style.css --minify --outfile=src/css/style.min.css', { stdio: 'inherit' });
 } catch (e) {
-  console.warn('Minification step warning:', e.message);
+  console.warn('CSS & Minification step warning:', e.message);
 }
 
 // Generate static RSS feed for Pinterest
