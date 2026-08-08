@@ -2,7 +2,7 @@ const { supabase, supabaseAdmin } = require('../config/supabase');
 const { generateToken, generateApiKey } = require('../auth');
 
 class AuthService {
-  static async register({ fullname, username, email, password, phone }) {
+  static async register({ fullname, username, email, password, phone, utm_params }) {
     const cleanEmail = email.trim().toLowerCase();
     const baseName = (fullname || username || cleanEmail.split('@')[0]).trim();
     const cleanFullName = fullname ? fullname.trim() : baseName;
@@ -24,7 +24,7 @@ class AuthService {
       email: cleanEmail,
       password: password,
       options: {
-        data: { username: cleanFullName, full_name: cleanFullName, phone: cleanPhone }
+        data: { username: cleanFullName, full_name: cleanFullName, phone: cleanPhone, utm_params: utm_params || null }
       }
     });
 

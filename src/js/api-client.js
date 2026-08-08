@@ -554,7 +554,8 @@ function initRegisterPage() {
       hasError = true;
     }
 
-    if (!phone || phone.replace(/[^0-9]/g, '').length < 10) {
+    // Phone is required. Check for minimum length of 7 digits.
+    if (!phone || phone.replace(/[^0-9]/g, '').length < 7) {
       if (phoneError) phoneError.classList.remove('hidden');
       hasError = true;
     }
@@ -584,9 +585,16 @@ function initRegisterPage() {
     }
 
     try {
-      const res = await API.request('/auth/register', 'POST', { fullname, email, password, phone });
+      const utm_params = window.getStoredUtmParams ? window.getStoredUtmParams() : {};
+      const res = await API.request('/auth/register', 'POST', { fullname, email, password, phone: phone || null, utm_params });
       API.setToken(res.token);
       API.setUser(res.user);
+
+      // Track Meta Pixel Conversion Event
+      if (window.trackConversionEvent) {
+        window.trackConversionEvent('CompleteRegistration', { content_name: 'User Signup' });
+      }
+
       window.location.href = '/dashboard';
     } catch (err) {
       if (alertContainer && alertText) {

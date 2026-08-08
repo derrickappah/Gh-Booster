@@ -57,6 +57,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS -->
+  </script>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Title & Description -->
+  <title>Create Account | GhBooster - #1 SMM Panel</title>
+  <meta name="description" content="Sign up for a free GhBooster account to access wholesale prices on Instagram followers, TikTok likes, YouTube watch hours, and automated reseller API.">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
   <link rel="stylesheet" href="src/css/style.css">
   <!-- Favicon & Icons -->
   <link rel="icon" type="image/png" sizes="32x32" href="/src/img/favicon.png?v=5">
@@ -64,6 +78,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/src/img/favicon.png?v=5">
   <link rel="shortcut icon" href="/favicon.ico?v=5">
   <link rel="manifest" href="manifest.json">
+  <!-- Meta Pixel Configuration (Replace YOUR_PIXEL_ID with your Facebook Pixel ID) -->
+  <meta name="meta-pixel-id" content="YOUR_PIXEL_ID">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
 
@@ -86,8 +102,10 @@
     <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 transition-colors duration-200">
       <div class="text-center mb-6">
         <a href="/" class="inline-flex items-center justify-center py-2">
-        <img src="/src/img/logo.png?v=4" alt="GhBooster Logo" class="h-12 w-auto object-contain">
-      </a>
+          <img src="/src/img/logo.png?v=4" alt="GhBooster Logo" class="h-12 w-auto object-contain">
+        </a>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white mt-3">Create Your Free Account</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Join 12,800+ users boosting their social media presence in Ghana. Ready in 20 seconds!</p>
       </div>
 
       <!-- Alert Notification Banner -->
@@ -139,7 +157,7 @@
             </div>
             <input type="tel" id="phone" name="phone" required placeholder="+233 50 000 0000" class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-pink-600 focus:bg-white dark:focus:bg-gray-900 transition">
           </div>
-          <p class="error-msg text-xs text-red-500 dark:text-red-400 font-medium mt-1 hidden" id="phone-error">Please enter a valid Phone Number (at least 10 digits).</p>
+          <p class="error-msg text-xs text-red-500 dark:text-red-400 font-medium mt-1 hidden" id="phone-error">Please enter a valid Phone Number.</p>
         </div>
 
         <!-- Password -->
@@ -168,7 +186,7 @@
         <!-- Terms Agreement -->
         <div class="pt-2">
           <label class="flex items-start cursor-pointer">
-            <input type="checkbox" id="terms" name="terms" class="w-4 h-4 mt-0.5 text-pink-600 border-gray-300 dark:border-gray-700 rounded focus:ring-pink-500 cursor-pointer flex-shrink-0">
+            <input type="checkbox" id="terms" name="terms" checked class="w-4 h-4 mt-0.5 text-pink-600 border-gray-300 dark:border-gray-700 rounded focus:ring-pink-500 cursor-pointer flex-shrink-0">
             <span class="ml-2 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
               I agree to GhBooster's <a href="/terms" class="underline font-medium hover:text-gray-800 dark:hover:text-gray-200">Terms of Service</a> and <a href="/terms" class="underline font-medium hover:text-gray-800 dark:hover:text-gray-200">Privacy Policy</a>.
             </span>
@@ -182,8 +200,15 @@
         </button>
       </form>
 
+      <!-- Trust Badges -->
+      <div class="mt-6 pt-4 flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700">
+        <span class="flex items-center gap-1">⚡ Instant Setup</span>
+        <span class="flex items-center gap-1">🔒 100% Safe</span>
+        <span class="flex items-center gap-1">🇬🇭 MoMo Accepted</span>
+      </div>
+
       <!-- Switch to Login Link -->
-      <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
+      <div class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
         Already have an account? 
         <a href="/login" class="font-bold text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 ml-1">Log In</a>
       </div>
@@ -196,6 +221,7 @@
   </footer>
 
   <script src="src/js/theme.js"></script>
+  <script src="src/js/analytics.js"></script>
   <script src="src/js/api-client.js"></script>
 
 </body>
