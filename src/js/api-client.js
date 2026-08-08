@@ -625,7 +625,7 @@ function renderAnnouncementsBanner(newsList, container) {
         <div class="flex items-center justify-between">
           <div class="inline-flex items-center space-x-2">
             <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300 border border-pink-200/60 dark:border-pink-800/40 inline-flex items-center gap-1">
-              <span>📢</span> Announcement
+              <svg class="w-3 h-3 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c.41 0 .789.204 1.018.547l3.65 5.474M13.5 12h.01"/></svg> Announcement
             </span>
             ${dateStr ? `<span class="text-[11px] text-gray-400 dark:text-gray-500 font-normal">${escapeHtml(dateStr)}</span>` : ''}
           </div>
@@ -644,7 +644,7 @@ function renderAnnouncementsBanner(newsList, container) {
       <div class="flex items-center justify-between mb-2">
         <div class="inline-flex items-center space-x-2">
           <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300 border border-pink-200/60 dark:border-pink-800/40 inline-flex items-center gap-1">
-            <span>📢</span> Announcement
+            <svg class="w-3 h-3 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c.41 0 .789.204 1.018.547l3.65 5.474M13.5 12h.01"/></svg> Announcement
           </span>
           <span id="announcement-date-text" class="text-[11px] text-gray-400 dark:text-gray-500 font-normal"></span>
         </div>
