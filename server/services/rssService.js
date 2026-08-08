@@ -8,6 +8,126 @@ const SITE_URL = process.env.SITE_URL || 'https://ghbooster.com';
 
 const FEED_ITEMS = [
   {
+    id: 'media-22',
+    title: 'Ultimate Instagram Followers Strategy 2026: Fast Retention & Real Growth',
+    description: 'Master organic Reels hooks, non-drop refill protection, and high-retention follower velocity to scale your Instagram account safely.',
+    content: 'Comprehensive strategy guide detailing high-retention Instagram follower growth, Reels engagement algorithms, and non-drop protection.',
+    pubDate: 'Sat, 08 Aug 2026 05:30:00 GMT',
+    author: 'GhBooster Media Team',
+    category: 'Instagram Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-22.png`
+  },
+  {
+    id: 'media-23',
+    title: 'TikTok FYP Mastery: Algorithm Secrets for Explosive Video Views',
+    description: 'Discover how completion rates, watch time velocity, and targeted TikTok views trigger the FYP algorithm for viral reach.',
+    content: 'Learn how to optimize video completion rates and leverage instant view boosts to trigger TikTok FYP recommendation algorithms.',
+    pubDate: 'Sat, 08 Aug 2026 05:00:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'TikTok Reach',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-23.png`
+  },
+  {
+    id: 'media-24',
+    title: 'YouTube Watch Hours Roadmap: Hitting 4,000 Hours Fast & Safely',
+    description: 'Step-by-step roadmap to reach YouTube Partner Program monetization requirements using authentic subscriber velocity and high watch time.',
+    content: 'Fast-track your YouTube monetization application with authentic watch time retention, safe subscriber growth, and CTR optimization tactics.',
+    pubDate: 'Sat, 08 Aug 2026 04:30:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'YouTube Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-24.png`
+  },
+  {
+    id: 'media-25',
+    title: 'Telegram Channel Booster: Building Active Subscribers & High Post Views',
+    description: 'Master Telegram channel growth, targeted member additions, and automated post views to build high social authority.',
+    content: 'Proven techniques for building high-trust crypto and business Telegram communities with automated post view velocity.',
+    pubDate: 'Sat, 08 Aug 2026 04:00:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'Telegram Marketing',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-25.png`
+  },
+  {
+    id: 'media-26',
+    title: 'High-Speed SMM Reseller API: Automated Order Processing & Wholesale Rates',
+    description: 'Automate your SMM reselling business with v2 API integration, real-time balance checking, and instant order routing.',
+    content: 'Complete developer guide to integrating GhBooster high-speed API endpoints into custom reseller panels and web apps.',
+    pubDate: 'Sat, 08 Aug 2026 03:30:00 GMT',
+    author: 'GhBooster Developer Team',
+    category: 'Reseller API',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-26.png`
+  },
+  {
+    id: 'media-27',
+    title: 'Social Proof Multiplier: How Verified Engagement Builds Brand Trust',
+    description: 'Transform brand perception and customer confidence with verified follower velocity and active engagement counters.',
+    content: 'An in-depth analysis of consumer trust signals and how active social media engagement boosts checkout conversions.',
+    pubDate: 'Sat, 08 Aug 2026 03:00:00 GMT',
+    author: 'GhBooster Analytics',
+    category: 'Social Proof',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-27.png`
+  },
+  {
+    id: 'media-28',
+    title: 'Instant Refill Guarantee: 30-Day Automated Non-Drop Delivery',
+    description: 'Learn how automated 30-day refill protection and passwordless order processing safeguard your account authority.',
+    content: 'Security and quality assurance overview. Zero password requirements, passwordless security, and automatic 30-day refill support.',
+    pubDate: 'Sat, 08 Aug 2026 02:30:00 GMT',
+    author: 'GhBooster Security Team',
+    category: 'Platform Security',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-28.png`
+  },
+  {
+    id: 'media-29',
+    title: 'Cross-Platform Social Expansion: Scaling Instagram, TikTok & YouTube Together',
+    description: 'Synchronize growth across Instagram, TikTok, YouTube, and Telegram to build a multi-channel digital media empire.',
+    content: 'Cross-platform marketing blueprint for creators looking to dominate multiple social networks simultaneously.',
+    pubDate: 'Sat, 08 Aug 2026 02:00:00 GMT',
+    author: 'GhBooster Media Team',
+    category: 'Cross Platform',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-29.png`
+  },
+  {
+    id: 'media-30',
+    title: 'Mobile Money SMM Payments: Instant Automated Wallet Top-Ups in Ghana',
+    description: 'Top up your GhBooster account instantly using MTN Mobile Money, Telecel Cash, or AT Money with zero processing delays.',
+    content: 'Guide to instant Mobile Money deposit integrations powering seamless GHS payments for SMM services in Ghana.',
+    pubDate: 'Sat, 08 Aug 2026 01:30:00 GMT',
+    author: 'GhBooster Payment Team',
+    category: 'Mobile Money',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-30.png`
+  },
+  {
+    id: 'media-31',
+    title: 'E-Commerce Revenue Lift: Transforming Social Proof into Sales',
+    description: 'Discover how e-commerce brands double conversion rates by showcasing verified social proof metrics and follower authority.',
+    content: 'Case study insights on leveraging high social proof to decrease buyer hesitation and lift online sales.',
+    pubDate: 'Sat, 08 Aug 2026 01:00:00 GMT',
+    author: 'GhBooster Analytics',
+    category: 'E-Commerce Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-31.png`
+  },
+  {
+    id: 'media-32',
+    title: 'Algorithmic Discovery Hacks: Triggering Recommendations Across Networks',
+    description: 'Understand the hidden algorithmic triggers across Instagram, TikTok, and YouTube that unlock massive organic reach.',
+    content: 'Algorithmic breakdown detailing how early engagement velocity signals social platforms to push content to recommended feeds.',
+    pubDate: 'Sat, 08 Aug 2026 00:30:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'Algorithm Hacks',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-32.png`
+  },
+  {
+    id: 'media-33',
+    title: 'Zero-Password Security Protocol: Safe SMM Boosting Infrastructure',
+    description: 'Protect your accounts with GhBooster passwordless order delivery protocols. No account credentials ever required.',
+    content: 'Technical security whitepaper on passwordless social media boosting protocols and safe delivery execution.',
+    pubDate: 'Fri, 07 Aug 2026 23:59:00 GMT',
+    author: 'GhBooster Security Team',
+    category: 'Security Standard',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-33.png`
+  },
+  {
     id: 'media-12',
     title: 'Master Social Media Panel Growth: Automated Order Execution & High Velocity',
     description: 'Discover how automated order routing and high-velocity social media engagement accelerate account reach without algorithmic flags.',
