@@ -3369,7 +3369,7 @@ async function initAdminDashboard() {
       const totalUsers = parseInt(stats.total_users || 0, 10);
       const usersToday = parseInt(stats.users_today || 0, 10);
       const depositsToday = parseFloat(stats.deposits_today || 0);
-      const totalDep = parseFloat(stats.total_deposits || (totalRev + parseFloat(stats.total_wallet_balance || 0)));
+      const totalDep = stats.total_deposits !== undefined && stats.total_deposits !== null ? parseFloat(stats.total_deposits) : (totalRev + parseFloat(stats.total_wallet_balance || 0));
       const ordersToday = parseInt(stats.orders_today || 0, 10);
       const completedOrd = parseInt(stats.completed_orders || 0, 10);
       const confirmedOrd = parseInt(stats.confirmed_orders || 0, 10);

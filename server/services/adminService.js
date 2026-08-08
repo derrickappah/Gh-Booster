@@ -51,10 +51,9 @@ class AdminService {
         const amt = parseFloat(t.amount || t.charge || t.value || 0);
         const st = String(t.status || 'completed').toLowerCase();
         const tp = String(t.type || 'deposit').toLowerCase();
-        const isFailed = st === 'failed' || st === 'expired' || st === 'rejected' || st === 'cancelled' || st === 'canceled';
-        if (isFailed) return false;
+        const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
         const isToday = t.created_at && new Date(t.created_at) >= todayStart;
-        return isToday && amt > 0 && !tp.includes('order');
+        return isToday && amt > 0 && !tp.includes('order') && isCompleted;
       })
       .reduce((acc, t) => acc + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
 
@@ -74,9 +73,8 @@ class AdminService {
         const amt = parseFloat(t.amount || t.charge || t.value || 0);
         const st = String(t.status || 'completed').toLowerCase();
         const tp = String(t.type || 'deposit').toLowerCase();
-        const isFailed = st === 'failed' || st === 'expired' || st === 'rejected' || st === 'cancelled' || st === 'canceled';
-        if (isFailed) return false;
-        return amt > 0 && !tp.includes('order');
+        const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
+        return amt > 0 && !tp.includes('order') && isCompleted;
       })
       .reduce((acc, t) => acc + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
 
@@ -115,8 +113,8 @@ class AdminService {
         const amt = parseFloat(t.amount || t.charge || t.value || 0);
         const st = String(t.status || 'completed').toLowerCase();
         const tp = String(t.type || 'deposit').toLowerCase();
-        const isFailed = st === 'failed' || st === 'expired' || st === 'rejected' || st === 'cancelled' || st === 'canceled';
-        return d >= dayStart && d <= dayEnd && !isFailed && amt > 0 && !tp.includes('order');
+        const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
+        return d >= dayStart && d <= dayEnd && isCompleted && amt > 0 && !tp.includes('order');
       });
 
       const dayDeposits = dayTxs.reduce((sum, t) => sum + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
