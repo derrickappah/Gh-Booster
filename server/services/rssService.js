@@ -8,6 +8,126 @@ const SITE_URL = process.env.SITE_URL || 'https://ghbooster.com';
 
 const FEED_ITEMS = [
   {
+    id: 'media-34',
+    title: 'Grow Faster, Effortlessly: Followers, Likes & Views on Autopilot',
+    description: 'Automate your social media growth across Instagram, TikTok, YouTube, and Facebook with GhBooster analytics overview and autopilot delivery.',
+    content: 'Explore the GhBooster automated analytics engine. Track follower count increases, engagement rate boosts, and automated multi-platform delivery.',
+    pubDate: 'Sun, 09 Aug 2026 19:00:00 GMT',
+    author: 'GhBooster Growth Team',
+    category: 'Social Media Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-34.png`
+  },
+  {
+    id: 'media-35',
+    title: 'Autopilot Social Media Scaling Banner & Analytics Suite',
+    description: 'Comprehensive visual dashboard showcase illustrating 256K+ follower growth metrics, 14.2% engagement rates, and 7.8M likes velocity.',
+    content: 'Full promotional banner showcasing unified Instagram, TikTok, YouTube, and Facebook autopilot marketing tools and real-time dashboard stats.',
+    pubDate: 'Sun, 09 Aug 2026 18:45:00 GMT',
+    author: 'GhBooster Media Team',
+    category: 'Growth Gallery',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-35.png`
+  },
+  {
+    id: 'media-36',
+    title: 'Blast Your Social Growth: Fast, Affordable & Guaranteed Results',
+    description: 'Accelerate your brand presence with +240% monthly follower growth velocity, rocket-boosted engagement, and instant delivery.',
+    content: 'Infographic showcasing GhBooster high-velocity growth packages with instant delivery, safe passwordless execution, and best prices guaranteed.',
+    pubDate: 'Sun, 09 Aug 2026 18:30:00 GMT',
+    author: 'GhBooster Marketing Team',
+    category: 'Brand Scaling',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-36.png`
+  },
+  {
+    id: 'media-37',
+    title: 'Automated Multi-Network Booster: Instagram, TikTok, YouTube & Facebook',
+    description: 'Streamline multi-platform social media campaigns with instant engagement triggers and verified follower delivery.',
+    content: 'Unified multi-platform growth asset highlighting multi-network growth metrics, automated engagement tracking, and instant delivery.',
+    pubDate: 'Sun, 09 Aug 2026 18:15:00 GMT',
+    author: 'GhBooster Analytics',
+    category: 'Cross-Platform Growth',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-37.png`
+  },
+  {
+    id: 'media-38',
+    title: 'Loved by Creators Worldwide: 12,000+ Verified 4.9/5 Customer Reviews',
+    description: 'Read authentic creator testimonials and 5-star ratings from over 12,000 satisfied creators scaling Instagram and TikTok.',
+    content: 'Customer proof artwork highlighting 4.9/5 satisfaction rating across 12,000+ global creators, fast delivery feedback, and real social proof results.',
+    pubDate: 'Sun, 09 Aug 2026 18:00:00 GMT',
+    author: 'GhBooster Community',
+    category: 'Social Proof & Reviews',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-38.png`
+  },
+  {
+    id: 'media-39',
+    title: 'Why Creators Choose GhBooster: Delivery, Security, Pricing & 24/7 Support',
+    description: 'Discover the 4 key advantages of GhBooster: ultra-fast delivery in seconds, 100% passwordless security, pricing from $4.99, and 24/7 human support.',
+    content: 'Infographic breakdown detailing why global digital agencies and creators prefer GhBooster over traditional SMM panels.',
+    pubDate: 'Sun, 09 Aug 2026 17:45:00 GMT',
+    author: 'GhBooster Platform Team',
+    category: 'Platform Highlights',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-39.png`
+  },
+  {
+    id: 'media-40',
+    title: 'Weekend Flash Sale: 50% OFF All Followers, Likes & Views (Code: BOOST50)',
+    description: 'Claim 50% discount on all social media growth packages with promo code BOOST50. Limited time 48-hour weekend offer.',
+    content: 'Promotional artwork for GhBooster 50% off flash sale on Instagram, TikTok, YouTube, and Facebook engagement boosts.',
+    pubDate: 'Sun, 09 Aug 2026 17:30:00 GMT',
+    author: 'GhBooster Promotions',
+    category: 'Discounts & Offers',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-40.png`
+  },
+  {
+    id: 'media-41',
+    title: 'GhBooster vs The Rest: Feature Comparison & Performance Analysis',
+    description: 'Compare GhBooster against generic SMM panels across delivery speed, account safety, pricing transparency, human support, and refill guarantees.',
+    content: 'Side-by-side comparison table matrix demonstrating GhBooster superiority in order processing speed, passwordless safety, and high-retention profiles.',
+    pubDate: 'Sun, 09 Aug 2026 17:15:00 GMT',
+    author: 'SMM Industry Benchmark',
+    category: 'Comparisons',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-41.png`
+  },
+  {
+    id: 'media-42',
+    title: 'GhBooster Referral Program: Refer a Friend, Get $10 Free Credit',
+    description: 'Earn $10 wallet credit for every friend you refer to GhBooster. 3-step simple sharing process with double reward benefits.',
+    content: 'Referral system artwork explaining how to earn passive wallet credits by inviting friends and clients to scale their social channels.',
+    pubDate: 'Sun, 09 Aug 2026 17:00:00 GMT',
+    author: 'GhBooster Rewards',
+    category: 'Referral Program',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-42.png`
+  },
+  {
+    id: 'media-43',
+    title: 'Dominate Instagram: Followers, Likes & Reel Views Delivered Instantly',
+    description: 'Boost your Instagram profile with +50K followers, 2.4M Reel views, and 18% engagement rate acceleration.',
+    content: 'High-impact Instagram promo asset showing profile transformation, Reel view boosts, and high engagement velocity.',
+    pubDate: 'Sun, 09 Aug 2026 16:45:00 GMT',
+    author: 'GhBooster Media Team',
+    category: 'Instagram Scaling',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-43.png`
+  },
+  {
+    id: 'media-44',
+    title: 'Frequently Asked Questions: Safety, Delivery Speed, Real Accounts & Refills',
+    description: 'Get instant answers to top SMM panel questions: passwordless safety, delivery speeds, real profile quality, and automatic refills.',
+    content: 'Visual FAQ guide explaining account safety protocols, order start speeds, non-drop refill protection, and zero-password policy.',
+    pubDate: 'Sun, 09 Aug 2026 16:30:00 GMT',
+    author: 'GhBooster Support Team',
+    category: 'FAQ & Support',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-44.png`
+  },
+  {
+    id: 'media-45',
+    title: 'Full-Suite Social Growth Platform: 360-Degree Brand Expansion',
+    description: 'Scale your online brand with unified social proof across all major networks — Instagram, TikTok, YouTube, and Facebook.',
+    content: 'Comprehensive 360-degree digital branding showcase illustrating cross-platform social proof synchronization.',
+    pubDate: 'Sun, 09 Aug 2026 16:15:00 GMT',
+    author: 'GhBooster Design Team',
+    category: 'Brand Scaling',
+    image: `${SITE_URL}/src/img/gallery/ghbooster-media-45.png`
+  },
+  {
     id: 'media-22',
     title: 'Ultimate Instagram Followers Strategy 2026: Fast Retention & Real Growth',
     description: 'Master organic Reels hooks, non-drop refill protection, and high-retention follower velocity to scale your Instagram account safely.',
