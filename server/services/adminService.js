@@ -642,6 +642,7 @@ class AdminService {
     const { data, error } = await supabaseAdmin
       .from('transactions')
       .select('*, profiles(username, email)')
+      .eq('type', 'deposit')
       .order('created_at', { ascending: false })
       .limit(1000);
 
