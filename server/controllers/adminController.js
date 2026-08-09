@@ -18,8 +18,10 @@ class AdminController {
 
   static async getUsers(req, res, next) {
     try {
-      const users = await AdminService.getAllUsers();
-      res.json({ success: true, users });
+      const page = req.query.page ? parseInt(req.query.page, 10) : null;
+      const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
+      const { users, total } = await AdminService.getAllUsers(page, limit);
+      res.json({ success: true, users, total });
     } catch (err) {
       next(err);
     }

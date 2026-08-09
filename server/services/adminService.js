@@ -188,13 +188,22 @@ class AdminService {
     return result;
   }
 
-  static async getAllUsers(page = 1, limit = 50) {
-    const offset = (page - 1) * limit;
-    const { data: profiles, error } = await supabaseAdmin
+  static async getAllUsers(page = null, limit = null) {
+    let query = supabaseAdmin
       .from('profiles')
-      .select('id, username, email, phone, phone_number, role, created_at, wallets(balance, currency)')
-      .range(offset, offset + limit - 1)
+      .select('id, username, email, phone, phone_number, role, created_at, wallets(balance, currency)', { count: 'exact' })
       .order('created_at', { ascending: false });
+
+    if (page && limit) {
+      const offset = (page - 1) * limit;
+      query = query.range(offset, offset + limit - 1);
+    } else if (limit) {
+      query = query.limit(limit);
+    } else {
+      query = query.limit(10000);
+    }
+
+    const { data: profiles, count, error } = await query;
 
     if (error) throw new Error(error.message);
 
@@ -207,7 +216,7 @@ class AdminService {
       spentMap[o.user_id] = (spentMap[o.user_id] || 0) + (parseFloat(o.charge) || 0);
     });
 
-    return (profiles || []).map(p => {
+    const userList = (profiles || []).map(p => {
       const walletObj = Array.isArray(p.wallets) ? p.wallets[0] : p.wallets;
       return {
         id: p.id,
@@ -221,6 +230,11 @@ class AdminService {
         created_at: new Date(p.created_at || Date.now()).toISOString().substring(0, 10)
       };
     });
+
+    return {
+      users: userList,
+      total: count !== null && count !== undefined ? count : userList.length
+    };
   }
 
   static async updateUserPhone({ userId, phone }) {

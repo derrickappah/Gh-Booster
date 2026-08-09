@@ -3712,11 +3712,12 @@ async function initAdminUsersPage() {
     const res = await API.request('/admin/users');
     if (res.success && res.users) {
       const users = res.users;
+      const totalUsers = res.total !== undefined ? res.total : users.length;
       const totalBalance = users.reduce((acc, u) => acc + (parseFloat(u.balance) || 0), 0);
       const resellerCount = users.filter(u => u.role === 'reseller').length;
       const adminCount = users.filter(u => u.role === 'admin').length;
 
-      if (totalElem) totalElem.textContent = users.length.toLocaleString();
+      if (totalElem) totalElem.textContent = totalUsers.toLocaleString();
       if (balElem) balElem.textContent = `GH₵${totalBalance.toFixed(2)}`;
       if (resellerElem) resellerElem.textContent = resellerCount.toLocaleString();
       if (adminElem) adminElem.textContent = adminCount.toLocaleString();
