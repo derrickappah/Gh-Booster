@@ -3778,6 +3778,14 @@ async function initAdminUsersPage() {
                       </button>
                     </div>
                     <div class="py-1">
+                      <button type="button" class="change-role-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        Change Role
+                      </button>
+                    </div>
+                    <div class="py-1">
                       <a href="/admin-orders?search=${encodeURIComponent(u.username || u.email || '')}" class="w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -3833,6 +3841,31 @@ async function initAdminUsersPage() {
           });
         });
       }
+
+        // Bind change-role action to role modal
+        tableBody.querySelectorAll('.change-role-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const tr = e.target.closest('tr');
+            const userId = tr.getAttribute('data-user-id');
+            const decodedId = decodeURIComponent(userId);
+            const userObj = users.find(u => u.id === userId || u.id === decodedId);
+            const username = userObj ? (userObj.username || userObj.email || 'User Account') : 'User Account';
+            const currentRole = userObj ? (userObj.role || 'user') : 'user';
+
+            const menu = tr.querySelector('.user-actions-menu');
+            if (menu) menu.classList.add('hidden');
+
+            const roleModal = document.getElementById('change-role-modal');
+            if (!roleModal) return;
+
+            document.getElementById('modal-role-user-id').value = userId;
+            document.getElementById('modal-role-username').textContent = username;
+            const roleSelect = document.getElementById('modal-role-select');
+            if (roleSelect) roleSelect.value = currentRole;
+
+            roleModal.classList.remove('hidden');
+          });
+        });
 
       // Modal Action Controls setup
       const modal = document.getElementById('fund-user-modal');
@@ -3938,6 +3971,57 @@ async function initAdminUsersPage() {
         document.addEventListener('click', (e) => {
           if (!e.target.closest('.user-actions-toggle') && !e.target.closest('.user-actions-menu')) {
             document.querySelectorAll('.user-actions-menu').forEach(m => m.classList.add('hidden'));
+          }
+        });
+      }
+
+      // Change Role Modal Setup
+      const roleModal = document.getElementById('change-role-modal');
+      const roleForm = document.getElementById('admin-user-role-form');
+      const closeRoleModalBtn = document.getElementById('close-role-modal');
+      const cancelRoleModalBtn = document.getElementById('cancel-role-modal');
+
+      const closeRoleModal = () => { if (roleModal) roleModal.classList.add('hidden'); };
+
+      if (closeRoleModalBtn) closeRoleModalBtn.onclick = closeRoleModal;
+      if (cancelRoleModalBtn) cancelRoleModalBtn.onclick = closeRoleModal;
+
+      if (roleModal) {
+        roleModal.addEventListener('click', (e) => { if (e.target === roleModal) closeRoleModal(); });
+      }
+
+      if (roleForm && !roleForm.__bound) {
+        roleForm.__bound = true;
+        roleForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const rawUserId = document.getElementById('modal-role-user-id').value;
+          const userId = decodeURIComponent(rawUserId || '');
+          const role = document.getElementById('modal-role-select').value;
+
+          if (!userId || !role) {
+            alert('Please select a role.');
+            return;
+          }
+
+          const submitBtn = document.getElementById('submit-role-btn');
+          const originalText = submitBtn ? submitBtn.innerHTML : 'Update Role';
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Updating role...';
+          }
+
+          try {
+            const res = await API.request(`/admin/users/${encodeURIComponent(userId)}/role`, 'PUT', { role });
+            alert(res.message || 'User role updated successfully.');
+            closeRoleModal();
+            initAdminUsersPage();
+          } catch (err) {
+            alert(err.message || 'Failed to update user role');
+          } finally {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalText;
+            }
           }
         });
       }

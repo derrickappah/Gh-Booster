@@ -27,6 +27,7 @@ router.get('/users', AdminController.getUsers);
 router.post('/users/balance', validate(adminUpdateBalanceSchema), AdminController.updateUserBalance);
 router.post('/users/:userId/fund', validate(adminUpdateBalanceSchema), AdminController.updateUserBalance);
 router.put('/users/:userId/phone', AdminController.updateUserPhone);
+router.put('/users/:userId/role', AdminController.updateUserRole);
 
 // Orders
 router.get('/orders', AdminController.getOrders);

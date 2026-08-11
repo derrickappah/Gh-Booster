@@ -38,6 +38,29 @@ class AdminController {
     }
   }
 
+  static async updateUserRole(req, res, next) {
+    try {
+      const { userId } = req.params;
+      const { role } = req.body;
+      if (!role) {
+        return res.status(400).json({ success: false, error: 'Role is required.' });
+      }
+      const result = await AdminService.updateUserRole({ userId, role });
+      // Audit log
+      try {
+        const { supabaseAdmin } = require('../config/supabase');
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: req.user.id,
+          action: 'ADMIN_UPDATE_USER_ROLE',
+          details: `Admin ${req.user.email || req.user.id} changed user ${userId} role to ${role}`
+        });
+      } catch (_) {}
+      res.json({ success: true, ...result });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
   static async updateUserBalance(req, res, next) {
     try {
       const userId = req.params.userId || req.body.userId;

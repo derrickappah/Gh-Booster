@@ -250,6 +250,23 @@ class AdminService {
     return { message: 'Phone number updated successfully', profile: data };
   }
 
+  static async updateUserRole({ userId, role }) {
+    const allowedRoles = ['user', 'reseller', 'staff', 'admin', 'super_admin'];
+    const cleanRole = (role || '').trim().toLowerCase();
+    if (!cleanRole || !allowedRoles.includes(cleanRole)) {
+      throw new Error(`Invalid role. Must be one of: ${allowedRoles.join(', ')}`);
+    }
+    const { data, error } = await supabaseAdmin
+      .from('profiles')
+      .update({ role: cleanRole, updated_at: new Date().toISOString() })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return { message: `User role updated to "${cleanRole}" successfully`, profile: data };
+  }
+
   static async updateUserBalance({ userId, newBalance, reason }) {
     const balance = parseFloat(newBalance);
     if (isNaN(balance)) throw new Error('Valid numeric balance is required');
