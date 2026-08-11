@@ -337,9 +337,9 @@ class OrderService {
             .update({ provider_order_id: providerOrderId, updated_at: new Date().toISOString() })
             .eq('id', newOrder.id);
         } else {
-          const providerErrMsg = smmRes?.error || 'Unknown provider error';
-          console.error(`SMMGen order error for order #${newOrder.id}:`, providerErrMsg);
-          throw new Error(`SMMGen Provider Error: ${providerErrMsg}`);
+          const providerErrMsg = smmRes?.error || 'Your order could not be placed. Please try again.';
+          console.error(`[Provider] Order error for order #${newOrder.id}:`, providerErrMsg);
+          throw new Error(providerErrMsg);
         }
       } catch (providerErr) {
         // Mark order as Canceled in DB on unexpected network/provider error

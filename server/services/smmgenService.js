@@ -75,7 +75,7 @@ class SmmgenService {
   static async getBalance(providerId = null) {
     try {
       const { url, key } = await SmmgenService._getCredentials(providerId);
-      if (!key) return { error: 'SMMGen API key not configured' };
+      if (!key) return { error: 'Service is temporarily unavailable. Please try again later.' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,15 +95,15 @@ class SmmgenService {
       }
       return data;
     } catch (err) {
-      console.error('SMMGen getBalance error:', err.message);
-      return { error: err.message };
+      console.error('[SMMGen] getBalance error:', err.message);
+      return { error: 'Service is temporarily unavailable. Please try again later.' };
     }
   }
 
   static async placeOrder({ providerServiceId, link, quantity, comments = null, providerId = null }) {
     try {
       const { url, key } = await SmmgenService._getCredentials(providerId);
-      if (!key) return { error: 'SMMGen API key not configured' };
+      if (!key) return { error: 'Service is temporarily unavailable. Please try again later.' };
       const bodyPayload = {
         key,
         action: 'add',
@@ -134,15 +134,15 @@ class SmmgenService {
       console.log('[SMMGen] Order placed, ID:', data?.order || 'unknown');
       return data;
     } catch (err) {
-      console.error('SMMGen placeOrder error:', err.message);
-      return { error: err.message };
+      console.error('[SMMGen] placeOrder error:', err.message);
+      return { error: 'Your order could not be placed. Please try again.' };
     }
   }
 
   static async getOrderStatus(providerOrderId, providerId = null) {
     try {
       const { url, key } = await SmmgenService._getCredentials(providerId);
-      if (!key) return { error: 'SMMGen API key not configured' };
+      if (!key) return { error: 'Service is temporarily unavailable. Please try again later.' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -166,15 +166,15 @@ class SmmgenService {
       }
       return data;
     } catch (err) {
-      console.error('SMMGen getOrderStatus error:', err.message);
-      return { error: err.message };
+      console.error('[SMMGen] getOrderStatus error:', err.message);
+      return { error: 'Unable to retrieve order status. Please try again later.' };
     }
   }
 
   static async refillOrder(providerOrderId, providerId = null) {
     try {
       const { url, key } = await SmmgenService._getCredentials(providerId);
-      if (!key) return { error: 'SMMGen API key not configured' };
+      if (!key) return { error: 'Service is temporarily unavailable. Please try again later.' };
       const response = await SmmgenService._fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -198,8 +198,8 @@ class SmmgenService {
       }
       return data;
     } catch (err) {
-      console.error('SMMGen refillOrder error:', err.message);
-      return { error: err.message };
+      console.error('[SMMGen] refillOrder error:', err.message);
+      return { error: 'Your refill request could not be processed. Please try again.' };
     }
   }
 }
