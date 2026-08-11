@@ -3840,7 +3840,6 @@ async function initAdminUsersPage() {
             modal.classList.remove('hidden');
           });
         });
-      }
 
         // Bind change-role action to role modal
         tableBody.querySelectorAll('.change-role-btn').forEach(btn => {
@@ -3866,6 +3865,7 @@ async function initAdminUsersPage() {
             roleModal.classList.remove('hidden');
           });
         });
+      }
 
       // Modal Action Controls setup
       const modal = document.getElementById('fund-user-modal');
