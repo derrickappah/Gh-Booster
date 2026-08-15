@@ -4,6 +4,12 @@ const MoolreService = require('../services/moolreService');
 class AdminController {
   static async getStats(req, res, next) {
     try {
+      try {
+        await MoolreService.repairPendingCompletedTransactions();
+        await MoolreService.expirePendingDeposits();
+      } catch (e) {
+        console.warn('[Admin Stats Repair Warning]', e.message);
+      }
       const stats = await AdminService.getStats();
       res.json({
         success: true,

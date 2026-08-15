@@ -43,17 +43,25 @@ class AdminService {
     }, 0);
     const totalWalletBalance = (wallets || []).reduce((acc, w) => acc + (parseFloat(w.balance) || 0), 0);
 
+    // Helper to identify strictly completed deposit transactions
+    const isCompletedDeposit = (t) => {
+      if (!t) return false;
+      const amt = parseFloat(t.amount || t.charge || t.value || 0);
+      if (isNaN(amt) || amt <= 0) return false;
+      const st = String(t.status || '').toLowerCase().trim();
+      const tp = String(t.type || 'deposit').toLowerCase().trim();
+      const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
+      const isDepositType = tp === 'deposit' || tp === 'bonus' || (!tp.includes('order') && !tp.includes('withdrawal') && !tp.includes('refund'));
+      return isCompleted && isDepositType;
+    };
+
     // Today calculations
     const usersToday = (users || []).filter(u => u.created_at && new Date(u.created_at) >= todayStart).length;
     const ordersToday = (orders || []).filter(o => o.created_at && new Date(o.created_at) >= todayStart).length;
     const depositsToday = (transactions || [])
       .filter(t => {
-        const amt = parseFloat(t.amount || t.charge || t.value || 0);
-        const st = String(t.status || 'completed').toLowerCase();
-        const tp = String(t.type || 'deposit').toLowerCase();
-        const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
         const isToday = t.created_at && new Date(t.created_at) >= todayStart;
-        return isToday && amt > 0 && !tp.includes('order') && isCompleted;
+        return isToday && isCompletedDeposit(t);
       })
       .reduce((acc, t) => acc + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
 
@@ -69,13 +77,7 @@ class AdminService {
     const avgOrderValue = totalOrdersCount > 0 ? (totalRevenue / totalOrdersCount) : 0;
 
     const totalDeposits = (transactions || [])
-      .filter(t => {
-        const amt = parseFloat(t.amount || t.charge || t.value || 0);
-        const st = String(t.status || 'completed').toLowerCase();
-        const tp = String(t.type || 'deposit').toLowerCase();
-        const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
-        return amt > 0 && !tp.includes('order') && isCompleted;
-      })
+      .filter(t => isCompletedDeposit(t))
       .reduce((acc, t) => acc + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
 
     const openTickets = (tickets || []).filter(t => t.status === 'Open').length;
@@ -86,7 +88,12 @@ class AdminService {
     const activeServicesCount = (services || []).filter(s => String(s.status || '').toLowerCase() === 'active' || s.status === 1 || s.status === true).length;
 
     // Exceptions
-    const expiredDeposits = (transactions || []).filter(t => String(t.status || '').toLowerCase() === 'expired' || String(t.status || '').toLowerCase() === 'rejected' || String(t.status || '').toLowerCase() === 'declined').length;
+    const expiredDeposits = (transactions || []).filter(t => {
+      const st = String(t.status || '').toLowerCase().trim();
+      const tp = String(t.type || 'deposit').toLowerCase().trim();
+      const isDepositType = tp === 'deposit' || tp === 'bonus' || (!tp.includes('order') && !tp.includes('withdrawal') && !tp.includes('refund'));
+      return isDepositType && (st === 'expired' || st === 'rejected' || st === 'declined');
+    }).length;
     const refundedCount = (transactions || []).filter(t => t.type === 'refund' || String(t.status || '').toLowerCase() === 'refunded').length + (orders || []).filter(o => String(o.status || '').toLowerCase() === 'refunded').length;
     const failedCount = (transactions || []).filter(t => String(t.status || '').toLowerCase() === 'failed').length;
 
@@ -110,11 +117,7 @@ class AdminService {
       const dayTxs = (transactions || []).filter(t => {
         if (!t.created_at) return false;
         const d = new Date(t.created_at);
-        const amt = parseFloat(t.amount || t.charge || t.value || 0);
-        const st = String(t.status || 'completed').toLowerCase();
-        const tp = String(t.type || 'deposit').toLowerCase();
-        const isCompleted = st === 'completed' || st === 'approved' || st === 'success' || st === 'successful' || st === 'confirmed';
-        return d >= dayStart && d <= dayEnd && isCompleted && amt > 0 && !tp.includes('order');
+        return d >= dayStart && d <= dayEnd && isCompletedDeposit(t);
       });
 
       const dayDeposits = dayTxs.reduce((sum, t) => sum + (parseFloat(t.amount || t.charge || t.value || 0) || 0), 0);
