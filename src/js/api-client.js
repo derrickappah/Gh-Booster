@@ -4515,6 +4515,88 @@ async function initAdminOrdersPage() {
           }
         };
       }
+
+      // ── Auto-Sync Polling for Non-Finalized Orders ──────────────────────────
+      const adminNonFinalizedStatuses = ['processing', 'pending', 'in progress', 'in-progress'];
+      let adminPollTimer = null;
+
+      function hasAdminNonFinalizedOrders(list) {
+        return (list || []).some(o => adminNonFinalizedStatuses.includes((o.status || '').toLowerCase()));
+      }
+
+      async function pollAdminOrdersStatus() {
+        if (document.hidden) return;
+        if (!hasAdminNonFinalizedOrders(orders)) {
+          stopAdminPolling();
+          return;
+        }
+
+        try {
+          const resSync = await API.request('/admin/orders');
+          if (resSync.success && resSync.orders) {
+            const newOrders = resSync.orders;
+            const oldMap = new Map(orders.map(o => [String(o.id), o]));
+
+            newOrders.forEach(no => {
+              const oo = oldMap.get(String(no.id));
+              if (oo && oo.status !== no.status) {
+                const shortId = typeof no.id === 'string' && no.id.length > 8 ? no.id.substring(0, 8) : no.id;
+                const toastType = (no.status === 'Completed') ? 'success' : (['Canceled', 'Refunded'].includes(no.status)) ? 'warning' : 'info';
+                if (typeof showToast === 'function') showToast(`Order #${shortId} status updated to ${no.status}`, toastType);
+              }
+            });
+
+            // Update the orders array in place
+            orders.length = 0;
+            orders.push(...newOrders);
+
+            // Update KPI counts
+            const newTotalCount = orders.length;
+            const newCompletedCount = orders.filter(o => (o.status || '').toLowerCase() === 'completed').length;
+            const newInProgressCount = orders.filter(o => ['in progress', 'in-progress', 'processing'].includes((o.status || '').toLowerCase())).length;
+            const newPendingCount = orders.filter(o => (o.status || '').toLowerCase() === 'pending').length;
+            const newCanceledCount = orders.filter(o => ['canceled', 'refunded', 'canceled & refund'].includes((o.status || '').toLowerCase())).length;
+
+            if (totalElem) totalElem.textContent = newTotalCount.toLocaleString();
+            if (completedSubElem) completedSubElem.textContent = `${newCompletedCount.toLocaleString()} completed`;
+            if (inProgressElem) inProgressElem.textContent = `${newInProgressCount.toLocaleString()} Orders`;
+            if (pendingElem) pendingElem.textContent = `${newPendingCount.toLocaleString()} Orders`;
+            if (canceledElem) canceledElem.textContent = `${newCanceledCount.toLocaleString()} Orders`;
+
+            applyFilters();
+
+            if (!hasAdminNonFinalizedOrders(orders)) {
+              stopAdminPolling();
+            }
+          }
+        } catch (err) {
+          console.warn('[Admin Orders Poller] Status sync error:', err.message);
+        }
+      }
+
+      function startAdminPolling() {
+        if (!adminPollTimer && hasAdminNonFinalizedOrders(orders)) {
+          adminPollTimer = setInterval(pollAdminOrdersStatus, 10000);
+        }
+      }
+
+      function stopAdminPolling() {
+        if (adminPollTimer) {
+          clearInterval(adminPollTimer);
+          adminPollTimer = null;
+        }
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopAdminPolling();
+        } else if (hasAdminNonFinalizedOrders(orders)) {
+          pollAdminOrdersStatus();
+          startAdminPolling();
+        }
+      });
+
+      startAdminPolling();
     }
   } catch (e) {
     console.error('Failed to load admin orders:', e.message);
