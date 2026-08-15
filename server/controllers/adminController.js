@@ -1,4 +1,5 @@
 const AdminService = require('../services/adminService');
+const MoolreService = require('../services/moolreService');
 
 class AdminController {
   static async getStats(req, res, next) {
@@ -267,6 +268,12 @@ class AdminController {
 
   static async getDeposits(req, res, next) {
     try {
+      try {
+        await MoolreService.repairPendingCompletedTransactions();
+        await MoolreService.expirePendingDeposits();
+      } catch (e) {
+        console.warn('[Admin Deposits Repair Warning]', e.message);
+      }
       const deposits = await AdminService.getAllDeposits();
       res.json({ success: true, deposits });
     } catch (err) {
@@ -276,6 +283,12 @@ class AdminController {
 
   static async getTransactions(req, res, next) {
     try {
+      try {
+        await MoolreService.repairPendingCompletedTransactions();
+        await MoolreService.expirePendingDeposits();
+      } catch (e) {
+        console.warn('[Admin Transactions Repair Warning]', e.message);
+      }
       const transactions = await AdminService.getAllTransactions();
       res.json({ success: true, transactions });
     } catch (err) {

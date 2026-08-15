@@ -9,10 +9,15 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📡 Backend connected to Supabase: ${env.SUPABASE_URL}`);
 
-  // Run initial auto-repair for any pending deposits already credited
-  MoolreService.repairPendingCompletedTransactions().then(count => {
-    if (count > 0) console.log(`[AutoRepair Startup] Marked ${count} credited deposit transaction(s) as completed.`);
-  }).catch(() => {});
+  // Run initial auto-repair and expiration for pending deposits
+  Promise.allSettled([
+    MoolreService.repairPendingCompletedTransactions().then(count => {
+      if (count > 0) console.log(`[AutoRepair Startup] Marked ${count} credited deposit transaction(s) as completed.`);
+    }),
+    MoolreService.expirePendingDeposits().then(count => {
+      if (count > 0) console.log(`[AutoExpire Startup] Expired ${count} old pending deposit transaction(s).`);
+    })
+  ]).catch(() => {});
 
   // Start Background Order & Deposit Status Sync Worker (Runs every 60 seconds with overlap protection)
   const SYNC_INTERVAL_MS = 60000;
@@ -26,6 +31,7 @@ const server = app.listen(PORT, () => {
         console.log(`[Background Sync] Successfully updated ${updatedCount} active order(s) in Supabase database.`);
       }
       await MoolreService.repairPendingCompletedTransactions();
+      await MoolreService.expirePendingDeposits();
     } catch (err) {
       console.error('[Background Sync Worker Error]:', err.message);
     } finally {
