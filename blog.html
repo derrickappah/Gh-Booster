@@ -10,7 +10,7 @@
 
     gtag('config', 'AW-18386262158');
   </script>
-    <!-- Anti-Flash & Failsafe Dark Mode Script -->
+  <!-- Anti-Flash & Failsafe Dark Mode Script -->
   <script>
     (function(){
       var t = localStorage.getItem('ghb_theme');
@@ -109,15 +109,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Favicon & Icons -->
   <link rel="icon" type="image/png" sizes="32x32" href="/src/img/favicon.png?v=5">
-  <link rel="icon" type="image/png" sizes="192x192" href="/src/img/favicon.png?v=5">
-  <link rel="apple-touch-icon" sizes="180x180" href="/src/img/favicon.png?v=5">
-  <link rel="shortcut icon" href="/favicon.ico?v=5">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col dark:bg-gray-900">
 
-  <!-- ========== { HEADER } ========== -->
+  <!-- HEADER -->
   <header class="fixed top-0 left-0 right-0 z-40 h-20 flex items-center bg-white/95 backdrop-blur border-b border-gray-100 dark:border-gray-800 shadow-sm dark:bg-gray-800/95">
      <nav class="w-full">
         <div class="container xl:max-w-6xl mx-auto px-4">
@@ -129,9 +125,8 @@
               </picture>
             </a>
             
-            <!-- Desktop Nav Buttons -->
             <div class="flex items-center space-x-3">
-              <a class="px-5 py-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white font-bold hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:border-gray-600 transition shadow-sm text-sm" href="/login">Login</a>
+              <a class="px-5 py-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition shadow-sm text-sm" href="/login">Login</a>
               <a class="px-5 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 text-white font-semibold transition text-sm shadow-md shadow-pink-600/10" href="/register">Create Account</a>
             </div>
           </div>
@@ -139,15 +134,14 @@
      </nav>
   </header>
 
-  <!-- ========== { MAIN CONTENT } ========== -->
+  <!-- MAIN CONTENT -->
   <main class="flex-grow pt-20">
     
     <!-- Hero Section -->
     <section class="relative bg-gradient-to-tr from-pink-700 via-pink-600 to-indigo-900 text-white py-16 md:py-24 overflow-hidden">
-      <!-- Background decorative shapes -->
       <div class="absolute inset-0 opacity-10">
-        <div class="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-white filter blur-2xl dark:bg-gray-800"></div>
-        <div class="absolute -bottom-20 -right-10 w-96 h-96 rounded-full bg-white filter blur-2xl dark:bg-gray-800"></div>
+        <div class="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-white filter blur-2xl"></div>
+        <div class="absolute -bottom-20 -right-10 w-96 h-96 rounded-full bg-white filter blur-2xl"></div>
       </div>
       
       <div class="container xl:max-w-6xl mx-auto px-4 relative z-10 text-center">
@@ -158,7 +152,6 @@
         </p>
         <div class="flex justify-center items-center space-x-3">
           <a href="/rss.xml" target="_blank" class="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white text-xs font-semibold rounded-full border border-white/20 transition">
-            <svg class="w-4 h-4 text-red-400 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.065-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
             <span>Pinterest RSS Feed</span>
           </a>
         </div>
@@ -170,8 +163,8 @@
       <div class="container xl:max-w-6xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         
         <!-- Category Filter Pills -->
-        <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          <button class="cat-btn px-4 py-2 bg-pink-600 text-white font-semibold text-xs rounded-xl shadow-md shadow-pink-600/10 transition flex-shrink-0 active" data-category="all">
+        <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0">
+          <button class="cat-btn px-4 py-2 bg-pink-600 text-white font-semibold text-xs rounded-xl shadow-md transition flex-shrink-0 active" data-category="all">
             All Articles
           </button>
           <button class="cat-btn px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-semibold text-xs rounded-xl transition flex-shrink-0 dark:bg-gray-900 dark:text-gray-300" data-category="instagram">
@@ -186,21 +179,22 @@
           <button class="cat-btn px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-semibold text-xs rounded-xl transition flex-shrink-0 dark:bg-gray-900 dark:text-gray-300" data-category="telegram">
             Telegram
           </button>
+          <button class="cat-btn px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 font-semibold text-xs rounded-xl transition flex-shrink-0 dark:bg-gray-900 dark:text-gray-300" data-category="api">
+            Reseller API
+          </button>
         </div>
 
         <!-- Search Bar -->
         <div class="relative w-full md:w-80">
-          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </span>
-          <input type="text" id="blog-search" placeholder="Search growth guides..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition-all dark:bg-gray-800 dark:border-gray-700">
+          <input type="text" id="blog-search" placeholder="Search growth guides..." class="w-full pl-4 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition-all dark:bg-gray-800 dark:border-gray-700">
         </div>
-
       </div>
     </section>
 
+    <!-- Blog Posts Content Grid -->
+    <section class="py-12 bg-gray-50 dark:bg-gray-900 min-h-[500px]">
+      <div class="container xl:max-w-6xl mx-auto px-4">
+        
         <!-- Platform Hub Links Banner -->
         <div class="mb-12 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-wrap items-center justify-between gap-4 dark:bg-gray-800 dark:border-gray-700">
           <div>
@@ -208,15 +202,123 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Dedicated SMM panels for instant automated growth.</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <a href="/smm-panel-instagram.html" class="px-3.5 py-1.5 bg-pink-50 text-pink-700 hover:bg-pink-100 rounded-lg text-xs font-bold transition">Instagram SMM</a>
-            <a href="/smm-panel-tiktok.html" class="px-3.5 py-1.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg text-xs font-bold transition">TikTok SMM</a>
-            <a href="/smm-panel-youtube.html" class="px-3.5 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-xs font-bold transition">YouTube SMM</a>
-            <a href="/smm-panel-telegram.html" class="px-3.5 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-lg text-xs font-bold transition">Telegram SMM</a>
+            <a href="/smm-panel-ghana.html" class="px-3.5 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-xs font-bold transition">Ghana Panel</a>
+            <a href="/smm-panel-nigeria.html" class="px-3.5 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg text-xs font-bold transition">Nigeria Panel</a>
+            <a href="/smm-panel-kenya.html" class="px-3.5 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-xs font-bold transition">Kenya Panel</a>
+            <a href="/smm-panel-south-africa.html" class="px-3.5 py-1.5 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 rounded-lg text-xs font-bold transition">South Africa Panel</a>
+            <a href="/smm-panel-instagram.html" class="px-3.5 py-1.5 bg-pink-50 text-pink-700 hover:bg-pink-100 rounded-lg text-xs font-bold transition">Instagram</a>
+            <a href="/smm-panel-tiktok.html" class="px-3.5 py-1.5 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg text-xs font-bold transition">TikTok</a>
+            <a href="/smm-panel-youtube.html" class="px-3.5 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-xs font-bold transition">YouTube</a>
           </div>
         </div>
 
         <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           
+          <!-- Card New 1: TikTok Monetization Ghana -->
+          <article class="article-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800" data-category="tiktok">
+            <div class="h-56 bg-gradient-to-br from-teal-600 to-indigo-900 relative flex items-center justify-center p-6 text-white text-center">
+              <div class="absolute inset-0 bg-black/10"></div>
+              <div class="relative z-10 space-y-2">
+                <span class="px-2.5 py-1 bg-white/20 backdrop-blur rounded text-[10px] font-bold uppercase tracking-wider">🇬🇭 Ghana Creator Guide</span>
+                <h3 class="text-2xl font-bold font-serif leading-tight">Monetize TikTok Ghana</h3>
+              </div>
+            </div>
+            <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+              <div class="space-y-2">
+                <div class="flex items-center space-x-2 text-xs text-gray-400">
+                  <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-bold rounded">TikTok Ghana</span>
+                  <span>•</span>
+                  <span>7 min read</span>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
+                  <a href="/blog-how-to-monetize-tiktok-ghana.html">How to Monetize TikTok in Ghana (2026 Step-by-Step Creator Guide)</a>
+                </h2>
+                <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
+                  Learn how Ghanaian creators qualify for the TikTok Creator Rewards Program, live gifts, brand deals, and unlock TikTok monetization fast.
+                </p>
+              </div>
+              <div class="pt-4 border-t border-gray-50 flex items-center justify-between text-xs">
+                <div class="flex items-center space-x-2">
+                  <span class="w-8 h-8 rounded-full bg-teal-100 text-teal-700 font-bold text-center leading-8 text-[11px]">GH</span>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
+                </div>
+                <a href="/blog-how-to-monetize-tiktok-ghana.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card New 2: YouTube Watch Hours -->
+          <article class="article-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800" data-category="youtube">
+            <div class="h-56 bg-gradient-to-br from-red-700 to-amber-900 relative flex items-center justify-center p-6 text-white text-center">
+              <div class="absolute inset-0 bg-black/10"></div>
+              <div class="relative z-10 space-y-2">
+                <span class="px-2.5 py-1 bg-white/20 backdrop-blur rounded text-[10px] font-bold uppercase tracking-wider">Monetization Secrets</span>
+                <h3 class="text-2xl font-bold font-serif leading-tight">4,000 Watch Hours Fast</h3>
+              </div>
+            </div>
+            <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+              <div class="space-y-2">
+                <div class="flex items-center space-x-2 text-xs text-gray-400">
+                  <span class="px-2 py-0.5 bg-red-50 text-red-700 font-bold rounded">YouTube Ghana</span>
+                  <span>•</span>
+                  <span>8 min read</span>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
+                  <a href="/blog-how-to-get-4000-youtube-watch-hours.html">How to Get 4000 Watch Hours & 1000 Subscribers on YouTube in Ghana</a>
+                </h2>
+                <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
+                  Fast-track your YouTube Partner Program approval in Ghana with proven watch time strategies and non-drop subscriber packages.
+                </p>
+              </div>
+              <div class="pt-4 border-t border-gray-50 flex items-center justify-between text-xs">
+                <div class="flex items-center space-x-2">
+                  <span class="w-8 h-8 rounded-full bg-red-100 text-red-700 font-bold text-center leading-8 text-[11px]">YT</span>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
+                </div>
+                <a href="/blog-how-to-get-4000-youtube-watch-hours.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card New 3: SMM Reseller Business -->
+          <article class="article-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800" data-category="api">
+            <div class="h-56 bg-gradient-to-br from-indigo-800 to-purple-900 relative flex items-center justify-center p-6 text-white text-center">
+              <div class="absolute inset-0 bg-black/10"></div>
+              <div class="relative z-10 space-y-2">
+                <span class="px-2.5 py-1 bg-white/20 backdrop-blur rounded text-[10px] font-bold uppercase tracking-wider">Business Blueprint</span>
+                <h3 class="text-2xl font-bold font-serif leading-tight">Start SMM Reseller Panel</h3>
+              </div>
+            </div>
+            <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+              <div class="space-y-2">
+                <div class="flex items-center space-x-2 text-xs text-gray-400">
+                  <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold rounded">Reseller Business</span>
+                  <span>•</span>
+                  <span>10 min read</span>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
+                  <a href="/blog-start-smm-reseller-business.html">How to Start an SMM Reseller Business & Make Money in 2026</a>
+                </h2>
+                <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
+                  Step-by-step guide to launching your own profitable SMM website with GhBooster child panel and automated wholesale API.
+                </p>
+              </div>
+              <div class="pt-4 border-t border-gray-50 flex items-center justify-between text-xs">
+                <div class="flex items-center space-x-2">
+                  <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-center leading-8 text-[11px]">BIZ</span>
+                  <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
+                </div>
+                <a href="/blog-start-smm-reseller-business.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
+                </a>
+              </div>
+            </div>
+          </article>
+
           <!-- Card 0: API Developer Guide -->
           <article class="article-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800" data-category="api">
             <div class="h-56 bg-gradient-to-br from-gray-900 to-indigo-900 relative flex items-center justify-center p-6 text-white text-center">
@@ -246,15 +348,12 @@
                   <span class="font-medium text-gray-700 dark:text-gray-300">By Tech Engineering</span>
                 </div>
                 <a href="/blog-smm-panel-api-guide.html" class="text-pink-600 font-bold hover:underline flex items-center">
-                  Read Article
-                  <svg class="w-3.5 h-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                  Read Article →
                 </a>
               </div>
             </div>
           </article>
-          
+
           <!-- Card 1: Instagram -->
           <article class="article-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transform transition duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col dark:bg-gray-800 dark:border-gray-800" data-category="instagram">
             <div class="h-56 bg-gradient-to-br from-pink-500 to-indigo-500 relative flex items-center justify-center p-6 text-white text-center">
@@ -272,7 +371,7 @@
                   <span>8 min read</span>
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
-                  <a href="/blog-instagram-followers">How to Get More Instagram Followers in 2026: The Ultimate SMM Strategy</a>
+                  <a href="/blog-instagram-followers.html">How to Get More Instagram Followers in 2026: The Ultimate SMM Strategy</a>
                 </h2>
                 <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
                   Understand the latest Instagram recommendations algorithm, explore how non-drop followers establish social proof, and discover a step-by-step engagement model.
@@ -283,11 +382,8 @@
                   <span class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 font-bold text-center leading-8 text-[11px]">GB</span>
                   <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
                 </div>
-                <a href="/blog-instagram-followers" class="text-pink-600 font-bold hover:underline flex items-center">
-                  Read Article
-                  <svg class="w-3.5 h-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                <a href="/blog-instagram-followers.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
                 </a>
               </div>
             </div>
@@ -305,12 +401,12 @@
             <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
               <div class="space-y-2">
                 <div class="flex items-center space-x-2 text-xs text-gray-400">
-                  <span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded">TikTok</span>
+                  <span class="px-2 py-0.5 bg-teal-50 text-teal-700 font-bold rounded">TikTok</span>
                   <span>•</span>
                   <span>7 min read</span>
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
-                  <a href="/blog-tiktok-views">How to Go Viral on TikTok: Algorithm Secrets and SMM Growth Hacks</a>
+                  <a href="/blog-tiktok-views.html">How to Go Viral on TikTok: Algorithm Secrets and SMM Growth Hacks</a>
                 </h2>
                 <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
                   Break down the TikTok feed loop factors: average watch duration, completion rates, and shares. Learn how targeted views can trigger algorithmic push.
@@ -321,11 +417,8 @@
                   <span class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 font-bold text-center leading-8 text-[11px]">GB</span>
                   <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
                 </div>
-                <a href="/blog-tiktok-views" class="text-pink-600 font-bold hover:underline flex items-center">
-                  Read Article
-                  <svg class="w-3.5 h-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                <a href="/blog-tiktok-views.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
                 </a>
               </div>
             </div>
@@ -343,12 +436,12 @@
             <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
               <div class="space-y-2">
                 <div class="flex items-center space-x-2 text-xs text-gray-400">
-                  <span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded">YouTube</span>
+                  <span class="px-2 py-0.5 bg-red-50 text-red-700 font-bold rounded">YouTube</span>
                   <span>•</span>
                   <span>9 min read</span>
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
-                  <a href="/blog-youtube-subscribers">Safe YouTube Monetization: Boosting Watch Hours and Subscribers with SMM</a>
+                  <a href="/blog-youtube-subscribers.html">Safe YouTube Monetization: Boosting Watch Hours and Subscribers with SMM</a>
                 </h2>
                 <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
                   Understand the mechanics of crossing the YouTube Partner Program threshold. Learn about high-retention views and how SMM panels accelerate monetization safely.
@@ -359,11 +452,8 @@
                   <span class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 font-bold text-center leading-8 text-[11px]">GB</span>
                   <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
                 </div>
-                <a href="/blog-youtube-subscribers" class="text-pink-600 font-bold hover:underline flex items-center">
-                  Read Article
-                  <svg class="w-3.5 h-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                <a href="/blog-youtube-subscribers.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
                 </a>
               </div>
             </div>
@@ -381,12 +471,12 @@
             <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
               <div class="space-y-2">
                 <div class="flex items-center space-x-2 text-xs text-gray-400">
-                  <span class="px-2 py-0.5 bg-pink-50 text-pink-700 font-bold rounded">Telegram</span>
+                  <span class="px-2 py-0.5 bg-sky-50 text-sky-700 font-bold rounded">Telegram</span>
                   <span>•</span>
                   <span>6 min read</span>
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white hover:text-pink-600 transition">
-                  <a href="/blog-telegram-members">The Ultimate Telegram Channel Growth Guide: Members, Views, & Auto-Reactions</a>
+                  <a href="/blog-telegram-members.html">The Ultimate Telegram Channel Growth Guide: Members, Views, & Auto-Reactions</a>
                 </h2>
                 <p class="text-gray-600 text-sm font-light leading-relaxed dark:text-gray-300">
                   Discover how to scale your Telegram channels, increase social proof with custom members, automate views, and drive organic reactions.
@@ -397,11 +487,8 @@
                   <span class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 font-bold text-center leading-8 text-[11px]">GB</span>
                   <span class="font-medium text-gray-700 dark:text-gray-300">By GhBooster Team</span>
                 </div>
-                <a href="/blog-telegram-members" class="text-pink-600 font-bold hover:underline flex items-center">
-                  Read Article
-                  <svg class="w-3.5 h-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                <a href="/blog-telegram-members.html" class="text-pink-600 font-bold hover:underline flex items-center">
+                  Read Article →
                 </a>
               </div>
             </div>
@@ -409,58 +496,49 @@
 
         </div>
 
-        <!-- No Results Msg -->
-        <div id="no-results" class="hidden text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm mt-8 dark:bg-gray-800 dark:border-gray-800">
-          <svg class="h-12 w-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h3 class="text-lg font-bold text-gray-700 dark:text-white mb-1">No articles found</h3>
-          <p class="text-gray-500 text-sm dark:text-gray-400">Try searching for another keyword or selecting a different platform.</p>
-        </div>
-
       </div>
     </section>
 
   </main>
 
-  <!-- ========== { FOOTER } ========== -->
+  <!-- FOOTER -->
   <footer class="bg-gray-50 text-gray-700 border-t border-gray-200 mt-auto dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300">
     <div id="footer-content" class="relative pt-8 xl:pt-16 pb-6 xl:pb-12">
       <div class="container xl:max-w-6xl mx-auto px-4 overflow-hidden">
         <div class="flex flex-wrap flex-row lg:justify-between -mx-3">
           <div class="flex-shrink max-w-full w-full lg:w-2/5 px-3 lg:pr-16">
             <div class="flex items-center mb-2">
-              <span class="text-3xl leading-normal mb-2 font-bold text-gray-800 mt-2"><span class="text-blue-600 dark:text-blue-500">Gh</span><span class="text-pink-600 dark:text-pink-500">Booster</span></span>
+              <span class="text-3xl leading-normal mb-2 font-bold text-gray-800 mt-2 dark:text-white"><span class="text-blue-600 dark:text-blue-500">Gh</span><span class="text-pink-600 dark:text-pink-500">Booster</span></span>
             </div>
             <p class="text-sm leading-relaxed">GhBooster is the premier Social Media Marketing (SMM) panel providing instant, high-quality, and affordable social media growth services worldwide.</p>
           </div>
           <div class="flex-shrink max-w-full w-full lg:w-3/5 px-3">
-            <div class="flex flex-wrap flex-row">
-              <div class="flex-shrink max-w-full w-1/2 md:w-1/3 mb-6 lg:mb-0">
-                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Services</h4>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div>
+                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Top Services</h4>
                 <ul class="text-sm space-y-2">
-                  <li class="hover:text-gray-900"><a href="index.html#services">Instagram Followers</a></li>
-                  <li class="hover:text-gray-900"><a href="index.html#services">TikTok Likes & Views</a></li>
-                  <li class="hover:text-gray-900"><a href="index.html#services">YouTube Subscribers</a></li>
-                  <li class="hover:text-gray-900"><a href="index.html#services">Telegram Members</a></li>
+                  <li><a href="/buy-instagram-followers-ghana.html" class="hover:text-pink-600">Instagram Followers</a></li>
+                  <li><a href="/buy-tiktok-views-ghana.html" class="hover:text-blue-600">TikTok Views</a></li>
+                  <li><a href="/buy-youtube-subscribers-ghana.html" class="hover:text-red-600">YouTube Monetization</a></li>
+                  <li><a href="/buy-telegram-members-ghana.html" class="hover:text-sky-500">Telegram Members</a></li>
                 </ul>
               </div>
-              <div class="flex-shrink max-w-full w-1/2 md:w-1/3 mb-6 lg:mb-0">
-                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Quick Links</h4>
+              <div>
+                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Explore</h4>
                 <ul class="text-sm space-y-2">
-                  <li class="hover:text-gray-900"><a href="/">Home</a></li>
-                  <li class="hover:text-gray-900"><a href="/blog" class="text-pink-600 font-semibold">Blog</a></li>
-                  <li class="hover:text-gray-900"><a href="/reviews">Reviews</a></li>
-                  <li class="hover:text-gray-900"><a href="/faq">FAQ</a></li>
+                  <li><a href="/services">Full Price List</a></li>
+                  <li><a href="/blog">SEO & Growth Blog</a></li>
+                  <li><a href="/faq">FAQ</a></li>
+                  <li><a href="/reviews">Reviews</a></li>
                 </ul>
               </div>
-              <div class="flex-shrink max-w-full w-1/2 md:w-1/3 mb-6 lg:mb-0">
-                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Legal</h4>
+              <div>
+                <h4 class="text-sm font-semibold uppercase text-gray-800 dark:text-white mb-3 tracking-wider">Regional Hubs</h4>
                 <ul class="text-sm space-y-2">
-                  <li class="hover:text-gray-900"><a href="/terms">Privacy Policy</a></li>
-                  <li class="hover:text-gray-900"><a href="/terms">Terms of Service</a></li>
-                  <li class="hover:text-gray-900"><a href="/terms">Refund Policy</a></li>
-                  <li class="hover:text-gray-900"><a href="/api-docs">API Documentation</a></li>
+                  <li><a href="/smm-panel-ghana.html">Ghana SMM Panel</a></li>
+                  <li><a href="/smm-panel-nigeria.html">Nigeria SMM Panel</a></li>
+                  <li><a href="/smm-panel-kenya.html">Kenya SMM Panel</a></li>
+                  <li><a href="/smm-panel-south-africa.html">South Africa SMM Panel</a></li>
                 </ul>
               </div>
             </div>
@@ -468,74 +546,52 @@
         </div>
       </div>
     </div>
-    
-    <div class="border-t border-gray-200/50 py-4 text-center text-xs text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400">
+    <div class="border-t border-gray-200/50 pt-4 text-center text-xs text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400">
       Copyright © GhBooster | All rights reserved.
     </div>
   </footer>
 
-  <!-- ========== { INTERACTIVE SCRIPTS } ========== -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const searchInput = document.getElementById("blog-search");
-      const catButtons = document.querySelectorAll(".cat-btn");
-      const articles = document.querySelectorAll(".article-card");
-      const noResults = document.getElementById("no-results");
-      
-      let activeCategory = "all";
-      let searchQuery = "";
+    // Blog filtering logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('blog-search');
+      const catBtns = document.querySelectorAll('.cat-btn');
+      const articles = document.querySelectorAll('.article-card');
 
       function filterArticles() {
-        let matchCount = 0;
-        
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const activeCat = document.querySelector('.cat-btn.active')?.dataset.category || 'all';
+
         articles.forEach(article => {
-          const category = article.getAttribute("data-category");
-          const title = article.querySelector("h2").textContent.toLowerCase();
-          const desc = article.querySelector("p").textContent.toLowerCase();
-          
-          const matchesCategory = (activeCategory === "all" || category === activeCategory);
-          const matchesSearch = (title.includes(searchQuery) || desc.includes(searchQuery));
-          
-          if (matchesCategory && matchesSearch) {
-            article.style.display = "flex";
-            matchCount++;
+          const cat = article.dataset.category || '';
+          const text = article.textContent.toLowerCase();
+          const matchesCat = (activeCat === 'all' || cat === activeCat);
+          const matchesQuery = query === '' || text.includes(query);
+
+          if (matchesCat && matchesQuery) {
+            article.classList.remove('hidden');
           } else {
-            article.style.display = "none";
+            article.classList.add('hidden');
           }
         });
-
-        if (matchCount === 0) {
-          noResults.classList.remove("hidden");
-        } else {
-          noResults.classList.add("hidden");
-        }
       }
 
-      // Search input listener
-      searchInput.addEventListener("input", function (e) {
-        searchQuery = e.target.value.toLowerCase().trim();
-        filterArticles();
-      });
-
-      // Category click listener
-      catButtons.forEach(btn => {
-        btn.addEventListener("click", function () {
-          // Remove active styles from other buttons
-          catButtons.forEach(b => {
-            b.classList.remove("bg-pink-600", "text-white", "shadow-md", "shadow-pink-600/10");
-            b.classList.add("bg-gray-50", "text-gray-600");
+      catBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          catBtns.forEach(b => {
+            b.classList.remove('active', 'bg-pink-600', 'text-white');
+            b.classList.add('bg-gray-50', 'text-gray-600');
           });
-          
-          // Add active styles to clicked button
-          btn.classList.remove("bg-gray-50", "text-gray-600");
-          btn.classList.add("bg-pink-600", "text-white", "shadow-md", "shadow-pink-600/10");
-          
-          activeCategory = btn.getAttribute("data-category");
+          btn.classList.add('active', 'bg-pink-600', 'text-white');
+          btn.classList.remove('bg-gray-50', 'text-gray-600');
           filterArticles();
         });
       });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', filterArticles);
+      }
     });
   </script>
-
 </body>
 </html>
