@@ -59,6 +59,13 @@ class SmmgenService {
   }
 
   static async _fetchWithTimeout(url, options, timeoutMs = 10000) {
+    const { validateSafeUrl } = require('../utils/urlValidator');
+    const urlCheck = await validateSafeUrl(url);
+    if (!urlCheck.safe) {
+      console.error(`[SMMGen SSRF Blocked] URL: ${url} Reason: ${urlCheck.reason}`);
+      throw new Error(`Outbound request blocked by security policy: ${urlCheck.reason}`);
+    }
+
     const httpFetch = globalThis.fetch || require('node-fetch');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);

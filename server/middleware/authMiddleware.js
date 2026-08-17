@@ -23,9 +23,9 @@ async function authenticateToken(req, res, next) {
   }
 
   try {
-    // 1. Try Custom JWT verification signed with JWT_SECRET
+    // 1. Try Custom JWT verification signed with JWT_SECRET (strictly enforce HS256)
     try {
-      const decoded = jwt.verify(token, env.JWT_SECRET);
+      const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
       if (decoded && decoded.id) {
         const { data: profile } = await supabaseAdmin
           .from('profiles')

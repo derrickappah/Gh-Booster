@@ -21,29 +21,19 @@ router.post('/order', authenticateToken, async (req, res) => {
 
     const price = 25.00;
 
-    const { data: wallet } = await supabaseAdmin.from('wallets').select('*').eq('user_id', req.user.id).maybeSingle();
-    const currentBalance = wallet ? parseFloat(wallet.balance) : 0;
-
-    if (currentBalance < price) {
-      return res.status(400).json({ success: false, error: `Insufficient wallet balance (GH₵${currentBalance.toFixed(2)}). Child panel costs GH₵${price.toFixed(2)}.` });
-    }
-
-    const newBalance = currentBalance - price;
-
-    // ATOMIC balance deduction: gte('balance', price) ensures no race condition
-    const { data: updatedWallet, error: wErr } = await supabaseAdmin
-      .from('wallets')
-      .update({
-        balance: newBalance,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', req.user.id)
-      .gte('balance', price)
-      .select('balance')
-      .maybeSingle();
-
-    if (wErr || !updatedWallet) {
-      return res.status(400).json({ success: false, error: 'Insufficient balance. Your balance may have changed. Please try again.' });
+    let newBalance;
+    try {
+      const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('debit_wallet', {
+        p_user_id: req.user.id,
+        p_amount: price
+      });
+      if (rpcErr) throw rpcErr;
+      newBalance = parseFloat(rpcBal);
+    } catch (debitErr) {
+      return res.status(400).json({
+        success: false,
+        error: `Insufficient wallet balance. Child panel costs GH₵${price.toFixed(2)}.`
+      });
     }
 
     const { hashPassword } = require('../auth');

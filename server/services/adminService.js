@@ -555,12 +555,26 @@ class AdminService {
   }
 
   static async createProvider(providerData) {
+    const { validateSafeUrl } = require('../utils/urlValidator');
+    if (providerData?.api_url) {
+      const urlCheck = await validateSafeUrl(providerData.api_url);
+      if (!urlCheck.safe) {
+        throw new Error(`Provider API URL rejected by security policy: ${urlCheck.reason}`);
+      }
+    }
     const { data, error } = await supabaseAdmin.from('providers').insert([providerData]).select();
     if (error) throw new Error(error.message);
     return data[0];
   }
 
   static async updateProvider(id, providerData) {
+    const { validateSafeUrl } = require('../utils/urlValidator');
+    if (providerData?.api_url) {
+      const urlCheck = await validateSafeUrl(providerData.api_url);
+      if (!urlCheck.safe) {
+        throw new Error(`Provider API URL rejected by security policy: ${urlCheck.reason}`);
+      }
+    }
     const { data, error } = await supabaseAdmin.from('providers').update(providerData).eq('id', id).select();
     if (error) throw new Error(error.message);
     return data[0];
@@ -575,51 +589,10 @@ class AdminService {
     let syncDetails = '';
 
     if (provider.api_url && provider.api_key) {
-      // Validate URL to prevent SSRF attacks via DNS resolution & private IP validation
-      try {
-        const parsedUrl = new URL(provider.api_url);
-        const dns = require('dns').promises;
-        const net = require('net');
-
-        if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
-          throw new Error('Only HTTP/HTTPS protocols are allowed for provider API endpoints');
-        }
-
-        const addrs4 = await dns.resolve4(parsedUrl.hostname).catch(() => []);
-        const addrs6 = await dns.resolve6(parsedUrl.hostname).catch(() => []);
-        const allAddrs = [...addrs4, ...addrs6];
-
-        for (const addr of allAddrs) {
-          if (net.isIP(addr) === 4) {
-            const parts = addr.split('.').map(Number);
-            if (
-              parts[0] === 10 ||
-              parts[0] === 127 ||
-              parts[0] === 0 ||
-              (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
-              (parts[0] === 192 && parts[1] === 168) ||
-              (parts[0] === 169 && parts[1] === 254)
-            ) {
-              throw new Error('Internal/private URLs are not allowed for provider API endpoints');
-            }
-          } else if (net.isIP(addr) === 6) {
-            const lowerAddr = addr.toLowerCase();
-            if (
-              lowerAddr === '::1' ||
-              lowerAddr.startsWith('fe80:') ||
-              lowerAddr.startsWith('fc00:') ||
-              lowerAddr.startsWith('fd00:') ||
-              lowerAddr.startsWith('::ffff:127.') ||
-              lowerAddr.startsWith('::ffff:10.') ||
-              lowerAddr.startsWith('::ffff:192.168.')
-            ) {
-              throw new Error('Internal/private URLs are not allowed for provider API endpoints');
-            }
-          }
-        }
-      } catch (urlErr) {
-        if (urlErr.message.includes('not allowed') || urlErr.message.includes('protocols are allowed')) throw urlErr;
-        throw new Error('Invalid provider API URL format');
+      const { validateSafeUrl } = require('../utils/urlValidator');
+      const urlCheck = await validateSafeUrl(provider.api_url);
+      if (!urlCheck.safe) {
+        throw new Error(`Provider API URL rejected by security policy: ${urlCheck.reason}`);
       }
       try {
         const httpFetch = globalThis.fetch || require('node-fetch');
