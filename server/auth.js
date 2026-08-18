@@ -16,7 +16,13 @@ async function comparePassword(password, hash) {
 
 function generateToken(user) {
   return jwt.sign(
-    { id: user.id, username: user.username, role: user.role, email: user.email },
+    {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      email: user.email,
+      token_version: user.token_version !== undefined ? user.token_version : 1
+    },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN || '7d' }
   );

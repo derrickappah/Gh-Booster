@@ -52,9 +52,11 @@ const allowedOrigins = [
   'https://ghbooster.com',
   'https://www.ghbooster.com',
   'https://ghbooster.vercel.app',
-  'http://localhost:5000',
-  'http://localhost:3000',
-  'http://127.0.0.1:5000'
+  ...(process.env.NODE_ENV !== 'production' ? [
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'http://127.0.0.1:5000'
+  ] : [])
 ];
 app.use(cors({
   origin: function (origin, callback) {

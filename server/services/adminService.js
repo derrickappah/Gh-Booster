@@ -267,6 +267,12 @@ class AdminService {
       .single();
 
     if (error) throw new Error(error.message);
+
+    // Increment token_version to immediately revoke existing sessions under the old role
+    try {
+      await supabaseAdmin.rpc('increment_token_version', { p_user_id: userId });
+    } catch (_) {}
+
     return { message: `User role updated to "${cleanRole}" successfully`, profile: data };
   }
 
@@ -282,18 +288,25 @@ class AdminService {
       .maybeSingle();
 
     const oldBal = wallet ? parseFloat(wallet.balance || 0) : 0.0;
+    const diff = Math.round((balance - oldBal) * 10000) / 10000;
+    let finalBalance = oldBal;
 
-    if (wallet && wallet.id) {
-      const { error } = await supabaseAdmin
-        .from('wallets')
-        .update({ balance, updated_at: new Date().toISOString() })
-        .eq('user_id', userId);
-      if (error) throw new Error(error.message);
+    if (diff > 0) {
+      const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('credit_wallet', {
+        p_user_id: userId,
+        p_amount: diff
+      });
+      if (rpcErr) throw new Error(`Failed to credit balance: ${rpcErr.message}`);
+      finalBalance = parseFloat(rpcBal);
+    } else if (diff < 0) {
+      const { data: rpcBal, error: rpcErr } = await supabaseAdmin.rpc('debit_wallet', {
+        p_user_id: userId,
+        p_amount: Math.abs(diff)
+      });
+      if (rpcErr) throw new Error(`Failed to debit balance: ${rpcErr.message}`);
+      finalBalance = parseFloat(rpcBal);
     } else {
-      const { error } = await supabaseAdmin
-        .from('wallets')
-        .insert({ user_id: userId, balance, currency: 'GHS', updated_at: new Date().toISOString() });
-      if (error) throw new Error(error.message);
+      finalBalance = oldBal;
     }
 
     const note = reason ? ` (Note: ${reason})` : '';
@@ -302,13 +315,12 @@ class AdminService {
       await supabaseAdmin.from('audit_logs').insert({
         user_id: userId,
         action: 'UPDATE_BALANCE',
-        details: `Admin changed user balance from GH₵${oldBal.toFixed(2)} to GH₵${balance.toFixed(2)}${note}`
+        details: `Admin changed user balance from GH₵${oldBal.toFixed(2)} to GH₵${finalBalance.toFixed(2)}${note}`
       });
     } catch (_) {}
 
     // Record audit entry in transactions ledger
     try {
-      const diff = balance - oldBal;
       if (diff !== 0) {
         const txRef = `adm_adj_${Date.now().toString(36)}`;
         await supabaseAdmin.from('transactions').insert({
@@ -320,14 +332,14 @@ class AdminService {
           payment_ref: txRef,
           type: diff < 0 ? 'withdrawal' : 'bonus',
           status: 'completed',
-          description: reason || `Admin manual balance adjustment from GH₵${oldBal.toFixed(2)} to GH₵${balance.toFixed(2)}`
+          description: reason || `Admin manual balance adjustment from GH₵${oldBal.toFixed(2)} to GH₵${finalBalance.toFixed(2)}`
         });
       }
     } catch (txErr) {
       console.error('[AdminService] Failed to record transaction audit for balance adjustment:', txErr.message);
     }
 
-    return { success: true, new_balance: balance, message: `User balance updated to GH₵${balance.toFixed(2)}` };
+    return { success: true, new_balance: finalBalance, message: `User balance updated to GH₵${finalBalance.toFixed(2)}` };
   }
 
   static async getAllOrders() {

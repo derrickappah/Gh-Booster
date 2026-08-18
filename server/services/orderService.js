@@ -436,21 +436,48 @@ class OrderService {
     const currentBalance = wallet ? parseFloat(wallet.balance) : 0.0;
 
     for (const line of lines) {
-      const isPipe = line.includes('|');
-      const parts = isPipe ? line.split('|').map(p => p.trim()) : line.split(/\s+/);
       let serviceId = null;
       let link = null;
       let quantityStr = null;
 
-      if (parts.length >= 3) {
-        serviceId = parts[0];
-        link = parts[1];
-        quantityStr = parts[2];
-      } else if (parts.length === 2 && defaultServiceId) {
+      // 1. Check strict pipe-delimited pattern: service|link|qty or link|qty
+      const pipeThreeMatch = line.match(/^([a-zA-Z0-9_-]+)\|(.+?)\|(\d+)$/);
+      const pipeTwoMatch = line.match(/^(.+?)\|(\d+)$/);
+
+      // 2. Check strict space-delimited pattern: service link qty or link qty
+      const spaceThreeMatch = line.match(/^([a-zA-Z0-9_-]+)\s+(.+?)\s+(\d+)$/);
+      const spaceTwoMatch = line.match(/^(.+?)\s+(\d+)$/);
+
+      if (pipeThreeMatch) {
+        serviceId = pipeThreeMatch[1];
+        link = pipeThreeMatch[2];
+        quantityStr = pipeThreeMatch[3];
+      } else if (spaceThreeMatch) {
+        serviceId = spaceThreeMatch[1];
+        link = spaceThreeMatch[2];
+        quantityStr = spaceThreeMatch[3];
+      } else if (pipeTwoMatch && defaultServiceId) {
         serviceId = defaultServiceId;
-        link = parts[0];
-        quantityStr = parts[1];
-      } else {
+        link = pipeTwoMatch[1];
+        quantityStr = pipeTwoMatch[2];
+      } else if (spaceTwoMatch && defaultServiceId) {
+        serviceId = defaultServiceId;
+        link = spaceTwoMatch[1];
+        quantityStr = spaceTwoMatch[2];
+      } else if (line.includes('|')) {
+        const parts = line.split('|').map(p => p.trim());
+        if (parts.length >= 3) {
+          serviceId = parts[0];
+          link = parts[1];
+          quantityStr = parts[2];
+        } else if (parts.length === 2 && defaultServiceId) {
+          serviceId = defaultServiceId;
+          link = parts[0];
+          quantityStr = parts[1];
+        }
+      }
+
+      if (!serviceId || !link || !quantityStr) {
         results.push({ line, success: false, error: 'Invalid format. Use "link quantity" or "serviceId link quantity"' });
         continue;
       }
@@ -587,6 +614,16 @@ class OrderService {
           } catch (txErr) {}
         } catch (rErr) {
           console.error('[BulkOrders] Failed to refund failed order item:', rErr.message);
+          try {
+            await supabaseAdmin.from('failed_refunds').insert({
+              order_id: null,
+              user_id: userId,
+              amount: item.charge,
+              error: `Bulk order item refund failed for Batch #${newBatch.id}: ${rErr.message}`
+            });
+          } catch (logErr) {
+            console.error('[BulkOrders] Failed to log failed refund:', logErr.message);
+          }
         }
         results.push({ line: item.line, success: false, error: err.message });
       }

@@ -102,7 +102,8 @@ class AuthService {
       throw new Error('Could not initialize user wallet: ' + walletErr.message);
     }
 
-    const token = generateToken({ id: userId, username: targetUsername, role: 'user', email: cleanEmail });
+    const initialTokenVersion = 1;
+    const token = generateToken({ id: userId, username: targetUsername, role: 'user', email: cleanEmail, token_version: initialTokenVersion });
 
     return {
       token,
@@ -163,6 +164,7 @@ class AuthService {
     const { data: wallet } = await supabaseAdmin.from('wallets').select('balance, currency').eq('user_id', userId).maybeSingle();
 
     const userRole = profile?.role || 'user';
+    const tokenVersion = profile?.token_version !== undefined && profile?.token_version !== null ? profile.token_version : 1;
 
     const user = {
       id: userId,
@@ -172,7 +174,8 @@ class AuthService {
       balance: wallet ? parseFloat(wallet.balance) : 0.0,
       currency: wallet?.currency || 'GHS',
       role: userRole,
-      is_admin: userRole === 'admin' || userRole === 'super_admin'
+      is_admin: userRole === 'admin' || userRole === 'super_admin',
+      token_version: tokenVersion
     };
 
     const token = generateToken(user);
@@ -227,6 +230,20 @@ class AuthService {
     }
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, { password: newPassword });
     if (error) throw new Error(error.message);
+
+    // Increment token_version to immediately revoke all existing active sessions on other devices
+    try {
+      const { error: rpcErr } = await supabaseAdmin.rpc('increment_token_version', { p_user_id: userId });
+      if (rpcErr) {
+        // Fallback direct update
+        const { data: curProf } = await supabaseAdmin.from('profiles').select('token_version').eq('id', userId).maybeSingle();
+        const nextVer = ((curProf?.token_version) || 1) + 1;
+        await supabaseAdmin.from('profiles').update({ token_version: nextVer, updated_at: new Date().toISOString() }).eq('id', userId);
+      }
+    } catch (verErr) {
+      console.warn('[AuthService] Could not increment token version:', verErr.message);
+    }
+
     return { message: 'Password updated successfully!' };
   }
 

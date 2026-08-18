@@ -37,6 +37,13 @@ async function authenticateToken(req, res, next) {
           return res.status(401).json({ success: false, error: 'User profile not found. Account may have been deleted.' });
         }
 
+        // Validate token version for instant cross-device session revocation
+        const currentTokenVersion = profile.token_version !== undefined && profile.token_version !== null ? profile.token_version : 1;
+        const decodedTokenVersion = decoded.token_version !== undefined && decoded.token_version !== null ? decoded.token_version : 1;
+        if (decodedTokenVersion !== currentTokenVersion) {
+          return res.status(401).json({ success: false, error: 'Session has been invalidated. Please login again.' });
+        }
+
         const wallet = Array.isArray(profile?.wallets) ? profile.wallets[0] : profile?.wallets;
         const userRole = profile?.role || 'user';
         const rawBalance = wallet ? parseFloat(wallet.balance) : 0.0;
