@@ -3712,10 +3712,11 @@ async function initAdminUsersPage() {
     const res = await API.request('/admin/users');
     if (res.success && res.users) {
       const users = res.users;
+      let currentFilteredUsers = users;
       const totalUsers = res.total !== undefined ? res.total : users.length;
       const totalBalance = users.reduce((acc, u) => acc + (parseFloat(u.balance) || 0), 0);
       const resellerCount = users.filter(u => u.role === 'reseller').length;
-      const adminCount = users.filter(u => u.role === 'admin').length;
+      const adminCount = users.filter(u => u.role === 'admin' || u.role === 'super_admin').length;
 
       if (totalElem) totalElem.textContent = totalUsers.toLocaleString();
       if (balElem) balElem.textContent = `GH₵${totalBalance.toFixed(2)}`;
@@ -3734,20 +3735,32 @@ async function initAdminUsersPage() {
 
         tableBody.innerHTML = userList.map(u => {
           const shortId = (u.id || '').substring(0, 8);
-          const phoneDisplay = u.phone ? `<span class="font-mono text-pink-600 font-bold">${u.phone}</span>` : '<span class="text-gray-400 font-normal italic">N/A</span>';
-          const roleBadgeClass = u.role === 'admin' 
-            ? 'bg-pink-100 text-pink-700 font-bold' 
-            : (u.role === 'reseller' ? 'bg-purple-100 text-purple-700 font-bold' : 'bg-blue-100 text-blue-700 font-bold');
+          const displayName = u.full_name || u.username || 'User Account';
+          const usernameStr = u.username ? `@${u.username}` : '';
+          const emailStr = u.email || '';
+          const roleVal = (u.role || 'user').toLowerCase();
+          
+          let roleBadgeClass = 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-bold';
+          if (roleVal === 'admin' || roleVal === 'super_admin') {
+            roleBadgeClass = 'bg-pink-100 text-pink-700 dark:bg-pink-900/60 dark:text-pink-300 font-bold';
+          } else if (roleVal === 'reseller') {
+            roleBadgeClass = 'bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 font-bold';
+          } else if (roleVal === 'staff') {
+            roleBadgeClass = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold';
+          }
 
           return `
             <tr class="user-row hover:bg-gray-50/50 dark:hover:bg-gray-700/40 transition border-b border-gray-100/50 dark:border-gray-700/50" data-user-id="${encodeURIComponent(u.id)}" data-role="${escapeHtml(u.role || 'user')}">
               <td class="py-4 px-4 font-bold text-pink-600">#${escapeHtml(shortId)}</td>
               <td class="py-4 px-4">
-                <div class="font-bold text-gray-900 dark:text-white text-sm">${escapeHtml(u.username || '')}</div>
-                <div class="text-[10px] text-gray-400 dark:text-gray-300">${escapeHtml(u.email || '')}</div>
+                <div class="font-bold text-gray-900 dark:text-white text-sm">${escapeHtml(displayName)}</div>
+                <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center space-x-1.5 flex-wrap">
+                  ${u.full_name && u.username && u.full_name !== u.username ? `<span class="font-medium text-pink-600 dark:text-pink-400">${escapeHtml(usernameStr)}</span><span class="text-gray-300 dark:text-gray-600">•</span>` : ''}
+                  <span>${escapeHtml(emailStr)}</span>
+                </div>
               </td>
               <td class="py-4 px-4 font-mono text-xs">
-                ${u.phone ? `<span class="font-mono text-pink-600 font-bold">${escapeHtml(u.phone)}</span>` : '<span class="text-gray-400 font-normal italic">N/A</span>'}
+                ${u.phone ? `<span class="font-mono text-pink-600 dark:text-pink-400 font-bold">${escapeHtml(u.phone)}</span>` : '<span class="text-gray-400 font-normal italic">N/A</span>'}
               </td>
               <td class="py-4 px-4">
                 <span class="px-2.5 py-0.5 ${roleBadgeClass} rounded text-[10px] uppercase">${escapeHtml(u.role || 'user')}</span>
@@ -3756,13 +3769,13 @@ async function initAdminUsersPage() {
               <td class="py-4 px-4 font-extrabold text-gray-900 dark:text-white">GH₵${parseFloat(u.total_spent || 0).toFixed(2)}</td>
               <td class="py-4 px-4 text-gray-500 dark:text-gray-300">${escapeHtml(u.created_at || '')}</td>
               <td class="py-4 px-4">
-                <span class="px-2.5 py-1 bg-green-100 text-green-700 rounded-full font-bold text-[11px] inline-flex items-center">
+                <span class="px-2.5 py-1 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded-full font-bold text-[11px] inline-flex items-center">
                   <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse" aria-hidden="true"></span> Active
                 </span>
               </td>
               <td class="py-4 px-4 text-center relative">
                 <div class="inline-block text-left relative">
-                  <button type="button" class="user-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for ${escapeHtml(u.username || 'user')}" title="Admin Actions">
+                  <button type="button" class="user-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for ${escapeHtml(u.username || u.full_name || 'user')}" title="Admin Actions">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                     </svg>
@@ -3821,7 +3834,7 @@ async function initAdminUsersPage() {
             const userId = tr.getAttribute('data-user-id');
             const decodedId = decodeURIComponent(userId);
             const userObj = users.find(u => u.id === userId || u.id === decodedId);
-            const username = userObj ? (userObj.username || userObj.email || 'User Account') : 'User Account';
+            const username = userObj ? (userObj.full_name || userObj.username || userObj.email || 'User Account') : 'User Account';
             const currentBal = userObj ? parseFloat(userObj.balance || 0).toFixed(2) : '0.00';
 
             const menu = tr.querySelector('.user-actions-menu');
@@ -3848,7 +3861,7 @@ async function initAdminUsersPage() {
             const userId = tr.getAttribute('data-user-id');
             const decodedId = decodeURIComponent(userId);
             const userObj = users.find(u => u.id === userId || u.id === decodedId);
-            const username = userObj ? (userObj.username || userObj.email || 'User Account') : 'User Account';
+            const username = userObj ? (userObj.full_name || userObj.username || userObj.email || 'User Account') : 'User Account';
             const currentRole = userObj ? (userObj.role || 'user') : 'user';
 
             const menu = tr.querySelector('.user-actions-menu');
@@ -4057,14 +4070,332 @@ async function initAdminUsersPage() {
 
         if (query) {
           filtered = filtered.filter(u => 
+            (u.full_name && u.full_name.toLowerCase().includes(query)) ||
             (u.username && u.username.toLowerCase().includes(query)) ||
             (u.email && u.email.toLowerCase().includes(query)) ||
-            (u.phone && u.phone.toLowerCase().includes(query)) ||
+            (u.phone && String(u.phone).toLowerCase().includes(query)) ||
             (u.id && u.id.toLowerCase().includes(query))
           );
         }
 
+        currentFilteredUsers = filtered;
         renderTable(filtered);
+      }
+
+      // ==========================================
+      // ADVANCED EXPORT USERS HANDLER
+      // ==========================================
+      const exportModal = document.getElementById('export-users-modal');
+      const openExportBtn = document.getElementById('open-export-users-modal-btn');
+      const closeExportBtn = document.getElementById('close-export-users-modal');
+      const downloadCsvBtn = document.getElementById('download-export-csv-btn');
+      const copyClipboardBtn = document.getElementById('copy-export-clipboard-btn');
+      const resetFiltersBtn = document.getElementById('reset-export-filters-btn');
+      const matchCountElem = document.getElementById('export-match-count');
+      const scopeRadios = document.querySelectorAll('input[name="export-scope"]');
+      const phoneTypeSelect = document.getElementById('export-filter-phone-type');
+      const phoneSearchInput = document.getElementById('export-filter-phone-search');
+      const fullnameInput = document.getElementById('export-filter-fullname');
+      const userEmailInput = document.getElementById('export-filter-user-email');
+      const roleSelect = document.getElementById('export-filter-role');
+      const balanceTypeSelect = document.getElementById('export-filter-balance-type');
+      const minBalanceInput = document.getElementById('export-filter-min-balance');
+      const spentTypeSelect = document.getElementById('export-filter-spent-type');
+      const minSpentInput = document.getElementById('export-filter-min-spent');
+      const dateSelect = document.getElementById('export-filter-date');
+      const dateFromInput = document.getElementById('export-filter-date-from');
+      const dateToInput = document.getElementById('export-filter-date-to');
+      const colCheckboxes = document.querySelectorAll('.export-col-checkbox');
+      const selectAllColsBtn = document.getElementById('export-select-all-cols');
+      const deselectAllColsBtn = document.getElementById('export-deselect-all-cols');
+
+      const COLUMN_MAP = {
+        id: { title: 'User ID', get: u => u.id || '' },
+        full_name: { title: 'Full Name', get: u => u.full_name || u.username || '' },
+        username: { title: 'Username', get: u => u.username || '' },
+        email: { title: 'Email Address', get: u => u.email || '' },
+        phone: { title: 'Phone Number', get: u => u.phone || '' },
+        role: { title: 'Role', get: u => (u.role || 'user').toUpperCase() },
+        balance: { title: 'Balance (GHS)', get: u => parseFloat(u.balance || 0).toFixed(2) },
+        total_spent: { title: 'Total Spent (GHS)', get: u => parseFloat(u.total_spent || 0).toFixed(2) },
+        created_at: { title: 'Registration Date', get: u => u.created_at || '' },
+        status: { title: 'Status', get: () => 'Active' }
+      };
+
+      function getSelectedExportScope() {
+        const checkedRadio = document.querySelector('input[name="export-scope"]:checked');
+        return checkedRadio ? checkedRadio.value : 'all';
+      }
+
+      function getFilteredExportUsers() {
+        const scope = getSelectedExportScope();
+        let baseList = scope === 'current' ? (currentFilteredUsers || users) : users;
+        let filtered = [...baseList];
+
+        // 1. Phone Number Filter
+        const phoneType = phoneTypeSelect ? phoneTypeSelect.value : 'all';
+        const phoneQuery = phoneSearchInput ? phoneSearchInput.value.trim().toLowerCase() : '';
+        if (phoneType === 'has_phone') {
+          filtered = filtered.filter(u => u.phone && String(u.phone).trim().length > 0);
+        } else if (phoneType === 'no_phone') {
+          filtered = filtered.filter(u => !u.phone || String(u.phone).trim().length === 0);
+        } else if (phoneType === 'search' && phoneQuery) {
+          filtered = filtered.filter(u => u.phone && String(u.phone).toLowerCase().includes(phoneQuery));
+        }
+
+        // 2. Full Name Filter
+        const nameQuery = fullnameInput ? fullnameInput.value.trim().toLowerCase() : '';
+        if (nameQuery) {
+          filtered = filtered.filter(u => (u.full_name && u.full_name.toLowerCase().includes(nameQuery)) || (u.username && u.username.toLowerCase().includes(nameQuery)));
+        }
+
+        // 3. Username / Email Filter
+        const userEmailQuery = userEmailInput ? userEmailInput.value.trim().toLowerCase() : '';
+        if (userEmailQuery) {
+          filtered = filtered.filter(u => (u.username && u.username.toLowerCase().includes(userEmailQuery)) || (u.email && u.email.toLowerCase().includes(userEmailQuery)));
+        }
+
+        // 4. Role Filter
+        const roleVal = roleSelect ? roleSelect.value : 'all';
+        if (roleVal !== 'all') {
+          filtered = filtered.filter(u => (u.role || '').toLowerCase() === roleVal.toLowerCase());
+        }
+
+        // 5. Balance Filter
+        const balType = balanceTypeSelect ? balanceTypeSelect.value : 'all';
+        const minBal = minBalanceInput ? parseFloat(minBalanceInput.value || 0) : 0;
+        if (balType === 'positive') {
+          filtered = filtered.filter(u => parseFloat(u.balance || 0) > 0);
+        } else if (balType === 'zero') {
+          filtered = filtered.filter(u => parseFloat(u.balance || 0) <= 0);
+        } else if (balType === 'min' && !isNaN(minBal)) {
+          filtered = filtered.filter(u => parseFloat(u.balance || 0) >= minBal);
+        }
+
+        // 6. Spent Filter
+        const spentType = spentTypeSelect ? spentTypeSelect.value : 'all';
+        const minSpent = minSpentInput ? parseFloat(minSpentInput.value || 0) : 0;
+        if (spentType === 'positive') {
+          filtered = filtered.filter(u => parseFloat(u.total_spent || 0) > 0);
+        } else if (spentType === 'zero') {
+          filtered = filtered.filter(u => parseFloat(u.total_spent || 0) <= 0);
+        } else if (spentType === 'min' && !isNaN(minSpent)) {
+          filtered = filtered.filter(u => parseFloat(u.total_spent || 0) >= minSpent);
+        }
+
+        // 7. Date Filter
+        const dateType = dateSelect ? dateSelect.value : 'all';
+        const now = new Date();
+        if (dateType === 'today') {
+          const todayStr = now.toISOString().substring(0, 10);
+          filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) === todayStr);
+        } else if (dateType === '7days') {
+          const pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          filtered = filtered.filter(u => u.created_at && new Date(u.created_at) >= pastDate);
+        } else if (dateType === '30days') {
+          const pastDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          filtered = filtered.filter(u => u.created_at && new Date(u.created_at) >= pastDate);
+        } else if (dateType === 'custom') {
+          const fromVal = dateFromInput ? dateFromInput.value : '';
+          const toVal = dateToInput ? dateToInput.value : '';
+          if (fromVal) {
+            filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) >= fromVal);
+          }
+          if (toVal) {
+            filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) <= toVal);
+          }
+        }
+
+        if (matchCountElem) {
+          matchCountElem.textContent = filtered.length.toLocaleString();
+        }
+
+        return filtered;
+      }
+
+      function updateExportFilterVisibilities() {
+        if (phoneSearchInput) {
+          phoneSearchInput.classList.toggle('hidden', !phoneTypeSelect || phoneTypeSelect.value !== 'search');
+        }
+        if (minBalanceInput) {
+          minBalanceInput.classList.toggle('hidden', !balanceTypeSelect || balanceTypeSelect.value !== 'min');
+        }
+        if (minSpentInput) {
+          minSpentInput.classList.toggle('hidden', !spentTypeSelect || spentTypeSelect.value !== 'min');
+        }
+        if (dateFromInput && dateToInput) {
+          const isCustom = dateSelect && dateSelect.value === 'custom';
+          dateFromInput.classList.toggle('hidden', !isCustom);
+          dateToInput.classList.toggle('hidden', !isCustom);
+        }
+        getFilteredExportUsers();
+      }
+
+      // Attach filter change listeners
+      [phoneTypeSelect, balanceTypeSelect, spentTypeSelect, dateSelect].forEach(sel => {
+        if (sel) sel.addEventListener('change', updateExportFilterVisibilities);
+      });
+
+      [phoneSearchInput, fullnameInput, userEmailInput, roleSelect, minBalanceInput, minSpentInput, dateFromInput, dateToInput].forEach(inp => {
+        if (inp) {
+          inp.addEventListener('input', getFilteredExportUsers);
+          inp.addEventListener('change', getFilteredExportUsers);
+        }
+      });
+
+      scopeRadios.forEach(r => {
+        r.addEventListener('change', getFilteredExportUsers);
+      });
+
+      if (selectAllColsBtn) {
+        selectAllColsBtn.addEventListener('click', () => {
+          colCheckboxes.forEach(cb => { cb.checked = true; });
+        });
+      }
+
+      if (deselectAllColsBtn) {
+        deselectAllColsBtn.addEventListener('click', () => {
+          colCheckboxes.forEach(cb => { cb.checked = false; });
+        });
+      }
+
+      if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', () => {
+          if (phoneTypeSelect) phoneTypeSelect.value = 'all';
+          if (phoneSearchInput) { phoneSearchInput.value = ''; phoneSearchInput.classList.add('hidden'); }
+          if (fullnameInput) fullnameInput.value = '';
+          if (userEmailInput) userEmailInput.value = '';
+          if (roleSelect) roleSelect.value = 'all';
+          if (balanceTypeSelect) balanceTypeSelect.value = 'all';
+          if (minBalanceInput) { minBalanceInput.value = ''; minBalanceInput.classList.add('hidden'); }
+          if (spentTypeSelect) spentTypeSelect.value = 'all';
+          if (minSpentInput) { minSpentInput.value = ''; minSpentInput.classList.add('hidden'); }
+          if (dateSelect) dateSelect.value = 'all';
+          if (dateFromInput) { dateFromInput.value = ''; dateFromInput.classList.add('hidden'); }
+          if (dateToInput) { dateToInput.value = ''; dateToInput.classList.add('hidden'); }
+          const defaultScope = document.querySelector('input[name="export-scope"][value="all"]');
+          if (defaultScope) defaultScope.checked = true;
+          colCheckboxes.forEach(cb => { cb.checked = true; });
+          getFilteredExportUsers();
+        });
+      }
+
+      const openExportModal = () => {
+        if (!exportModal) return;
+        updateExportFilterVisibilities();
+        exportModal.classList.remove('hidden');
+      };
+
+      const closeExportModal = () => {
+        if (!exportModal) return;
+        exportModal.classList.add('hidden');
+      };
+
+      if (openExportBtn) openExportBtn.addEventListener('click', openExportModal);
+      if (closeExportBtn) closeExportBtn.addEventListener('click', closeExportModal);
+      if (exportModal) {
+        exportModal.addEventListener('click', (e) => {
+          if (e.target === exportModal) closeExportModal();
+        });
+      }
+
+      // Safe CSV formatting with RFC 4180 rules and formula injection prevention
+      function formatCsvCell(val) {
+        let str = String(val === null || val === undefined ? '' : val);
+        if (/^[=+\-@\t\r]/.test(str)) {
+          str = "'" + str;
+        }
+        if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+          str = '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+      }
+
+      function getSelectedColumns() {
+        const selected = [];
+        colCheckboxes.forEach(cb => {
+          if (cb.checked && COLUMN_MAP[cb.value]) {
+            selected.push({ key: cb.value, ...COLUMN_MAP[cb.value] });
+          }
+        });
+        return selected;
+      }
+
+      // Download CSV action
+      if (downloadCsvBtn) {
+        downloadCsvBtn.addEventListener('click', () => {
+          const exportUsers = getFilteredExportUsers();
+          const selectedCols = getSelectedColumns();
+
+          if (selectedCols.length === 0) {
+            alert('Please select at least one column to include in the export.');
+            return;
+          }
+
+          if (exportUsers.length === 0) {
+            alert('No matching users found to export based on current filters.');
+            return;
+          }
+
+          const headerRow = selectedCols.map(c => formatCsvCell(c.title)).join(',');
+          const dataRows = exportUsers.map(u => {
+            return selectedCols.map(c => formatCsvCell(c.get(u))).join(',');
+          });
+
+          const csvContent = [headerRow, ...dataRows].join('\r\n');
+          const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const timestamp = new Date().toISOString().substring(0, 10);
+          link.setAttribute('href', url);
+          link.setAttribute('download', `ghbooster-users-export-${timestamp}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+
+          closeExportModal();
+        });
+      }
+
+      // Copy table to clipboard action (TSV formatted for direct spreadsheet paste)
+      if (copyClipboardBtn) {
+        copyClipboardBtn.addEventListener('click', async () => {
+          const exportUsers = getFilteredExportUsers();
+          const selectedCols = getSelectedColumns();
+
+          if (selectedCols.length === 0) {
+            alert('Please select at least one column to include in the export.');
+            return;
+          }
+
+          if (exportUsers.length === 0) {
+            alert('No matching users found to export based on current filters.');
+            return;
+          }
+
+          const headerRow = selectedCols.map(c => c.title).join('\t');
+          const dataRows = exportUsers.map(u => {
+            return selectedCols.map(c => String(c.get(u) || '').replace(/[\t\r\n]+/g, ' ')).join('\t');
+          });
+
+          const tsvContent = [headerRow, ...dataRows].join('\n');
+          try {
+            await navigator.clipboard.writeText(tsvContent);
+            const originalText = copyClipboardBtn.innerHTML;
+            copyClipboardBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Copied! (${exportUsers.length} users)</span>
+            `;
+            setTimeout(() => {
+              copyClipboardBtn.innerHTML = originalText;
+            }, 2500);
+          } catch (err) {
+            alert('Failed to copy to clipboard. Please use the Download CSV option.');
+          }
+        });
       }
     }
   } catch (e) {

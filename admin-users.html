@@ -303,18 +303,25 @@
       </div>
 
       <!-- User Search & Filter Bar -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 dark:bg-gray-800 dark:border-gray-800">
+      <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4 dark:bg-gray-800 dark:border-gray-800">
         <div class="relative flex-grow">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3.5 top-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input type="text" id="user-search" placeholder="Search users by username, email, or user ID..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+          <input type="text" id="user-search" placeholder="Search users by name, username, phone, email, or user ID..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-pink-600 focus:bg-white transition dark:bg-gray-800 dark:border-gray-700 dark:text-white">
         </div>
 
-        <div class="flex items-center space-x-2 text-xs font-semibold">
+        <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
           <button class="user-filter-btn px-4 py-2 bg-pink-600 text-white rounded-lg shadow-sm transition active" data-filter="all">All Users</button>
           <button class="user-filter-btn px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition dark:text-gray-400" data-filter="reseller">Resellers</button>
           <button class="user-filter-btn px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition dark:text-gray-400" data-filter="admin">Admins</button>
+          
+          <button type="button" id="open-export-users-modal-btn" class="inline-flex items-center space-x-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-pink-600 dark:hover:bg-pink-700 text-white font-bold rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-pink-500 cursor-pointer ml-auto sm:ml-0" title="Export users with advanced filters (Phone, Name, Balance, Role, etc.)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Export Users</span>
+          </button>
         </div>
       </div>
 
@@ -352,16 +359,6 @@
     </footer>
 
   </div>
-
-  <!-- Dynamic Script -->
-  
-  
-
-
-  
-
-
-  
 
   <!-- Custom Add / Deduct User Balance Modal Dialog -->
   <div id="fund-user-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 transition-all duration-200">
@@ -497,6 +494,212 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Advanced Export Users Modal -->
+  <div id="export-users-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 transition-all duration-200 overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl p-4 sm:p-6 space-y-5 border border-gray-100 dark:border-gray-700 animate-in fade-in zoom-in-95 duration-200 my-auto">
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3.5">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 dark:text-white text-base">Export Users Database</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Filter, customize columns, and export user accounts to CSV or clipboard.</p>
+          </div>
+        </div>
+        <button type="button" id="close-export-users-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Export Scope Selector -->
+      <div class="bg-gray-50 dark:bg-gray-900/60 p-3 rounded-xl border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Export Scope:</span>
+        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+          <label class="flex items-center space-x-2 px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer shadow-xs">
+            <input type="radio" name="export-scope" value="all" checked class="text-pink-600 focus:ring-pink-500">
+            <span class="text-gray-800 dark:text-gray-200">All Database Users</span>
+          </label>
+          <label class="flex items-center space-x-2 px-3 py-1.5 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer shadow-xs">
+            <input type="radio" name="export-scope" value="current" class="text-pink-600 focus:ring-pink-500">
+            <span class="text-gray-800 dark:text-gray-200">Current Table View</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Filter Controls Grid -->
+      <div id="export-filters-container" class="space-y-3.5 text-xs">
+        <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Advanced Filters</div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <!-- Phone Number Filter -->
+          <div class="space-y-1">
+            <label for="export-filter-phone-type" class="block font-semibold text-gray-700 dark:text-gray-300">Phone Number</label>
+            <select id="export-filter-phone-type" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+              <option value="all">Any Phone Status</option>
+              <option value="has_phone">With Phone Number Only</option>
+              <option value="no_phone">Missing Phone Number Only</option>
+              <option value="search">Search Specific Phone...</option>
+            </select>
+            <input type="text" id="export-filter-phone-search" placeholder="e.g. 024, +233, 055..." class="w-full py-1.5 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 mt-1 hidden">
+          </div>
+
+          <!-- Full Name Filter -->
+          <div class="space-y-1">
+            <label for="export-filter-fullname" class="block font-semibold text-gray-700 dark:text-gray-300">Full Name</label>
+            <input type="text" id="export-filter-fullname" placeholder="Filter by full name..." class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+          </div>
+
+          <!-- Username or Email Filter -->
+          <div class="space-y-1">
+            <label for="export-filter-user-email" class="block font-semibold text-gray-700 dark:text-gray-300">Username / Email</label>
+            <input type="text" id="export-filter-user-email" placeholder="e.g. john, @gmail.com..." class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+          </div>
+
+          <!-- User Role Filter -->
+          <div class="space-y-1">
+            <label for="export-filter-role" class="block font-semibold text-gray-700 dark:text-gray-300">User Role</label>
+            <select id="export-filter-role" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+              <option value="all">All Roles</option>
+              <option value="user">User (Standard)</option>
+              <option value="reseller">Reseller (API)</option>
+              <option value="staff">Staff</option>
+              <option value="admin">Admin</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+          </div>
+
+          <!-- Balance Filter -->
+          <div class="space-y-1">
+            <label for="export-filter-balance-type" class="block font-semibold text-gray-700 dark:text-gray-300">Wallet Balance</label>
+            <select id="export-filter-balance-type" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+              <option value="all">All Balances</option>
+              <option value="positive">Has Balance (> GH₵0.00)</option>
+              <option value="zero">Zero Balance (= GH₵0.00)</option>
+              <option value="min">Minimum Balance...</option>
+            </select>
+            <input type="number" id="export-filter-min-balance" step="0.01" min="0" placeholder="Min GH₵ balance e.g. 50" class="w-full py-1.5 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 mt-1 hidden">
+          </div>
+
+          <!-- Total Spent Filter -->
+          <div class="space-y-1">
+            <label for="export-filter-spent-type" class="block font-semibold text-gray-700 dark:text-gray-300">Total Spent</label>
+            <select id="export-filter-spent-type" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+              <option value="all">All Spending</option>
+              <option value="positive">Has Spent (> GH₵0.00)</option>
+              <option value="zero">Zero Spending (GH₵0.00)</option>
+              <option value="min">Minimum Spent...</option>
+            </select>
+            <input type="number" id="export-filter-min-spent" step="0.01" min="0" placeholder="Min GH₵ spent e.g. 100" class="w-full py-1.5 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 mt-1 hidden">
+          </div>
+
+          <!-- Registration Date Filter (spans 3 columns on lg) -->
+          <div class="sm:col-span-2 lg:col-span-3 space-y-1">
+            <label for="export-filter-date" class="block font-semibold text-gray-700 dark:text-gray-300">Registration Date</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <select id="export-filter-date" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600">
+                <option value="all">All Time</option>
+                <option value="today">Registered Today</option>
+                <option value="7days">Last 7 Days</option>
+                <option value="30days">Last 30 Days</option>
+                <option value="custom">Custom Date Range...</option>
+              </select>
+              <input type="date" id="export-filter-date-from" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 hidden" placeholder="From Date">
+              <input type="date" id="export-filter-date-to" class="w-full py-2 px-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-pink-600 hidden" placeholder="To Date">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column Selection Section -->
+      <div class="space-y-2.5 text-xs pt-2 border-t border-gray-100 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Include Columns</span>
+          <div class="space-x-2">
+            <button type="button" id="export-select-all-cols" class="text-pink-600 hover:text-pink-700 dark:text-pink-400 font-bold hover:underline">Select All</button>
+            <span class="text-gray-300 dark:text-gray-600">|</span>
+            <button type="button" id="export-deselect-all-cols" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 font-medium hover:underline">Deselect All</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-gray-50 dark:bg-gray-900/60 p-3 rounded-xl border border-gray-100 dark:border-gray-700 font-medium text-gray-700 dark:text-gray-300">
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="id" checked>
+            <span>User ID</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="full_name" checked>
+            <span class="font-bold text-pink-600 dark:text-pink-400">Full Name</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="username" checked>
+            <span>Username</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="email" checked>
+            <span>Email</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="phone" checked>
+            <span class="font-bold text-pink-600 dark:text-pink-400">Phone Number</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="role" checked>
+            <span>Role</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="balance" checked>
+            <span>Balance (GH₵)</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="total_spent" checked>
+            <span>Total Spent (GH₵)</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="created_at" checked>
+            <span>Registered Date</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" class="export-col-checkbox rounded text-pink-600 focus:ring-pink-500" value="status" checked>
+            <span>Status</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Live Match Preview Counter & Actions -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-pink-100 dark:bg-pink-950/80 text-pink-700 dark:text-pink-300 font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="export-match-count">0</span> matching users
+          </span>
+          <button type="button" id="reset-export-filters-btn" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 font-medium hover:underline text-[11px]">Reset Filters</button>
+        </div>
+
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+          <button type="button" id="copy-export-clipboard-btn" class="px-3.5 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-xl transition text-xs flex items-center space-x-1.5 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            <span>Copy Table</span>
+          </button>
+          
+          <button type="button" id="download-export-csv-btn" class="px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl shadow transition text-xs flex items-center space-x-1.5 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>Download CSV</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 

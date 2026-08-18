@@ -877,6 +877,11 @@ video {
   margin-bottom:1.5rem;
 }
 
+.my-auto {
+  margin-top:auto;
+  margin-bottom:auto;
+}
+
 .mb-0\.5 {
   margin-bottom:0.125rem;
 }
@@ -931,6 +936,10 @@ video {
 
 .ml-4 {
   margin-left:1rem;
+}
+
+.ml-auto {
+  margin-left:auto;
 }
 
 .mr-1 {
@@ -1686,10 +1695,22 @@ video {
   margin-bottom:calc(0.5rem * var(--tw-space-y-reverse));
 }
 
+.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse:0;
+  margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom:calc(0.625rem * var(--tw-space-y-reverse));
+}
+
 .space-y-3 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse:0;
   margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom:calc(0.75rem * var(--tw-space-y-reverse));
+}
+
+.space-y-3\.5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse:0;
+  margin-top:calc(0.875rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom:calc(0.875rem * var(--tw-space-y-reverse));
 }
 
 .space-y-4 > :not([hidden]) ~ :not([hidden]) {
@@ -6444,6 +6465,10 @@ html.dark input::placeholder {
   background-color:rgb(30 58 138 / 0.4);
 }
 
+.dark\:bg-blue-900\/60:is(.dark *) {
+  background-color:rgb(30 58 138 / 0.6);
+}
+
 .dark\:bg-blue-950\/40:is(.dark *) {
   background-color:rgb(23 37 84 / 0.4);
 }
@@ -6454,6 +6479,10 @@ html.dark input::placeholder {
 
 .dark\:bg-cyan-950\/50:is(.dark *) {
   background-color:rgb(8 51 68 / 0.5);
+}
+
+.dark\:bg-emerald-900\/60:is(.dark *) {
+  background-color:rgb(6 78 59 / 0.6);
 }
 
 .dark\:bg-emerald-950\/40:is(.dark *) {
@@ -6527,6 +6556,10 @@ html.dark input::placeholder {
   background-color:rgb(20 83 45 / 0.4);
 }
 
+.dark\:bg-green-900\/50:is(.dark *) {
+  background-color:rgb(20 83 45 / 0.5);
+}
+
 .dark\:bg-green-950\/40:is(.dark *) {
   background-color:rgb(5 46 22 / 0.4);
 }
@@ -6555,12 +6588,21 @@ html.dark input::placeholder {
   background-color:rgb(67 20 7 / 0.5);
 }
 
+.dark\:bg-pink-600:is(.dark *) {
+  --tw-bg-opacity:1;
+  background-color:rgb(219 39 119 / var(--tw-bg-opacity, 1));
+}
+
 .dark\:bg-pink-900\/30:is(.dark *) {
   background-color:rgb(131 24 67 / 0.3);
 }
 
 .dark\:bg-pink-900\/40:is(.dark *) {
   background-color:rgb(131 24 67 / 0.4);
+}
+
+.dark\:bg-pink-900\/60:is(.dark *) {
+  background-color:rgb(131 24 67 / 0.6);
 }
 
 .dark\:bg-pink-950\/40:is(.dark *) {
@@ -6575,12 +6617,20 @@ html.dark input::placeholder {
   background-color:rgb(80 7 36 / 0.6);
 }
 
+.dark\:bg-pink-950\/80:is(.dark *) {
+  background-color:rgb(80 7 36 / 0.8);
+}
+
 .dark\:bg-purple-900\/30:is(.dark *) {
   background-color:rgb(88 28 135 / 0.3);
 }
 
 .dark\:bg-purple-900\/40:is(.dark *) {
   background-color:rgb(88 28 135 / 0.4);
+}
+
+.dark\:bg-purple-900\/60:is(.dark *) {
+  background-color:rgb(88 28 135 / 0.6);
 }
 
 .dark\:bg-purple-950\/50:is(.dark *) {
@@ -6742,6 +6792,11 @@ html.dark input::placeholder {
 .dark\:text-gray-500:is(.dark *) {
   --tw-text-opacity:1;
   color:rgb(125 125 125 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-gray-600:is(.dark *) {
+  --tw-text-opacity:1;
+  color:rgb(104 100 101 / var(--tw-text-opacity, 1));
 }
 
 .dark\:text-green-200:is(.dark *) {
@@ -6931,6 +6986,11 @@ html.dark input::placeholder {
   background-color:rgb(219 39 119 / var(--tw-bg-opacity, 1));
 }
 
+.dark\:hover\:bg-pink-700:hover:is(.dark *) {
+  --tw-bg-opacity:1;
+  background-color:rgb(190 24 93 / var(--tw-bg-opacity, 1));
+}
+
 .dark\:hover\:bg-pink-900\/30:hover:is(.dark *) {
   background-color:rgb(131 24 67 / 0.3);
 }
@@ -6982,6 +7042,14 @@ html.dark input::placeholder {
 @media (min-width: 640px) {
   .sm\:col-span-1 {
     grid-column:span 1 / span 1;
+  }
+
+  .sm\:col-span-2 {
+    grid-column:span 2 / span 2;
+  }
+
+  .sm\:ml-0 {
+    margin-left:0px;
   }
 
   .sm\:mr-1\.5 {
@@ -7048,8 +7116,16 @@ html.dark input::placeholder {
     padding:2.5rem;
   }
 
+  .sm\:p-4 {
+    padding:1rem;
+  }
+
   .sm\:p-5 {
     padding:1.25rem;
+  }
+
+  .sm\:p-6 {
+    padding:1.5rem;
   }
 
   .sm\:px-12 {
@@ -7175,6 +7251,10 @@ html.dark input::placeholder {
     grid-template-columns:repeat(4, minmax(0, 1fr));
   }
 
+  .md\:grid-cols-5 {
+    grid-template-columns:repeat(5, minmax(0, 1fr));
+  }
+
   .md\:flex-row {
     flex-direction:row;
   }
@@ -7290,6 +7370,10 @@ html.dark input::placeholder {
 
   .lg\:col-span-2 {
     grid-column:span 2 / span 2;
+  }
+
+  .lg\:col-span-3 {
+    grid-column:span 3 / span 3;
   }
 
   .lg\:mb-0 {

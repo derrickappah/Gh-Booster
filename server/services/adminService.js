@@ -194,7 +194,7 @@ class AdminService {
   static async getAllUsers(page = null, limit = null) {
     let query = supabaseAdmin
       .from('profiles')
-      .select('id, username, email, phone, phone_number, role, created_at, wallets(balance, currency)', { count: 'exact' })
+      .select('id, username, full_name, email, phone, phone_number, role, created_at, wallets(balance, currency)', { count: 'exact' })
       .order('created_at', { ascending: false });
 
     if (page && limit) {
@@ -224,13 +224,15 @@ class AdminService {
       return {
         id: p.id,
         username: p.username || p.email,
+        full_name: p.full_name || p.username || '',
         email: p.email,
         phone: p.phone || p.phone_number || null,
         role: p.role || 'user',
         balance: walletObj ? parseFloat(walletObj.balance) : 0.0,
         currency: walletObj?.currency || 'GHS',
         total_spent: spentMap[p.id] || 0.0,
-        created_at: new Date(p.created_at || Date.now()).toISOString().substring(0, 10)
+        created_at: new Date(p.created_at || Date.now()).toISOString().substring(0, 10),
+        raw_created_at: p.created_at || null
       };
     });
 
