@@ -3697,6 +3697,299 @@ async function initAdminDashboard() {
 }
 
 // ADMIN USERS HANDLER
+window.__adminUsersList = window.__adminUsersList || [];
+window.__filteredAdminUsers = window.__filteredAdminUsers || [];
+
+const COLUMN_MAP = {
+  id: { title: 'User ID', get: u => u.id || '' },
+  full_name: { title: 'Full Name', get: u => u.full_name || u.username || '' },
+  username: { title: 'Username', get: u => u.username || '' },
+  email: { title: 'Email Address', get: u => u.email || '' },
+  phone: { title: 'Phone Number', get: u => u.phone || '' },
+  role: { title: 'Role', get: u => (u.role || 'user').toUpperCase() },
+  balance: { title: 'Balance (GHS)', get: u => parseFloat(u.balance || 0).toFixed(2) },
+  total_spent: { title: 'Total Spent (GHS)', get: u => parseFloat(u.total_spent || 0).toFixed(2) },
+  created_at: { title: 'Registration Date', get: u => u.created_at || '' },
+  status: { title: 'Status', get: () => 'Active' }
+};
+
+function formatCsvCell(val) {
+  let str = String(val === null || val === undefined ? '' : val);
+  if (/^[=+\-@\t\r]/.test(str)) {
+    str = "'" + str;
+  }
+  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+    str = '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+window.getSelectedExportColumns = function() {
+  const selected = [];
+  const colCheckboxes = document.querySelectorAll('.export-col-checkbox');
+  colCheckboxes.forEach(cb => {
+    if (cb.checked && COLUMN_MAP[cb.value]) {
+      selected.push({ key: cb.value, ...COLUMN_MAP[cb.value] });
+    }
+  });
+  return selected;
+};
+
+window.getFilteredExportUsers = function() {
+  const checkedRadio = document.querySelector('input[name="export-scope"]:checked');
+  const scope = checkedRadio ? checkedRadio.value : 'all';
+  const allUsers = window.__adminUsersList || [];
+  const currentUsers = window.__filteredAdminUsers || allUsers;
+  let baseList = scope === 'current' ? currentUsers : allUsers;
+  let filtered = [...baseList];
+
+  const phoneTypeSelect = document.getElementById('export-filter-phone-type');
+  const phoneSearchInput = document.getElementById('export-filter-phone-search');
+  const fullnameInput = document.getElementById('export-filter-fullname');
+  const userEmailInput = document.getElementById('export-filter-user-email');
+  const roleSelect = document.getElementById('export-filter-role');
+  const balanceTypeSelect = document.getElementById('export-filter-balance-type');
+  const minBalanceInput = document.getElementById('export-filter-min-balance');
+  const spentTypeSelect = document.getElementById('export-filter-spent-type');
+  const minSpentInput = document.getElementById('export-filter-min-spent');
+  const dateSelect = document.getElementById('export-filter-date');
+  const dateFromInput = document.getElementById('export-filter-date-from');
+  const dateToInput = document.getElementById('export-filter-date-to');
+  const matchCountElem = document.getElementById('export-match-count');
+
+  // 1. Phone Number Filter
+  const phoneType = phoneTypeSelect ? phoneTypeSelect.value : 'all';
+  const phoneQuery = phoneSearchInput ? phoneSearchInput.value.trim().toLowerCase() : '';
+  if (phoneType === 'has_phone') {
+    filtered = filtered.filter(u => u.phone && String(u.phone).trim().length > 0);
+  } else if (phoneType === 'no_phone') {
+    filtered = filtered.filter(u => !u.phone || String(u.phone).trim().length === 0);
+  } else if (phoneType === 'search' && phoneQuery) {
+    filtered = filtered.filter(u => u.phone && String(u.phone).toLowerCase().includes(phoneQuery));
+  }
+
+  // 2. Full Name Filter
+  const nameQuery = fullnameInput ? fullnameInput.value.trim().toLowerCase() : '';
+  if (nameQuery) {
+    filtered = filtered.filter(u => (u.full_name && u.full_name.toLowerCase().includes(nameQuery)) || (u.username && u.username.toLowerCase().includes(nameQuery)));
+  }
+
+  // 3. Username / Email Filter
+  const userEmailQuery = userEmailInput ? userEmailInput.value.trim().toLowerCase() : '';
+  if (userEmailQuery) {
+    filtered = filtered.filter(u => (u.username && u.username.toLowerCase().includes(userEmailQuery)) || (u.email && u.email.toLowerCase().includes(userEmailQuery)));
+  }
+
+  // 4. Role Filter
+  const roleVal = roleSelect ? roleSelect.value : 'all';
+  if (roleVal !== 'all') {
+    filtered = filtered.filter(u => (u.role || '').toLowerCase() === roleVal.toLowerCase());
+  }
+
+  // 5. Balance Filter
+  const balType = balanceTypeSelect ? balanceTypeSelect.value : 'all';
+  const minBal = minBalanceInput ? parseFloat(minBalanceInput.value || 0) : 0;
+  if (balType === 'positive') {
+    filtered = filtered.filter(u => parseFloat(u.balance || 0) > 0);
+  } else if (balType === 'zero') {
+    filtered = filtered.filter(u => parseFloat(u.balance || 0) <= 0);
+  } else if (balType === 'min' && !isNaN(minBal)) {
+    filtered = filtered.filter(u => parseFloat(u.balance || 0) >= minBal);
+  }
+
+  // 6. Spent Filter
+  const spentType = spentTypeSelect ? spentTypeSelect.value : 'all';
+  const minSpent = minSpentInput ? parseFloat(minSpentInput.value || 0) : 0;
+  if (spentType === 'positive') {
+    filtered = filtered.filter(u => parseFloat(u.total_spent || 0) > 0);
+  } else if (spentType === 'zero') {
+    filtered = filtered.filter(u => parseFloat(u.total_spent || 0) <= 0);
+  } else if (spentType === 'min' && !isNaN(minSpent)) {
+    filtered = filtered.filter(u => parseFloat(u.total_spent || 0) >= minSpent);
+  }
+
+  // 7. Date Filter
+  const dateType = dateSelect ? dateSelect.value : 'all';
+  const now = new Date();
+  if (dateType === 'today') {
+    const todayStr = now.toISOString().substring(0, 10);
+    filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) === todayStr);
+  } else if (dateType === '7days') {
+    const pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    filtered = filtered.filter(u => u.created_at && new Date(u.created_at) >= pastDate);
+  } else if (dateType === '30days') {
+    const pastDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    filtered = filtered.filter(u => u.created_at && new Date(u.created_at) >= pastDate);
+  } else if (dateType === 'custom') {
+    const fromVal = dateFromInput ? dateFromInput.value : '';
+    const toVal = dateToInput ? dateToInput.value : '';
+    if (fromVal) {
+      filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) >= fromVal);
+    }
+    if (toVal) {
+      filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) <= toVal);
+    }
+  }
+
+  if (matchCountElem) {
+    matchCountElem.textContent = filtered.length.toLocaleString();
+  }
+
+  return filtered;
+};
+
+window.updateExportFilterVisibilities = function() {
+  const phoneTypeSelect = document.getElementById('export-filter-phone-type');
+  const phoneSearchInput = document.getElementById('export-filter-phone-search');
+  const balanceTypeSelect = document.getElementById('export-filter-balance-type');
+  const minBalanceInput = document.getElementById('export-filter-min-balance');
+  const spentTypeSelect = document.getElementById('export-filter-spent-type');
+  const minSpentInput = document.getElementById('export-filter-min-spent');
+  const dateSelect = document.getElementById('export-filter-date');
+  const dateFromInput = document.getElementById('export-filter-date-from');
+  const dateToInput = document.getElementById('export-filter-date-to');
+
+  if (phoneSearchInput) {
+    phoneSearchInput.classList.toggle('hidden', !phoneTypeSelect || phoneTypeSelect.value !== 'search');
+  }
+  if (minBalanceInput) {
+    minBalanceInput.classList.toggle('hidden', !balanceTypeSelect || balanceTypeSelect.value !== 'min');
+  }
+  if (minSpentInput) {
+    minSpentInput.classList.toggle('hidden', !spentTypeSelect || spentTypeSelect.value !== 'min');
+  }
+  if (dateFromInput && dateToInput) {
+    const isCustom = dateSelect && dateSelect.value === 'custom';
+    dateFromInput.classList.toggle('hidden', !isCustom);
+    dateToInput.classList.toggle('hidden', !isCustom);
+  }
+  window.getFilteredExportUsers();
+};
+
+window.openExportUsersModal = function() {
+  const modal = document.getElementById('export-users-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  modal.style.display = 'flex';
+  window.updateExportFilterVisibilities();
+};
+
+window.closeExportUsersModal = function() {
+  const modal = document.getElementById('export-users-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  modal.style.display = 'none';
+};
+
+window.handleResetExportFilters = function() {
+  const phoneTypeSelect = document.getElementById('export-filter-phone-type');
+  const phoneSearchInput = document.getElementById('export-filter-phone-search');
+  const fullnameInput = document.getElementById('export-filter-fullname');
+  const userEmailInput = document.getElementById('export-filter-user-email');
+  const roleSelect = document.getElementById('export-filter-role');
+  const balanceTypeSelect = document.getElementById('export-filter-balance-type');
+  const minBalanceInput = document.getElementById('export-filter-min-balance');
+  const spentTypeSelect = document.getElementById('export-filter-spent-type');
+  const minSpentInput = document.getElementById('export-filter-min-spent');
+  const dateSelect = document.getElementById('export-filter-date');
+  const dateFromInput = document.getElementById('export-filter-date-from');
+  const dateToInput = document.getElementById('export-filter-date-to');
+  const colCheckboxes = document.querySelectorAll('.export-col-checkbox');
+
+  if (phoneTypeSelect) phoneTypeSelect.value = 'all';
+  if (phoneSearchInput) { phoneSearchInput.value = ''; phoneSearchInput.classList.add('hidden'); }
+  if (fullnameInput) fullnameInput.value = '';
+  if (userEmailInput) userEmailInput.value = '';
+  if (roleSelect) roleSelect.value = 'all';
+  if (balanceTypeSelect) balanceTypeSelect.value = 'all';
+  if (minBalanceInput) { minBalanceInput.value = ''; minBalanceInput.classList.add('hidden'); }
+  if (spentTypeSelect) spentTypeSelect.value = 'all';
+  if (minSpentInput) { minSpentInput.value = ''; minSpentInput.classList.add('hidden'); }
+  if (dateSelect) dateSelect.value = 'all';
+  if (dateFromInput) { dateFromInput.value = ''; dateFromInput.classList.add('hidden'); }
+  if (dateToInput) { dateToInput.value = ''; dateToInput.classList.add('hidden'); }
+  const defaultScope = document.querySelector('input[name="export-scope"][value="all"]');
+  if (defaultScope) defaultScope.checked = true;
+  colCheckboxes.forEach(cb => { cb.checked = true; });
+  window.getFilteredExportUsers();
+};
+
+window.handleDownloadExportCsv = function() {
+  const exportUsers = window.getFilteredExportUsers();
+  const selectedCols = window.getSelectedExportColumns();
+
+  if (selectedCols.length === 0) {
+    alert('Please select at least one column to include in the export.');
+    return;
+  }
+
+  if (exportUsers.length === 0) {
+    alert('No matching users found to export based on current filters.');
+    return;
+  }
+
+  const headerRow = selectedCols.map(c => formatCsvCell(c.title)).join(',');
+  const dataRows = exportUsers.map(u => {
+    return selectedCols.map(c => formatCsvCell(c.get(u))).join(',');
+  });
+
+  const csvContent = [headerRow, ...dataRows].join('\r\n');
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const timestamp = new Date().toISOString().substring(0, 10);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `ghbooster-users-export-${timestamp}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  window.closeExportUsersModal();
+};
+
+window.handleCopyExportClipboard = async function() {
+  const exportUsers = window.getFilteredExportUsers();
+  const selectedCols = window.getSelectedExportColumns();
+  const copyBtn = document.getElementById('copy-export-clipboard-btn');
+
+  if (selectedCols.length === 0) {
+    alert('Please select at least one column to include in the export.');
+    return;
+  }
+
+  if (exportUsers.length === 0) {
+    alert('No matching users found to export based on current filters.');
+    return;
+  }
+
+  const headerRow = selectedCols.map(c => c.title).join('\t');
+  const dataRows = exportUsers.map(u => {
+    return selectedCols.map(c => String(c.get(u) || '').replace(/[\t\r\n]+/g, ' ')).join('\t');
+  });
+
+  const tsvContent = [headerRow, ...dataRows].join('\n');
+  try {
+    await navigator.clipboard.writeText(tsvContent);
+    if (copyBtn) {
+      const originalText = copyBtn.innerHTML;
+      copyBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Copied! (${exportUsers.length} users)</span>
+      `;
+      setTimeout(() => {
+        copyBtn.innerHTML = originalText;
+      }, 2500);
+    }
+  } catch (err) {
+    alert('Failed to copy to clipboard. Please use the Download CSV option.');
+  }
+};
+
 async function initAdminUsersPage() {
   const totalElem = document.getElementById('admin-users-total');
   const balElem = document.getElementById('admin-users-total-balance');
@@ -3706,13 +3999,110 @@ async function initAdminUsersPage() {
   const searchInput = document.getElementById('user-search');
   const filterBtns = document.querySelectorAll('.user-filter-btn');
 
+  // Synchronously bind export modal button listeners
+  const openExportBtn = document.getElementById('open-export-users-modal-btn');
+  const closeExportBtn = document.getElementById('close-export-users-modal');
+  const downloadCsvBtn = document.getElementById('download-export-csv-btn');
+  const copyClipboardBtn = document.getElementById('copy-export-clipboard-btn');
+  const resetFiltersBtn = document.getElementById('reset-export-filters-btn');
+  const scopeRadios = document.querySelectorAll('input[name="export-scope"]');
+  const phoneTypeSelect = document.getElementById('export-filter-phone-type');
+  const phoneSearchInput = document.getElementById('export-filter-phone-search');
+  const fullnameInput = document.getElementById('export-filter-fullname');
+  const userEmailInput = document.getElementById('export-filter-user-email');
+  const roleSelect = document.getElementById('export-filter-role');
+  const balanceTypeSelect = document.getElementById('export-filter-balance-type');
+  const minBalanceInput = document.getElementById('export-filter-min-balance');
+  const spentTypeSelect = document.getElementById('export-filter-spent-type');
+  const minSpentInput = document.getElementById('export-filter-min-spent');
+  const dateSelect = document.getElementById('export-filter-date');
+  const dateFromInput = document.getElementById('export-filter-date-from');
+  const dateToInput = document.getElementById('export-filter-date-to');
+  const colCheckboxes = document.querySelectorAll('.export-col-checkbox');
+  const selectAllColsBtn = document.getElementById('export-select-all-cols');
+  const deselectAllColsBtn = document.getElementById('export-deselect-all-cols');
+
+  if (openExportBtn && !openExportBtn.__bound) {
+    openExportBtn.__bound = true;
+    openExportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.openExportUsersModal();
+    });
+  }
+  if (closeExportBtn && !closeExportBtn.__bound) {
+    closeExportBtn.__bound = true;
+    closeExportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.closeExportUsersModal();
+    });
+  }
+  if (downloadCsvBtn && !downloadCsvBtn.__bound) {
+    downloadCsvBtn.__bound = true;
+    downloadCsvBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.handleDownloadExportCsv();
+    });
+  }
+  if (copyClipboardBtn && !copyClipboardBtn.__bound) {
+    copyClipboardBtn.__bound = true;
+    copyClipboardBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.handleCopyExportClipboard();
+    });
+  }
+  if (resetFiltersBtn && !resetFiltersBtn.__bound) {
+    resetFiltersBtn.__bound = true;
+    resetFiltersBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.handleResetExportFilters();
+    });
+  }
+
+  [phoneTypeSelect, balanceTypeSelect, spentTypeSelect, dateSelect].forEach(sel => {
+    if (sel && !sel.__bound) {
+      sel.__bound = true;
+      sel.addEventListener('change', window.updateExportFilterVisibilities);
+    }
+  });
+
+  [phoneSearchInput, fullnameInput, userEmailInput, roleSelect, minBalanceInput, minSpentInput, dateFromInput, dateToInput].forEach(inp => {
+    if (inp && !inp.__bound) {
+      inp.__bound = true;
+      inp.addEventListener('input', window.getFilteredExportUsers);
+      inp.addEventListener('change', window.getFilteredExportUsers);
+    }
+  });
+
+  scopeRadios.forEach(r => {
+    if (r && !r.__bound) {
+      r.__bound = true;
+      r.addEventListener('change', window.getFilteredExportUsers);
+    }
+  });
+
+  if (selectAllColsBtn && !selectAllColsBtn.__bound) {
+    selectAllColsBtn.__bound = true;
+    selectAllColsBtn.addEventListener('click', () => {
+      colCheckboxes.forEach(cb => { cb.checked = true; });
+    });
+  }
+
+  if (deselectAllColsBtn && !deselectAllColsBtn.__bound) {
+    deselectAllColsBtn.__bound = true;
+    deselectAllColsBtn.addEventListener('click', () => {
+      colCheckboxes.forEach(cb => { cb.checked = false; });
+    });
+  }
+
   if (!tableBody) return;
 
   try {
     const res = await API.request('/admin/users');
     if (res.success && res.users) {
       const users = res.users;
-      let currentFilteredUsers = users;
+      window.__adminUsersList = users;
+      window.__filteredAdminUsers = users;
+
       const totalUsers = res.total !== undefined ? res.total : users.length;
       const totalBalance = users.reduce((acc, u) => acc + (parseFloat(u.balance) || 0), 0);
       const resellerCount = users.filter(u => u.role === 'reseller').length;
@@ -3775,7 +4165,7 @@ async function initAdminUsersPage() {
               </td>
               <td class="py-4 px-4 text-center relative">
                 <div class="inline-block text-left relative">
-                  <button type="button" class="user-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500" aria-label="Actions for ${escapeHtml(u.username || u.full_name || 'user')}" title="Admin Actions">
+                  <button type="button" class="user-actions-toggle p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 cursor-pointer" aria-label="Actions for ${escapeHtml(u.username || u.full_name || 'user')}" title="Admin Actions">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                     </svg>
@@ -3783,7 +4173,7 @@ async function initAdminUsersPage() {
 
                   <div class="user-actions-menu hidden absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 divide-y divide-gray-100 dark:divide-gray-700 text-left text-xs font-semibold">
                     <div class="py-1">
-                      <button type="button" class="add-funds-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                      <button type="button" class="add-funds-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -3791,7 +4181,7 @@ async function initAdminUsersPage() {
                       </button>
                     </div>
                     <div class="py-1">
-                      <button type="button" class="change-role-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center">
+                      <button type="button" class="change-role-btn w-full text-left px-3.5 py-2 text-gray-700 dark:text-gray-200 hover:bg-pink-50 hover:text-pink-600 dark:hover:bg-gray-700 transition flex items-center cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
@@ -3819,7 +4209,6 @@ async function initAdminUsersPage() {
             e.stopPropagation();
             const currentMenu = btn.nextElementSibling;
             const isHidden = currentMenu.classList.contains('hidden');
-            // Close any other open user action dropdowns
             document.querySelectorAll('.user-actions-menu').forEach(m => m.classList.add('hidden'));
             if (isHidden) {
               currentMenu.classList.remove('hidden');
@@ -4078,325 +4467,12 @@ async function initAdminUsersPage() {
           );
         }
 
-        currentFilteredUsers = filtered;
+        window.__filteredAdminUsers = filtered;
         renderTable(filtered);
+        window.getFilteredExportUsers();
       }
 
-      // ==========================================
-      // ADVANCED EXPORT USERS HANDLER
-      // ==========================================
-      const exportModal = document.getElementById('export-users-modal');
-      const openExportBtn = document.getElementById('open-export-users-modal-btn');
-      const closeExportBtn = document.getElementById('close-export-users-modal');
-      const downloadCsvBtn = document.getElementById('download-export-csv-btn');
-      const copyClipboardBtn = document.getElementById('copy-export-clipboard-btn');
-      const resetFiltersBtn = document.getElementById('reset-export-filters-btn');
-      const matchCountElem = document.getElementById('export-match-count');
-      const scopeRadios = document.querySelectorAll('input[name="export-scope"]');
-      const phoneTypeSelect = document.getElementById('export-filter-phone-type');
-      const phoneSearchInput = document.getElementById('export-filter-phone-search');
-      const fullnameInput = document.getElementById('export-filter-fullname');
-      const userEmailInput = document.getElementById('export-filter-user-email');
-      const roleSelect = document.getElementById('export-filter-role');
-      const balanceTypeSelect = document.getElementById('export-filter-balance-type');
-      const minBalanceInput = document.getElementById('export-filter-min-balance');
-      const spentTypeSelect = document.getElementById('export-filter-spent-type');
-      const minSpentInput = document.getElementById('export-filter-min-spent');
-      const dateSelect = document.getElementById('export-filter-date');
-      const dateFromInput = document.getElementById('export-filter-date-from');
-      const dateToInput = document.getElementById('export-filter-date-to');
-      const colCheckboxes = document.querySelectorAll('.export-col-checkbox');
-      const selectAllColsBtn = document.getElementById('export-select-all-cols');
-      const deselectAllColsBtn = document.getElementById('export-deselect-all-cols');
-
-      const COLUMN_MAP = {
-        id: { title: 'User ID', get: u => u.id || '' },
-        full_name: { title: 'Full Name', get: u => u.full_name || u.username || '' },
-        username: { title: 'Username', get: u => u.username || '' },
-        email: { title: 'Email Address', get: u => u.email || '' },
-        phone: { title: 'Phone Number', get: u => u.phone || '' },
-        role: { title: 'Role', get: u => (u.role || 'user').toUpperCase() },
-        balance: { title: 'Balance (GHS)', get: u => parseFloat(u.balance || 0).toFixed(2) },
-        total_spent: { title: 'Total Spent (GHS)', get: u => parseFloat(u.total_spent || 0).toFixed(2) },
-        created_at: { title: 'Registration Date', get: u => u.created_at || '' },
-        status: { title: 'Status', get: () => 'Active' }
-      };
-
-      function getSelectedExportScope() {
-        const checkedRadio = document.querySelector('input[name="export-scope"]:checked');
-        return checkedRadio ? checkedRadio.value : 'all';
-      }
-
-      function getFilteredExportUsers() {
-        const scope = getSelectedExportScope();
-        let baseList = scope === 'current' ? (currentFilteredUsers || users) : users;
-        let filtered = [...baseList];
-
-        // 1. Phone Number Filter
-        const phoneType = phoneTypeSelect ? phoneTypeSelect.value : 'all';
-        const phoneQuery = phoneSearchInput ? phoneSearchInput.value.trim().toLowerCase() : '';
-        if (phoneType === 'has_phone') {
-          filtered = filtered.filter(u => u.phone && String(u.phone).trim().length > 0);
-        } else if (phoneType === 'no_phone') {
-          filtered = filtered.filter(u => !u.phone || String(u.phone).trim().length === 0);
-        } else if (phoneType === 'search' && phoneQuery) {
-          filtered = filtered.filter(u => u.phone && String(u.phone).toLowerCase().includes(phoneQuery));
-        }
-
-        // 2. Full Name Filter
-        const nameQuery = fullnameInput ? fullnameInput.value.trim().toLowerCase() : '';
-        if (nameQuery) {
-          filtered = filtered.filter(u => (u.full_name && u.full_name.toLowerCase().includes(nameQuery)) || (u.username && u.username.toLowerCase().includes(nameQuery)));
-        }
-
-        // 3. Username / Email Filter
-        const userEmailQuery = userEmailInput ? userEmailInput.value.trim().toLowerCase() : '';
-        if (userEmailQuery) {
-          filtered = filtered.filter(u => (u.username && u.username.toLowerCase().includes(userEmailQuery)) || (u.email && u.email.toLowerCase().includes(userEmailQuery)));
-        }
-
-        // 4. Role Filter
-        const roleVal = roleSelect ? roleSelect.value : 'all';
-        if (roleVal !== 'all') {
-          filtered = filtered.filter(u => (u.role || '').toLowerCase() === roleVal.toLowerCase());
-        }
-
-        // 5. Balance Filter
-        const balType = balanceTypeSelect ? balanceTypeSelect.value : 'all';
-        const minBal = minBalanceInput ? parseFloat(minBalanceInput.value || 0) : 0;
-        if (balType === 'positive') {
-          filtered = filtered.filter(u => parseFloat(u.balance || 0) > 0);
-        } else if (balType === 'zero') {
-          filtered = filtered.filter(u => parseFloat(u.balance || 0) <= 0);
-        } else if (balType === 'min' && !isNaN(minBal)) {
-          filtered = filtered.filter(u => parseFloat(u.balance || 0) >= minBal);
-        }
-
-        // 6. Spent Filter
-        const spentType = spentTypeSelect ? spentTypeSelect.value : 'all';
-        const minSpent = minSpentInput ? parseFloat(minSpentInput.value || 0) : 0;
-        if (spentType === 'positive') {
-          filtered = filtered.filter(u => parseFloat(u.total_spent || 0) > 0);
-        } else if (spentType === 'zero') {
-          filtered = filtered.filter(u => parseFloat(u.total_spent || 0) <= 0);
-        } else if (spentType === 'min' && !isNaN(minSpent)) {
-          filtered = filtered.filter(u => parseFloat(u.total_spent || 0) >= minSpent);
-        }
-
-        // 7. Date Filter
-        const dateType = dateSelect ? dateSelect.value : 'all';
-        const now = new Date();
-        if (dateType === 'today') {
-          const todayStr = now.toISOString().substring(0, 10);
-          filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) === todayStr);
-        } else if (dateType === '7days') {
-          const pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          filtered = filtered.filter(u => u.created_at && new Date(u.created_at) >= pastDate);
-        } else if (dateType === '30days') {
-          const pastDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-          filtered = filtered.filter(u => u.created_at && new Date(u.created_at) >= pastDate);
-        } else if (dateType === 'custom') {
-          const fromVal = dateFromInput ? dateFromInput.value : '';
-          const toVal = dateToInput ? dateToInput.value : '';
-          if (fromVal) {
-            filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) >= fromVal);
-          }
-          if (toVal) {
-            filtered = filtered.filter(u => (u.created_at || '').substring(0, 10) <= toVal);
-          }
-        }
-
-        if (matchCountElem) {
-          matchCountElem.textContent = filtered.length.toLocaleString();
-        }
-
-        return filtered;
-      }
-
-      function updateExportFilterVisibilities() {
-        if (phoneSearchInput) {
-          phoneSearchInput.classList.toggle('hidden', !phoneTypeSelect || phoneTypeSelect.value !== 'search');
-        }
-        if (minBalanceInput) {
-          minBalanceInput.classList.toggle('hidden', !balanceTypeSelect || balanceTypeSelect.value !== 'min');
-        }
-        if (minSpentInput) {
-          minSpentInput.classList.toggle('hidden', !spentTypeSelect || spentTypeSelect.value !== 'min');
-        }
-        if (dateFromInput && dateToInput) {
-          const isCustom = dateSelect && dateSelect.value === 'custom';
-          dateFromInput.classList.toggle('hidden', !isCustom);
-          dateToInput.classList.toggle('hidden', !isCustom);
-        }
-        getFilteredExportUsers();
-      }
-
-      // Attach filter change listeners
-      [phoneTypeSelect, balanceTypeSelect, spentTypeSelect, dateSelect].forEach(sel => {
-        if (sel) sel.addEventListener('change', updateExportFilterVisibilities);
-      });
-
-      [phoneSearchInput, fullnameInput, userEmailInput, roleSelect, minBalanceInput, minSpentInput, dateFromInput, dateToInput].forEach(inp => {
-        if (inp) {
-          inp.addEventListener('input', getFilteredExportUsers);
-          inp.addEventListener('change', getFilteredExportUsers);
-        }
-      });
-
-      scopeRadios.forEach(r => {
-        r.addEventListener('change', getFilteredExportUsers);
-      });
-
-      if (selectAllColsBtn) {
-        selectAllColsBtn.addEventListener('click', () => {
-          colCheckboxes.forEach(cb => { cb.checked = true; });
-        });
-      }
-
-      if (deselectAllColsBtn) {
-        deselectAllColsBtn.addEventListener('click', () => {
-          colCheckboxes.forEach(cb => { cb.checked = false; });
-        });
-      }
-
-      if (resetFiltersBtn) {
-        resetFiltersBtn.addEventListener('click', () => {
-          if (phoneTypeSelect) phoneTypeSelect.value = 'all';
-          if (phoneSearchInput) { phoneSearchInput.value = ''; phoneSearchInput.classList.add('hidden'); }
-          if (fullnameInput) fullnameInput.value = '';
-          if (userEmailInput) userEmailInput.value = '';
-          if (roleSelect) roleSelect.value = 'all';
-          if (balanceTypeSelect) balanceTypeSelect.value = 'all';
-          if (minBalanceInput) { minBalanceInput.value = ''; minBalanceInput.classList.add('hidden'); }
-          if (spentTypeSelect) spentTypeSelect.value = 'all';
-          if (minSpentInput) { minSpentInput.value = ''; minSpentInput.classList.add('hidden'); }
-          if (dateSelect) dateSelect.value = 'all';
-          if (dateFromInput) { dateFromInput.value = ''; dateFromInput.classList.add('hidden'); }
-          if (dateToInput) { dateToInput.value = ''; dateToInput.classList.add('hidden'); }
-          const defaultScope = document.querySelector('input[name="export-scope"][value="all"]');
-          if (defaultScope) defaultScope.checked = true;
-          colCheckboxes.forEach(cb => { cb.checked = true; });
-          getFilteredExportUsers();
-        });
-      }
-
-      const openExportModal = () => {
-        if (!exportModal) return;
-        updateExportFilterVisibilities();
-        exportModal.classList.remove('hidden');
-      };
-
-      const closeExportModal = () => {
-        if (!exportModal) return;
-        exportModal.classList.add('hidden');
-      };
-
-      if (openExportBtn) openExportBtn.addEventListener('click', openExportModal);
-      if (closeExportBtn) closeExportBtn.addEventListener('click', closeExportModal);
-      if (exportModal) {
-        exportModal.addEventListener('click', (e) => {
-          if (e.target === exportModal) closeExportModal();
-        });
-      }
-
-      // Safe CSV formatting with RFC 4180 rules and formula injection prevention
-      function formatCsvCell(val) {
-        let str = String(val === null || val === undefined ? '' : val);
-        if (/^[=+\-@\t\r]/.test(str)) {
-          str = "'" + str;
-        }
-        if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
-          str = '"' + str.replace(/"/g, '""') + '"';
-        }
-        return str;
-      }
-
-      function getSelectedColumns() {
-        const selected = [];
-        colCheckboxes.forEach(cb => {
-          if (cb.checked && COLUMN_MAP[cb.value]) {
-            selected.push({ key: cb.value, ...COLUMN_MAP[cb.value] });
-          }
-        });
-        return selected;
-      }
-
-      // Download CSV action
-      if (downloadCsvBtn) {
-        downloadCsvBtn.addEventListener('click', () => {
-          const exportUsers = getFilteredExportUsers();
-          const selectedCols = getSelectedColumns();
-
-          if (selectedCols.length === 0) {
-            alert('Please select at least one column to include in the export.');
-            return;
-          }
-
-          if (exportUsers.length === 0) {
-            alert('No matching users found to export based on current filters.');
-            return;
-          }
-
-          const headerRow = selectedCols.map(c => formatCsvCell(c.title)).join(',');
-          const dataRows = exportUsers.map(u => {
-            return selectedCols.map(c => formatCsvCell(c.get(u))).join(',');
-          });
-
-          const csvContent = [headerRow, ...dataRows].join('\r\n');
-          const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          const timestamp = new Date().toISOString().substring(0, 10);
-          link.setAttribute('href', url);
-          link.setAttribute('download', `ghbooster-users-export-${timestamp}.csv`);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-
-          closeExportModal();
-        });
-      }
-
-      // Copy table to clipboard action (TSV formatted for direct spreadsheet paste)
-      if (copyClipboardBtn) {
-        copyClipboardBtn.addEventListener('click', async () => {
-          const exportUsers = getFilteredExportUsers();
-          const selectedCols = getSelectedColumns();
-
-          if (selectedCols.length === 0) {
-            alert('Please select at least one column to include in the export.');
-            return;
-          }
-
-          if (exportUsers.length === 0) {
-            alert('No matching users found to export based on current filters.');
-            return;
-          }
-
-          const headerRow = selectedCols.map(c => c.title).join('\t');
-          const dataRows = exportUsers.map(u => {
-            return selectedCols.map(c => String(c.get(u) || '').replace(/[\t\r\n]+/g, ' ')).join('\t');
-          });
-
-          const tsvContent = [headerRow, ...dataRows].join('\n');
-          try {
-            await navigator.clipboard.writeText(tsvContent);
-            const originalText = copyClipboardBtn.innerHTML;
-            copyClipboardBtn.innerHTML = `
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Copied! (${exportUsers.length} users)</span>
-            `;
-            setTimeout(() => {
-              copyClipboardBtn.innerHTML = originalText;
-            }, 2500);
-          } catch (err) {
-            alert('Failed to copy to clipboard. Please use the Download CSV option.');
-          }
-        });
-      }
+      window.getFilteredExportUsers();
     }
   } catch (e) {
     console.error('Failed to load admin users:', e.message);
