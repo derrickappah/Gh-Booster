@@ -27,21 +27,29 @@ try {
   console.warn('RSS Feed generation warning:', e.message);
 }
 
-[dist, publicDir].forEach(targetDir => {
-  if (!fs.existsSync(targetDir)) {
-    fs.mkdirSync(targetDir, { recursive: true });
+// Copy assets to dist (full bundle) and public (static assets only)
+if (!fs.existsSync(dist)) {
+  fs.mkdirSync(dist, { recursive: true });
+}
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
+
+// Copy to dist
+fs.readdirSync(root).forEach(file => {
+  if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'rss.xml' || file === 'llms.txt' || file === 'manifest.json' || file === 'service-worker.js' || file === 'favicon.ico' || file.endsWith('.txt')) {
+    fs.copyFileSync(path.join(root, file), path.join(dist, file));
   }
+});
+if (fs.existsSync(path.join(root, 'src'))) {
+  fs.cpSync(path.join(root, 'src'), path.join(dist, 'src'), { recursive: true });
+}
 
-  // Copy all .html files, robots.txt, sitemap.xml, rss.xml, llms.txt, manifest.json, and service-worker.js
-  fs.readdirSync(root).forEach(file => {
-    if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'rss.xml' || file === 'llms.txt' || file === 'manifest.json' || file === 'service-worker.js') {
-      fs.copyFileSync(path.join(root, file), path.join(targetDir, file));
-    }
-  });
-
-  // Copy src folder recursively
-  if (fs.existsSync(path.join(root, 'src'))) {
-    fs.cpSync(path.join(root, 'src'), path.join(targetDir, 'src'), { recursive: true });
+// Static assets only to public/ (NO duplicate HTML pages)
+const staticFilesForPublic = ['robots.txt', 'sitemap.xml', 'rss.xml', 'llms.txt', 'manifest.json', 'service-worker.js', 'favicon.ico', 'ghbooster2026indexnow.txt'];
+staticFilesForPublic.forEach(file => {
+  if (fs.existsSync(path.join(root, file))) {
+    fs.copyFileSync(path.join(root, file), path.join(publicDir, file));
   }
 });
 

@@ -1,39 +1,59 @@
 # GhBooster Robots.txt Configuration for Search & AI Indexing
 User-agent: *
-Disallow: /dashboard
 Disallow: /admin
+Disallow: /admin-
+Disallow: /dashboard
 Disallow: /api/
-Disallow: /account.html
-Disallow: /add-funds.html
-Disallow: /admin-*.html
-Disallow: /bulk-order.html
-Disallow: /child-panel.html
-Disallow: /order-detail.html
-Disallow: /orders.html
-Disallow: /tickets.html
+Disallow: /public/
+Disallow: /dist/
+Disallow: /account
+Disallow: /add-funds
+Disallow: /bulk-order
+Disallow: /order-detail
+Disallow: /orders
+Disallow: /tickets
+Disallow: /transactions
+Disallow: /referrals
 Allow: /
 
 # Googlebot Specific Rules
 User-agent: Googlebot
+Disallow: /admin
+Disallow: /admin-
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /public/
+Disallow: /dist/
+Disallow: /account
+Disallow: /add-funds
+Disallow: /bulk-order
+Disallow: /order-detail
+Disallow: /orders
+Disallow: /tickets
+Disallow: /transactions
+Disallow: /referrals
 Allow: /src/
-Allow: /public/
-Allow: /*.html$
+Allow: /
 
 # AI Search Engine Crawlers (Generative Engine Optimization)
 User-agent: GPTBot
 Allow: /
 Disallow: /admin
+Disallow: /dashboard
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin
+Disallow: /dashboard
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /admin
+Disallow: /dashboard
 
 User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://ghbooster.com/sitemap.xml
+
 

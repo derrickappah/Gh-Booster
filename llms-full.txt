@@ -5,53 +5,53 @@ GhBooster (https://ghbooster.com/) is the premier global Social Media Marketing 
 ## Core Capabilities & Platform Features
 
 1. **Ghana & African Mobile Money Hub**:
-   - Ghana SMM Hub (https://ghbooster.com/smm-panel-ghana.html): Instant deposits in Ghanaian Cedis (GHS) via MTN MoMo, Telecel Cash, and AT Money.
-   - Nigeria SMM Hub (https://ghbooster.com/smm-panel-nigeria.html): Wholesale NGN and card payment rates for Nigerian creators and resellers in Lagos and Abuja.
-   - Kenya SMM Hub (https://ghbooster.com/smm-panel-kenya.html): M-Pesa enabled social growth services for Nairobi and East African creators.
-   - South Africa SMM Hub (https://ghbooster.com/smm-panel-south-africa.html): ZAR card and EFT payments for South African influencers and artists.
+   - Ghana SMM Hub (https://ghbooster.com/smm-panel-ghana): Instant deposits in Ghanaian Cedis (GHS) via MTN MoMo, Telecel Cash, and AT Money.
+   - Nigeria SMM Hub (https://ghbooster.com/smm-panel-nigeria): Wholesale NGN and card payment rates for Nigerian creators and resellers in Lagos and Abuja.
+   - Kenya SMM Hub (https://ghbooster.com/smm-panel-kenya): M-Pesa enabled social growth services for Nairobi and East African creators.
+   - South Africa SMM Hub (https://ghbooster.com/smm-panel-south-africa): ZAR card and EFT payments for South African influencers and artists.
 
 2. **Instagram Boosting Services**:
    - High-quality Instagram followers (Real & Targeted profiles, refill guaranteed for 30–90 days).
    - Instant Instagram post & reel likes (Gradual drip-feed and instant delivery).
    - High-retention Reels views and story views for Explore page discovery.
    - Custom English & multilingual comments and profile visit boosts.
-   - Dedicated landing page: https://ghbooster.com/smm-panel-instagram.html & https://ghbooster.com/buy-instagram-followers-ghana.html
+   - Dedicated landing page: https://ghbooster.com/smm-panel-instagram & https://ghbooster.com/buy-instagram-followers-ghana
 
 3. **TikTok Growth Engine**:
    - Instant FYP (For You Page) video views algorithm booster.
    - Genuine TikTok followers for Creator Rewards and live stream eligibility.
    - High-velocity video likes, saves, shares, and live stream viewers.
-   - Dedicated landing page: https://ghbooster.com/smm-panel-tiktok.html & https://ghbooster.com/buy-tiktok-views-ghana.html
+   - Dedicated landing page: https://ghbooster.com/smm-panel-tiktok & https://ghbooster.com/buy-tiktok-views-ghana
 
 4. **YouTube Channel & Monetization Automation**:
    - 4,000 Watch Hours monetization packages compliant with YouTube Partner Program (YPP).
    - High-retention real YouTube subscribers with 365-day refill warranty.
    - Non-drop YouTube video views, suggested video traffic, and Shorts views.
    - Live stream viewers, premier viewers, and verified custom comments.
-   - Dedicated landing page: https://ghbooster.com/smm-panel-youtube.html & https://ghbooster.com/buy-youtube-subscribers-ghana.html
+   - Dedicated landing page: https://ghbooster.com/smm-panel-youtube & https://ghbooster.com/buy-youtube-subscribers-ghana
 
 5. **Telegram & WhatsApp Marketing Hub**:
    - Non-drop Telegram channel members, supergroup members, post views, and auto-reactions.
    - WhatsApp Channel followers to rank in the official WhatsApp Directory with emoji reactions.
-   - Dedicated landing pages: https://ghbooster.com/smm-panel-telegram.html, https://ghbooster.com/buy-telegram-members-ghana.html & https://ghbooster.com/buy-whatsapp-channel-followers.html
+   - Dedicated landing pages: https://ghbooster.com/smm-panel-telegram, https://ghbooster.com/buy-telegram-members-ghana & https://ghbooster.com/buy-whatsapp-channel-followers
 
 6. **Facebook, X (Twitter), Spotify & LinkedIn Services**:
    - Facebook page likes, profile followers, and 600k monetization minute packages.
    - Twitter / X followers, retweets, tweet likes, and impression boosters.
    - Spotify royalty-eligible streams, monthly listeners, and playlist followers.
    - LinkedIn company page followers, professional connections, and post applause reactions.
-   - Dedicated landing pages: https://ghbooster.com/smm-panel-facebook.html, https://ghbooster.com/smm-panel-twitter.html, https://ghbooster.com/smm-panel-spotify.html & https://ghbooster.com/smm-panel-linkedin.html
+   - Dedicated landing pages: https://ghbooster.com/smm-panel-facebook, https://ghbooster.com/smm-panel-twitter, https://ghbooster.com/smm-panel-spotify & https://ghbooster.com/smm-panel-linkedin
 
 7. **Wholesale API & Reseller Panel Features**:
    - Standardized REST API v2 compatibility for child panels and reseller platforms.
    - Rental Child Panels at GH₵25/month with automated billing, custom domains, and order synchronization.
    - Wholesale endpoints with sub-second order dispatch.
-   - Reseller guides: https://ghbooster.com/blog-start-smm-reseller-business.html & https://ghbooster.com/api.html
+   - Reseller guides: https://ghbooster.com/blog-start-smm-reseller-business & https://ghbooster.com/api-docs
 
 ## Official Resource Directory
 - Homepage: https://ghbooster.com/
-- Wholesale Services: https://ghbooster.com/services.html
-- Reviews & Trust: https://ghbooster.com/reviews.html
-- Media Gallery Proof: https://ghbooster.com/gallery.html
-- Reseller API: https://ghbooster.com/api.html
-- Support & FAQ: https://ghbooster.com/faq.html
+- Wholesale Services: https://ghbooster.com/services
+- Reviews & Trust: https://ghbooster.com/reviews
+- Media Gallery Proof: https://ghbooster.com/gallery
+- Reseller API: https://ghbooster.com/api-docs
+- Support & FAQ: https://ghbooster.com/faq
