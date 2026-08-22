@@ -1,14 +1,10 @@
 {
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "redirects": [
     {
       "source": "/api.html",
       "destination": "/api-docs",
-      "permanent": true
-    },
-    {
-      "source": "/public/:path*",
-      "destination": "/:path*",
       "permanent": true
     }
   ],

@@ -27,17 +27,13 @@ try {
   console.warn('RSS Feed generation warning:', e.message);
 }
 
-// Copy assets to dist (full bundle) and public (static assets only)
+// Copy all assets to dist (Vercel output directory)
 if (!fs.existsSync(dist)) {
   fs.mkdirSync(dist, { recursive: true });
 }
-if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir, { recursive: true });
-}
 
-// Copy to dist
 fs.readdirSync(root).forEach(file => {
-  if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'rss.xml' || file === 'llms.txt' || file === 'manifest.json' || file === 'service-worker.js' || file === 'favicon.ico' || file.endsWith('.txt')) {
+  if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'rss.xml' || file === 'llms.txt' || file === 'llms-full.txt' || file === 'manifest.json' || file === 'service-worker.js' || file === 'favicon.ico' || file.endsWith('.txt')) {
     fs.copyFileSync(path.join(root, file), path.join(dist, file));
   }
 });
@@ -45,12 +41,4 @@ if (fs.existsSync(path.join(root, 'src'))) {
   fs.cpSync(path.join(root, 'src'), path.join(dist, 'src'), { recursive: true });
 }
 
-// Static assets only to public/ (NO duplicate HTML pages)
-const staticFilesForPublic = ['robots.txt', 'sitemap.xml', 'rss.xml', 'llms.txt', 'manifest.json', 'service-worker.js', 'favicon.ico', 'ghbooster2026indexnow.txt'];
-staticFilesForPublic.forEach(file => {
-  if (fs.existsSync(path.join(root, file))) {
-    fs.copyFileSync(path.join(root, file), path.join(publicDir, file));
-  }
-});
-
-console.log('Successfully generated static assets in root, dist/, and public/');
+console.log('Successfully generated static assets in root and dist/');
