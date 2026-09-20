@@ -191,8 +191,28 @@ const pageRoutesMap = {
   '/review-ghbooster-smm': 'review-ghbooster-smm.html'
 };
 
-// Server-side protection for admin pages — redirect unauthenticated users & non-admins
+// Redirect authenticated users away from public entry and authentication pages.
+// Invalid or expired tokens are ignored so users can still reach the login page.
 const { authenticateToken } = require('./middleware/authMiddleware');
+const redirectAuthenticatedUsers = async (req, res, next) => {
+  let authenticated = false;
+  const dummyRes = {
+    status: () => dummyRes,
+    json: () => { authenticated = false; }
+  };
+
+  await authenticateToken(req, dummyRes, () => {
+    authenticated = Boolean(req.user);
+  });
+
+  if (authenticated) {
+    return res.redirect('/dashboard');
+  }
+
+  next();
+};
+
+// Server-side protection for admin pages — redirect unauthenticated users & non-admins
 const adminPageMiddleware = async (req, res, next) => {
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.startsWith('Bearer ')
@@ -224,6 +244,9 @@ const adminPageMiddleware = async (req, res, next) => {
 
 Object.entries(pageRoutesMap).forEach(([routePath, htmlFileName]) => {
   const handlers = [];
+  if (['/', '/login', '/register'].includes(routePath)) {
+    handlers.push(redirectAuthenticatedUsers);
+  }
   if (routePath.startsWith('/admin-')) {
     handlers.push(adminPageMiddleware);
   }
