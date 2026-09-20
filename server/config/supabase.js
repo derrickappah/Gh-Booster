@@ -1,12 +1,13 @@
 const { createClient } = require('@supabase/supabase-js');
 const env = require('./env');
 
-const dummyUrl = 'https://placeholder.supabase.co';
-const dummyKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy';
+const supabaseUrl = env.SUPABASE_URL;
+const supabaseAnonKey = env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabaseUrl = env.SUPABASE_URL || dummyUrl;
-const supabaseAnonKey = env.SUPABASE_ANON_KEY || dummyKey;
-const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY || dummyKey;
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+  throw new Error('Supabase server configuration is incomplete');
+}
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

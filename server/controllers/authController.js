@@ -7,15 +7,17 @@ class AuthController {
       if (result.token) {
         res.cookie('token', result.token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: 7 * 24 * 60 * 60 * 1000
+          secure: true,
+          sameSite: 'strict',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          path: '/'
         });
       }
+      const { token: _token, ...safeResult } = result;
       res.json({
         success: true,
         message: 'Account created successfully! Welcome to GhBooster.',
-        ...result
+        ...safeResult
       });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });
@@ -28,15 +30,17 @@ class AuthController {
       if (result.token) {
         res.cookie('token', result.token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: 7 * 24 * 60 * 60 * 1000
+          secure: true,
+          sameSite: 'strict',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          path: '/'
         });
       }
+      const { token: _token, ...safeResult } = result;
       res.json({
         success: true,
         message: 'Login successful',
-        ...result
+        ...safeResult
       });
     } catch (err) {
       res.status(401).json({ success: false, error: err.message });

@@ -28,7 +28,8 @@ const rssRoutes = require('./routes/rssRoutes');
 
 const app = express();
 // Trust proxy configuration for Vercel/reverse proxies. Override with TRUST_PROXY env var if needed.
-app.set('trust proxy', parseInt(process.env.TRUST_PROXY || '1', 10));
+// Trust only the first proxy hop in production; never accept arbitrary proxy headers.
+app.set('trust proxy', process.env.NODE_ENV === 'production' ? 1 : false);
 
 // Security Hardening & Compression
 app.use(helmet({
@@ -114,11 +115,10 @@ app.get(['/api/health', '/health'], (req, res) => {
   if (!process.env.JWT_SECRET) missingVars.push('JWT_SECRET');
 
   const isHealthy = missingVars.length === 0;
-  res.status(isHealthy ? 200 : 500).json({
+  res.status(isHealthy ? 200 : 503).json({
     success: isHealthy,
     status: isHealthy ? 'operational' : 'degraded',
-    message: isHealthy ? 'GhBooster Express Backend powered by Supabase PostgreSQL & Auth' : 'Missing required environment variables in server environment',
-    missing_env_vars: missingVars,
+    message: isHealthy ? 'GhBooster backend operational' : 'Service temporarily unavailable',
     timestamp: new Date().toISOString()
   });
 });

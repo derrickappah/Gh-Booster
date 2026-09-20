@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 
 const globalLimiter = rateLimit({
@@ -52,7 +53,9 @@ const apiKeyLimiter = rateLimit({
   keyGenerator: (req) => {
     // Rate limit by API key if present, otherwise by IP
     const apiKey = req.query.key || req.body?.key;
-    return apiKey || req.ip;
+    return apiKey
+      ? `api-key:${crypto.createHash('sha256').update(String(apiKey)).digest('hex')}`
+      : `ip:${req.ip}`;
   },
   message: {
     success: false,

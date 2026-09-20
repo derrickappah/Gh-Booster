@@ -16,8 +16,19 @@ async function authenticateToken(req, res, next) {
   // CSRF Defense: Require custom headers for cookie-authenticated state-changing requests
   const stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
   if (isCookieAuth && stateChangingMethods.includes(req.method.toUpperCase())) {
-    const customHeader = req.headers['x-requested-with'] || req.headers['x-csrf-token'] || req.headers['sec-fetch-site'];
-    if (!customHeader || customHeader === 'cross-site') {
+    const requestOrigin = req.headers.origin;
+    const requestReferer = req.headers.referer;
+    const allowedOrigins = new Set([
+      process.env.APP_URL,
+      'https://ghbooster.com',
+      'https://www.ghbooster.com',
+      'https://ghbooster.vercel.app',
+      ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:5000', 'http://localhost:3000'] : [])
+    ].filter(Boolean));
+    const originAllowed = requestOrigin
+      ? allowedOrigins.has(requestOrigin)
+      : (requestReferer ? [...allowedOrigins].some(origin => requestReferer.startsWith(`${origin}/`)) : false);
+    if (!originAllowed || req.headers['sec-fetch-site'] === 'cross-site') {
       return res.status(403).json({ success: false, error: 'CSRF validation failed for cookie-based request.' });
     }
   }
