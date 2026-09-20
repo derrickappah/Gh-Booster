@@ -54,10 +54,10 @@ fs.readdirSync(root).forEach(file => {
       ? 'noindex, nofollow'
       : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     if (!/<meta\s+name=["']robots["']/i.test(html)) {
-      html = html.replace(/<meta name=["']viewport["'][^>]*>/i, match => `${match}\\n  <meta name="robots" content="${robots}">`);
+      html = html.replace(/<meta name=["']viewport["'][^>]*>/i, match => `${match}\n  <meta name="robots" content="${robots}">`);
     }
     if (!/<meta\s+name=["']theme-color["']/i.test(html)) {
-      html = html.replace(/<meta name=["']viewport["'][^>]*>/i, match => `${match}\\n  <meta name="theme-color" content="#0b1220">`);
+      html = html.replace(/<meta name=["']viewport["'][^>]*>/i, match => `${match}\n  <meta name="theme-color" content="#0b1220">`);
     }
     fs.writeFileSync(destination, html);
   }
