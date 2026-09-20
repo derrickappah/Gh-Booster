@@ -120,7 +120,7 @@ class AuthService {
     };
   }
 
-  static async login({ username, password }) {
+  static async login({ username, password, remember = false }) {
     // Rate-limited at route level (authLimiter), additional account-level protection:
     // Log failed login attempt for audit trail
     const inputStr = (username || '').trim();
@@ -178,7 +178,7 @@ class AuthService {
       token_version: tokenVersion
     };
 
-    const token = generateToken(user);
+    const token = generateToken({ ...user, token_expires_in: remember ? '30d' : 'session' });
 
     // Log successful login
     try {
