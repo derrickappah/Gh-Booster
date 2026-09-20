@@ -50,6 +50,7 @@ app.use(helmet({
 }));
 
 const allowedOrigins = [
+  process.env.APP_URL,
   'https://ghbooster.com',
   'https://www.ghbooster.com',
   'https://ghbooster.vercel.app',
