@@ -53,6 +53,20 @@
       });
     })();
   </script>
+  <!-- Redirect active sessions away from registration. -->
+  <script>
+    (function () {
+      var token = localStorage.getItem('ghb_token') || sessionStorage.getItem('ghb_token');
+      if (!token) return;
+      fetch('/api/auth/me', {
+        headers: { Authorization: 'Bearer ' + token },
+        credentials: 'include',
+        cache: 'no-store'
+      }).then(function (response) {
+        if (response.ok) window.location.replace('/dashboard');
+      }).catch(function () {});
+    })();
+  </script>
   <!-- Required meta tags -->
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
