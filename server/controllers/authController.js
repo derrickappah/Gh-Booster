@@ -1,17 +1,20 @@
 const AuthService = require('../services/authService');
+const env = require('../config/env');
+
+const authCookieOptions = {
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: '/'
+};
 
 class AuthController {
   static async register(req, res, next) {
     try {
       const result = await AuthService.register(req.body);
       if (result.token) {
-        res.cookie('token', result.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          path: '/'
-        });
+        res.cookie('token', result.token, authCookieOptions);
       }
       res.json({
         success: true,
@@ -27,13 +30,7 @@ class AuthController {
     try {
       const result = await AuthService.login(req.body);
       if (result.token) {
-        res.cookie('token', result.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          path: '/'
-        });
+        res.cookie('token', result.token, authCookieOptions);
       }
       // The frontend uses the short-lived bearer token for API requests while
       // the HttpOnly cookie protects cookie-capable clients and refreshes.

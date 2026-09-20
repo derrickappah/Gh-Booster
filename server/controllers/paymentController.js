@@ -46,6 +46,15 @@ class PaymentController {
       // development (localhost) and production (Vercel / custom domain)
       // without needing to set APP_URL as an environment variable.
       const appUrl = process.env.APP_URL || 'https://ghbooster.com';
+      let parsedAppUrl;
+      try {
+        parsedAppUrl = new URL(appUrl);
+      } catch {
+        return res.status(500).json({ success: false, error: 'Payment return URL is not configured correctly.' });
+      }
+      if (parsedAppUrl.protocol !== 'https:' && process.env.NODE_ENV === 'production') {
+        return res.status(500).json({ success: false, error: 'Payment return URL must use HTTPS in production.' });
+      }
 
       const result = await MoolreService.generatePaymentLink({
         userId: req.user.id,
