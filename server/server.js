@@ -7,7 +7,7 @@ const PORT = env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📡 Backend connected to Supabase: ${env.SUPABASE_URL}`);
+  console.log('Backend connected to Supabase.');
 
   // Run initial auto-repair and expiration for pending deposits
   Promise.allSettled([

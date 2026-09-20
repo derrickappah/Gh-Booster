@@ -15,6 +15,10 @@ const env = {
 };
 
 const missingVars = [];
+if (env.NODE_ENV === 'production' && env.JWT_SECRET.length < 32) {
+  console.error('[FATAL CONFIG ERROR] JWT_SECRET must be at least 32 characters in production.');
+  process.exit(1);
+}
 if (!env.SUPABASE_URL) missingVars.push('SUPABASE_URL');
 if (!env.SUPABASE_ANON_KEY) missingVars.push('SUPABASE_ANON_KEY');
 if (!env.SUPABASE_SERVICE_ROLE_KEY) missingVars.push('SUPABASE_SERVICE_ROLE_KEY');
