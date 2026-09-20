@@ -85,8 +85,12 @@ function showToast(message, type = 'success', duration = 5000) {
 }
 
 const API = {
-  getToken: () => localStorage.getItem('ghb_token'),
-  setToken: (token) => localStorage.setItem('ghb_token', token),
+  getToken: () => localStorage.getItem('ghb_token') || sessionStorage.getItem('ghb_token'),
+  setToken: (token, remember = false) => {
+    localStorage.removeItem('ghb_token');
+    sessionStorage.removeItem('ghb_token');
+    (remember ? localStorage : sessionStorage).setItem('ghb_token', token);
+  },
   getUser: () => {
     try {
       return JSON.parse(localStorage.getItem('ghb_user'));
@@ -387,6 +391,7 @@ function initLoginPage() {
   const submitBtn = document.getElementById('login-submit-btn');
   const toggleBtn = document.getElementById('toggle-password-btn');
   const forgotLink = document.getElementById('forgot-password-link');
+  const rememberInput = form.querySelector('input[name="remember"]');
 
   if (toggleBtn && passwordInput) {
     toggleBtn.addEventListener('click', () => {
@@ -464,8 +469,9 @@ function initLoginPage() {
     }
 
     try {
-      const res = await API.request('/auth/login', 'POST', { username, password });
-      API.setToken(res.token);
+      const remember = Boolean(rememberInput && rememberInput.checked);
+      const res = await API.request('/auth/login', 'POST', { username, password, remember });
+      API.setToken(res.token, remember);
       API.setUser(res.user);
 
       const urlParams = new URLSearchParams(window.location.search);

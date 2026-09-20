@@ -24,7 +24,7 @@ function generateToken(user) {
       token_version: user.token_version !== undefined ? user.token_version : 1
     },
     env.JWT_SECRET,
-    { expiresIn: env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: user.token_expires_in === 'session' ? '1d' : (user.token_expires_in || env.JWT_EXPIRES_IN || '7d') }
   );
 }
 
