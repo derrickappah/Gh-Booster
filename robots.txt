@@ -51,9 +51,31 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /account
+Disallow: /orders
+Disallow: /order-detail
+
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /account
+Disallow: /orders
+Disallow: /order-detail
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /account
+Disallow: /orders
+Disallow: /order-detail
 
 Sitemap: https://ghbooster.com/sitemap.xml
+Host: https://ghbooster.com/
 
 
