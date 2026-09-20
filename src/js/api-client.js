@@ -122,7 +122,13 @@ const API = {
     const token = API.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const config = { method, headers };
+    const config = {
+      method,
+      headers,
+      // Keep the HttpOnly auth cookie available when the API is configured on
+      // another same-site origin; Authorization remains the compatibility path.
+      credentials: 'include'
+    };
     if (data) config.body = JSON.stringify(data);
 
     try {
