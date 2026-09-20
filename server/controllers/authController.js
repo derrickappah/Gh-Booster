@@ -13,11 +13,10 @@ class AuthController {
           path: '/'
         });
       }
-      const { token: _token, ...safeResult } = result;
       res.json({
         success: true,
         message: 'Account created successfully! Welcome to GhBooster.',
-        ...safeResult
+        ...result
       });
     } catch (err) {
       res.status(400).json({ success: false, error: err.message });
@@ -36,11 +35,12 @@ class AuthController {
           path: '/'
         });
       }
-      const { token: _token, ...safeResult } = result;
+      // The frontend uses the short-lived bearer token for API requests while
+      // the HttpOnly cookie protects cookie-capable clients and refreshes.
       res.json({
         success: true,
         message: 'Login successful',
-        ...safeResult
+        ...result
       });
     } catch (err) {
       res.status(401).json({ success: false, error: err.message });
