@@ -61,18 +61,30 @@ License: You must have a valid license from official store to legally use the th
       });
     })();
   </script>
-  <!-- Redirect active sessions away from the public landing page. -->
+  <!-- Redirect active sessions away from the public landing page before it can flash. -->
+  <style>html.auth-redirect-pending { visibility: hidden; }</style>
   <script>
     (function () {
+      var root = document.documentElement;
+      root.classList.add('auth-redirect-pending');
       var token = localStorage.getItem('ghb_token') || sessionStorage.getItem('ghb_token');
-      if (!token) return;
+      if (!token) {
+        root.classList.remove('auth-redirect-pending');
+        return;
+      }
       fetch('/api/auth/me', {
         headers: { Authorization: 'Bearer ' + token },
         credentials: 'include',
         cache: 'no-store'
       }).then(function (response) {
-        if (response.ok) window.location.replace('/dashboard');
-      }).catch(function () {});
+        if (response.ok) {
+          window.location.replace('/dashboard');
+        } else {
+          root.classList.remove('auth-redirect-pending');
+        }
+      }).catch(function () {
+        root.classList.remove('auth-redirect-pending');
+      });
     })();
   </script>
   <!-- Required meta tags -->
