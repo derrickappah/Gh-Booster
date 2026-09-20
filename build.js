@@ -5,6 +5,13 @@ const root = __dirname;
 const dist = path.join(root, 'dist');
 const publicDir = path.join(root, 'public');
 
+// Keep static pages discoverable while excluding authenticated and admin surfaces.
+const noindexPages = new Set([
+  'account.html', 'add-funds.html', 'bulk-order.html', 'dashboard.html',
+  'login.html', 'order-detail.html', 'orders.html', 'referrals.html',
+  'register.html', 'tickets.html', 'transactions.html'
+]);
+
 const { execSync } = require('child_process');
 
 // Compile Tailwind CSS & Run esbuild minification
@@ -34,7 +41,25 @@ if (!fs.existsSync(dist)) {
 
 fs.readdirSync(root).forEach(file => {
   if (file.endsWith('.html') || file === 'robots.txt' || file === 'sitemap.xml' || file === 'rss.xml' || file === 'llms.txt' || file === 'llms-full.txt' || file === 'manifest.json' || file === 'service-worker.js' || file === 'favicon.ico' || file.endsWith('.txt')) {
-    fs.copyFileSync(path.join(root, file), path.join(dist, file));
+    const source = path.join(root, file);
+    const destination = path.join(dist, file);
+    if (!file.endsWith('.html')) {
+      fs.copyFileSync(source, destination);
+      return;
+    }
+
+    let html = fs.readFileSync(source, 'utf8');
+    const isPrivate = noindexPages.has(file) || file.startsWith('admin-');
+    const robots = isPrivate
+      ? 'noindex, nofollow'
+      : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+    if (!/<meta\s+name=["']robots["']/i.test(html)) {
+      html = html.replace(/<meta name=["']viewport["'][^>]*>/i, match => `${match}\\n  <meta name="robots" content="${robots}">`);
+    }
+    if (!/<meta\s+name=["']theme-color["']/i.test(html)) {
+      html = html.replace(/<meta name=["']viewport["'][^>]*>/i, match => `${match}\\n  <meta name="theme-color" content="#0b1220">`);
+    }
+    fs.writeFileSync(destination, html);
   }
 });
 if (fs.existsSync(path.join(root, 'src'))) {

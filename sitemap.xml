@@ -160,12 +160,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
-  <url>
-    <loc>https://ghbooster.com/api-docs</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <!-- Pillar Educational Guides & Blog Cluster -->
   <url>
     <loc>https://ghbooster.com/blog</loc>
